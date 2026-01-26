@@ -1,0 +1,21 @@
+{
+  "name": "cybershop",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:user": "npm --workspace apps/user run dev",
+    "dev:admin": "npm --workspace apps/admin run dev",
+    "dev:api": "npm --workspace apps/api run dev",
+    "dev": "concurrently -n user,admin,api \"npm run dev:user\" \"npm run dev:admin\" \"npm run dev:api\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
