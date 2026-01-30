@@ -12,11 +12,11 @@ type FeaturedItem = {
 
 export default function FeaturedCategorySection() {
   return (
-    <section className="w-full bg-white">
-      <div className="w-full max-w-8xl ">
-        <div className="grid gap-4 lg:grid-cols-2">
+    <section className="w-full h-175 bg-white">
+      <div className="w-full h-full max-w-8xl ">
+        <div className="grid h-full grid-cols-2">
           {/* LEFT COLUMN */}
-          <div className="grid gap-4">
+          <div className="grid">
             {/* PS5 */}
             <FeatureCard
               item={{
@@ -26,22 +26,22 @@ export default function FeaturedCategorySection() {
                 imageSrc: "/images/PlayStation.png",
                 imageAlt: "Playstation 5",
               }}
-              className="bg-white text-black min-h-[380px] lg:min-h-[440px]"
-              imageClassName="right-0 top-0 h-full w-[42%] object-cover"
-              contentClassName="max-w-[58%]"
+              className="bg-white text-black min-h-100"
+              imageClassName="left-0 top-0 h-full w-[45%] object-cover"
+              contentClassName="ml-auto max-w-[58%] flex flex-col justify-center text-center"
             />
 
             {/* SMALL CARDS */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-2">
               <FeatureCard
                 item={{
                   title: "Apple AirPods Max",
                   description: "Computational audio. Listen, it’s powerful.",
-                  imageSrc: "/images/featured-airpods.png",
+                  imageSrc: "/images/Wireless.png",
                   imageAlt: "AirPods Max",
                 }}
-                className="bg-neutral-50 min-h-[170px]"
-                imageClassName="left-4 top-1/2 h-[85%] w-[55%] -translate-y-1/2 object-contain"
+                className="bg-neutral-100 min-h-85"
+                imageClassName="left-0 top-1/2 h-full w-[20%] -translate-y-1/2 object-contain"
                 contentClassName="ml-auto max-w-[52%] text-right"
               />
 
@@ -49,11 +49,11 @@ export default function FeaturedCategorySection() {
                 item={{
                   title: "Apple Vision Pro",
                   description: "An immersive way to experience entertainment.",
-                  imageSrc: "/images/featured-vision.png",
+                  imageSrc: "/images/VisionPro.png",
                   imageAlt: "Vision Pro",
                 }}
-                className="bg-neutral-800 text-white min-h-[170px]"
-                imageClassName="left-4 top-1/2 h-[85%] w-[55%] -translate-y-1/2 object-contain"
+                className="bg-black text-white min-h-85"
+                imageClassName="left-0 top-1/2 h-full w-[40%] -translate-y-1/2 object-contain"
                 contentClassName="ml-auto max-w-[52%] text-right"
               />
             </div>
@@ -67,11 +67,11 @@ export default function FeaturedCategorySection() {
                 "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
               ctaLabel: "Shop Now",
               ctaHref: "/products",
-              imageSrc: "/images/featured-macbook.png",
+              imageSrc: "/images/MacBookAir.png",
               imageAlt: "Macbook Air",
             }}
-            className="bg-neutral-100 min-h-[380px] lg:min-h-[440px]"
-            imageClassName="right-0 top-1/2 h-[95%] w-[52%] -translate-y-1/2 object-contain"
+            className="bg-neutral-100 min-h-100"
+            imageClassName="right-0 top-1/2 h-[90%] w-[35%] -translate-y-1/2 object-contain"
             contentClassName="max-w-[52%]"
             showCta
           />
@@ -97,7 +97,7 @@ function FeatureCard({
   return (
     <div
       className={[
-        "relative overflow-hidden rounded-xl p-6 sm:p-8",
+        "relative overflow-hidden sm:p-8",
         className,
       ].join(" ")}
     >
@@ -114,7 +114,7 @@ function FeatureCard({
 
       {/* Content */}
       <div className={["relative", contentClassName].join(" ")}>
-        <h3 className="text-2xl font-semibold leading-tight sm:text-3xl">
+        <h3 className="text-9xl font-semibold leading-tight sm:text-3xl">
           {item.title === "Macbook Air" ? (
             <>
               <span className="font-light">Macbook</span>{" "}
@@ -126,7 +126,7 @@ function FeatureCard({
         </h3>
 
         {item.description && (
-          <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+          <p className="mt-2 text-base leading-relaxed text-neutral-600">
             {item.description}
           </p>
         )}
