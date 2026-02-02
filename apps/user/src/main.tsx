@@ -1,11 +1,10 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import Header from "./components/layout/Header";
 import { BrowserRouter } from "react-router-dom";
-import Breadcrumb from "./components/layout/Breadcrumb";
+import ProductDetailPage from "./pages/product-detail/ProductDetailPage";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
-    <Breadcrumb />
+    <ProductDetailPage></ProductDetailPage>
   </BrowserRouter>,
 );
