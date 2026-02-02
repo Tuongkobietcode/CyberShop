@@ -1,11 +1,15 @@
 // import { OrderSummary } from "./pages/cart/components/OrderSummary";
-import { ShoppingCart } from "./pages/cart/components/CartList";
-// import { SelectedProductsBar } from "./pages/products/components/SortBar";
+// import { CartList } from "./pages/cart/components/CartList";
+// import { SortBar } from "./pages/products/components/SortBar";
+// import { ShippingMethodList } from "./pages/checkout/shipping/components/ShippingMethodList";
+import CartPage from "./pages/cart/CartPage";
 
 function App() {
     // return <OrderSummary />
-    return <ShoppingCart />
-    // return <SelectedProductsBar />
+    // return <CartList />
+    // return <SortBar />
+    // return <ShippingMethodList />
+    return <CartPage />
 }
 
 export default App;

@@ -9,7 +9,7 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest" },
 ];
 
-export const SelectedProductsBar: React.FC = () => {
+export const SortBar: React.FC = () => {
   const [selectedCount] = useState<number>(85);
   const [sortBy, setSortBy] = useState<SortOption>("rating");
 

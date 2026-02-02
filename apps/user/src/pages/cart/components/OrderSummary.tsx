@@ -4,7 +4,7 @@ export const OrderSummary: React.FC = () => {
   const [cardNumber, setCardNumber] = useState("");
 
   return (
-    <div className="w-full max-w-md bg-white p-6 border rounded">
+    <div className="w-full max-w-md bg-white p-6 border border-gray-300 rounded">
       <h3 className="text-xl font-semibold mb-6">Order Summary</h3>
 
       <div className="mb-5">

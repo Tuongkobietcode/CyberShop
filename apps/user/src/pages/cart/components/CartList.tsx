@@ -36,20 +36,20 @@ const initialItems: CartItem[] = [
   },
 ];
 
-export const ShoppingCart: React.FC = () => {
+export const CartList: React.FC = () => {
   const [items, setItems] = useState<CartItem[]>(initialItems);
 
   const increaseQty = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) =>
+    setItems((current) =>
+      current.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
   const decreaseQty = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) =>
+    setItems((current) =>
+      current.map((item) =>
         item.id === id && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item
@@ -58,18 +58,18 @@ export const ShoppingCart: React.FC = () => {
   };
 
   const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    setItems((current) => current.filter((item) => item.id !== id));
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white p-6">
+    <div className="w-full mx-auto bg-white p-6">
       <h2 className="text-2xl font-semibold mb-6">Shopping Cart</h2>
 
       <div className="space-y-6">
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between border-b pb-6"
+            className="flex items-center justify-between border-b border-gray-300 pb-6"
           >
             <div className="flex gap-4 items-center w-2/3">
               <img
