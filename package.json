@@ -1,7 +1,10 @@
 {
   "name": "cybershop",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,5 +20,8 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "framer-motion": "^12.29.2"
   }
 }
