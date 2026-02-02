@@ -1,10 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import FilterSidebar from "./pages/products/components/FilterSidebar";
+import AddressForm from "./pages/checkout/address/components/AddressForm";
+
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <FilterSidebar />
+    <AddressForm />
   </StrictMode>,
 );
