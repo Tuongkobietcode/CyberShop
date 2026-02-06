@@ -1,11 +1,10 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import DashboardPage from "./features/dashboard/pages/DashboardPage";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <h1 className='text-red-700 text-9xl'>
-      Hello đây là trang Admin CyberShop!
-    </h1>
+    <DashboardPage />
   </StrictMode>,
-)
+);
