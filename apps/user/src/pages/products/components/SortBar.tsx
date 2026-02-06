@@ -3,10 +3,10 @@ import React, { useState } from "react";
 type SortOption = "rating" | "price_asc" | "price_desc" | "newest";
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "rating", label: "By rating" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-  { value: "newest", label: "Newest" },
+  { value: "rating", label: "Đánh giá" },
+  { value: "price_asc", label: "Giá tăng dần" },
+  { value: "price_desc", label: "Giá giảm dần" },
+  { value: "newest", label: "Mới nhất" },
 ];
 
 export const SortBar: React.FC = () => {
@@ -16,7 +16,7 @@ export const SortBar: React.FC = () => {
   return (
     <div className="w-full rounded-sm flex items-center justify-between px-3 py-2 bg-white">
       <div className="text-sm text-gray-700">
-        <span className="font-medium">Selected Products:</span>{" "}
+        <span className="font-medium">Sản phẩm được chọn:</span>{" "}
         <span className="font-bold">{selectedCount}</span>
       </div>
 
