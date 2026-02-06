@@ -1,11 +1,12 @@
 import React from "react";
 import AddNewProductWidget from "../components/AddNewProductWidget";
-import TopProducts from "../components/TopProducts";
+import BestSellingProduct from "../components/BestSellingProduct";
+import TopProduct from "../components/TopProduct";
 
 const DashboardPage = () => {
   return (
     <div>
-      <AddNewProductWidget />
+      <TopProduct></TopProduct>
     </div>
   );
 };
