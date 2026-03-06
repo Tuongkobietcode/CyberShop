@@ -6,7 +6,7 @@ import TopProduct from "../components/TopProduct";
 const DashboardPage = () => {
   return (
     <div>
-      <TopProduct></TopProduct>
+      <AddNewProductWidget></AddNewProductWidget>
     </div>
   );
 };
