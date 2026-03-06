@@ -1,5 +1,18 @@
-import AppRoutes from "@/app/router/routes";
+// import { PaymentMethodCard } from "./features/transactions/components/PaymentMethodCard";
 
-export default function App() {
-  return <AppRoutes />;
+// import { TransactionKpiRow } from "./features/transactions/components/TransactionKpiRow";
+
+// import { TransactionToolbar } from "./features/transactions/components/TransactionsToolbar";
+
+import { TransactionsTable } from "./features/transactions/components/TransactionsTable";
+function App() {
+    // return <PaymentMethodCard />
+
+    // return <TransactionKpiRow />
+
+    // return <TransactionToolbar />
+
+    return <TransactionsTable />
 }
+
+export default App;
