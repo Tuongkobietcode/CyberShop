@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { PATHS } from "./paths";
 import AdminLayout from "@/layouts/AdminLayout/AdminLayout";
 import { CustomersListPage } from "@/features/customers/pages/CustomersListPage";
+import { CategoriesPage } from "@/features/categories/pages/CategoriesPage";
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -20,7 +21,8 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<Placeholder title="Dashboard" />} />
         <Route path="orders" element={<Placeholder title="Order Management" />} />
         <Route path="customers" element={<CustomersListPage />} />
-        <Route path="categories" element={<Placeholder title="Categories" />} />
+        <Route path="coupons" element={<Placeholder title="Coupon Code Management" />} />
+        <Route path="categories" element={<CategoriesPage />} />
         <Route path="transactions" element={<Placeholder title="Transactions" />} />
         <Route path="products">
           <Route path="new" element={<Placeholder title="Add Product" />} />
@@ -35,7 +37,8 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<Placeholder title="(DEV) Dashboard" />} />
         <Route path="orders" element={<Placeholder title="(DEV) Orders" />} />
         <Route path="customers" element={<CustomersListPage />} />
-        <Route path="categories" element={<Placeholder title="(DEV) Categories" />} />
+        <Route path="coupons" element={<Placeholder title="(DEV) Coupon Code Management" />} />
+        <Route path="categories" element={<CategoriesPage/>} />
         <Route path="transactions" element={<Placeholder title="(DEV) Transactions" />} />
         <Route path="add-product" element={<Placeholder title="(DEV) Add Product" />} />
         <Route path="admin-role" element={<Placeholder title="(DEV) Admin Role" />} />
