@@ -1,11 +1,14 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react";
 import type { CategoryItem } from "../types";
 
 type Props = {
   categories: CategoryItem[];
+  selectedId?: string;
+  onSelect?: (categoryId: string) => void;
+  onDelete?: (categoryId: string) => void;
 };
 
-export function CategoryChips({ categories }: Props) {
+export function CategoryChips({ categories, selectedId, onSelect, onDelete }: Props) {
   return (
     <div className="relative">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -13,16 +16,54 @@ export function CategoryChips({ categories }: Props) {
           <button
             key={category.id}
             type="button"
+            onClick={() => onSelect?.(category.id)}
             className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left shadow-sm transition hover:border-slate-300 hover:shadow-md"
+            aria-pressed={selectedId === category.id}
           >
             <img
               src={category.image}
               alt={category.name}
               className="h-14 w-14 rounded-xl object-cover"
             />
-            <span className="text-sm font-semibold text-slate-800">
-              {category.name}
-            </span>
+            <div className="min-w-0 flex-1">
+              <span className="text-sm font-semibold text-slate-800">
+                {category.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={[
+                  "rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]",
+                  selectedId === category.id
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-slate-100 text-slate-500",
+                ].join(" ")}
+              >
+                {selectedId === category.id ? "Editing" : "Ready"}
+              </span>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSelect?.(category.id);
+                }}
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                aria-label={`Edit ${category.name}`}
+              >
+                <Pencil size={15} />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onDelete?.(category.id);
+                }}
+                className="rounded-lg p-2 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                aria-label={`Delete ${category.name}`}
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
           </button>
         ))}
       </div>
