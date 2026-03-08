@@ -24,6 +24,7 @@ export default function AppRoutes() {
         <Route path="coupons" element={<Placeholder title="Coupon Code Management" />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="transactions" element={<Placeholder title="Transactions" />} />
+        <Route path="brand" element={<Placeholder title="Brand" />} />
         <Route path="products">
           <Route path="new" element={<Placeholder title="Add Product" />} />
         </Route>
@@ -40,7 +41,10 @@ export default function AppRoutes() {
         <Route path="coupons" element={<Placeholder title="(DEV) Coupon Code Management" />} />
         <Route path="categories" element={<CategoriesPage/>} />
         <Route path="transactions" element={<Placeholder title="(DEV) Transactions" />} />
-        <Route path="add-product" element={<Placeholder title="(DEV) Add Product" />} />
+        <Route path="brand" element={<Placeholder title="(DEV) Brand" />} />
+        <Route path="add-product">
+          <Route path="new" element={<Placeholder title="(DEV) Add Product" />} />
+        </Route>
         <Route path="admin-role" element={<Placeholder title="(DEV) Admin Role" />} />
       </Route>
 

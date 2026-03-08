@@ -188,7 +188,7 @@ export function CategoriesPage() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
           >
             <PlusCircle size={18} />
             Add Product
@@ -196,7 +196,7 @@ export function CategoriesPage() {
 
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700"
           >
             More Action
             <MoreVertical size={16} />
@@ -206,7 +206,7 @@ export function CategoriesPage() {
 
       <CategoryChips categories={categories} />
 
-      <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5">
+      <div className="space-y-4 rounded-[5px] border border-slate-200 bg-white p-5">
         <CategoriesToolbar
           active={status}
           onChange={(nextStatus) => {

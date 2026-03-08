@@ -13,7 +13,7 @@ export function CategoryChips({ categories }: Props) {
           <button
             key={category.id}
             type="button"
-            className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left shadow-sm transition hover:border-slate-300 hover:shadow-md"
+            className="flex items-center gap-4 rounded-[5px] border border-slate-200 bg-white px-4 py-4 text-left shadow-sm transition hover:border-slate-300 hover:shadow-md"
           >
             <img
               src={category.image}

@@ -18,7 +18,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
   return (
     <div
       className={[
-        "sticky top-4 flex h-[calc(100vh-32px)] flex-col rounded-3xl border p-4 transition-colors duration-300",
+        "sticky top-4 flex h-[calc(100vh-32px)] flex-col border p-4 transition-colors duration-300",
         isDark
           ? "border-slate-800 bg-[#111827] text-slate-100"
           : "border-slate-200 bg-white text-slate-900",
@@ -32,13 +32,8 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
             collapsed ? "justify-center" : "",
           ].join(" ")}
         >
-          <div className="text-[22px] font-extrabold tracking-tight text-emerald-500">
-            DEAL
-            {!collapsed && (
-              <span className={isDark ? "text-white" : "text-emerald-500"}>
-                PORT
-              </span>
-            )}
+          <div className="text-[22px] font-extrabold margin-left-10 tracking-tight text-emerald-500">
+            Cyber
           </div>
         </Link>
 
