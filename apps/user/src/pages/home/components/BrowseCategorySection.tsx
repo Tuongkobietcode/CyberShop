@@ -1,4 +1,5 @@
 import {
+  type LucideIcon,
   Camera,
   Gamepad2,
   Headphones,
@@ -6,17 +7,36 @@ import {
   Smartphone,
   Watch,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getCatalogCategories } from "@/features/catalog/catalog.service";
 
-const categories = [
-  { label: "Phones", icon: Smartphone },
-  { label: "Smart Watches", icon: Watch },
-  { label: "Cameras", icon: Camera },
-  { label: "Headphones", icon: Headphones },
-  { label: "Computers", icon: Laptop2 },
-  { label: "Gaming", icon: Gamepad2 },
-];
+const categoryIconMap: Record<string, LucideIcon> = {
+  phones: Smartphone,
+  "smart-watches": Watch,
+  cameras: Camera,
+  headphones: Headphones,
+  computers: Laptop2,
+  gaming: Gamepad2,
+};
 
 export default function BrowseCategorySection() {
+  const [categories, setCategories] = useState<Array<{ label: string; slug: string; icon: LucideIcon }>>([]);
+
+  useEffect(() => {
+    async function loadCategories() {
+      const response = await getCatalogCategories({ limit: 6 });
+      setCategories(
+        response.data.map((item) => ({
+          label: item.name,
+          slug: item.slug,
+          icon: categoryIconMap[item.slug] || Smartphone,
+        }))
+      );
+    }
+
+    loadCategories();
+  }, []);
+
   return (
     <section className="bg-[#f1f1f1] py-14">
       <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-10 2xl:px-16">

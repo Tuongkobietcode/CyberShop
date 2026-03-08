@@ -10,7 +10,9 @@
     "seed:admin": "node src/scripts/seed-admin.js",
     "seed:categories": "node src/scripts/seed-categories.js",
     "seed:products": "node src/scripts/seed-products.js",
-    "seed:demo": "npm run seed:admin && npm run seed:categories && npm run seed:products"
+    "seed:customers": "node src/scripts/seed-customers.js",
+    "seed:orders": "node src/scripts/seed-orders.js",
+    "seed:demo": "npm run seed:admin && npm run seed:categories && npm run seed:products && npm run seed:customers && npm run seed:orders"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

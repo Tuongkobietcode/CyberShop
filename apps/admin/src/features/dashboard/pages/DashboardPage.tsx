@@ -27,11 +27,19 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center text-sm text-slate-500">Loading dashboard...</div>;
+    return (
+      <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center text-sm text-slate-500">
+        Loading dashboard...
+      </div>
+    );
   }
 
   if (!summary) {
-    return <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-10 text-center text-sm text-red-600">Dashboard data is unavailable.</div>;
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-10 text-center text-sm text-red-600">
+        Dashboard data is unavailable.
+      </div>
+    );
   }
 
   return (
@@ -46,6 +54,17 @@ export default function DashboardPage() {
         <StatCard title="Orders" value={String(summary.overview.totalOrders)} subtitle="All time" />
         <StatCard title="Customers" value={String(summary.overview.totalCustomers)} subtitle="Registered" />
         <StatCard title="Pending Orders" value={String(summary.overview.pendingOrders)} subtitle="Needs action" />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard title="Products" value={String(summary.overview.totalProducts)} subtitle="Catalog items" />
+        <StatCard title="Categories" value={String(summary.overview.totalCategories)} subtitle="Live on storefront" />
+        <StatCard title="New Customers" value={String(summary.overview.newCustomersLast30Days)} subtitle="Last 30 days" />
+        <StatCard
+          title="Avg Order Value"
+          value={formatMoney(summary.overview.totalOrders ? Math.round(summary.overview.totalRevenue / summary.overview.totalOrders) : 0)}
+          subtitle="Estimated"
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_0.9fr]">
@@ -85,6 +104,20 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <h2 className="text-lg font-semibold text-slate-900">Revenue Timeline</h2>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {summary.recentRevenue.map((point) => (
+            <div key={point._id} className="rounded-2xl border border-slate-100 px-4 py-3">
+              <p className="text-sm font-medium text-slate-900">{point._id}</p>
+              <p className="mt-1 text-sm text-slate-500">{formatMoney(point.revenue)}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

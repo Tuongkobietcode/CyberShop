@@ -20,10 +20,19 @@ const allowedOrigins = new Set(
   ].filter(Boolean)
 );
 
+function isAllowedLocalOrigin(origin) {
+  try {
+    const url = new URL(origin);
+    return ["localhost", "127.0.0.1"].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.has(origin)) {
+      if (!origin || allowedOrigins.has(origin) || isAllowedLocalOrigin(origin)) {
         callback(null, true);
         return;
       }

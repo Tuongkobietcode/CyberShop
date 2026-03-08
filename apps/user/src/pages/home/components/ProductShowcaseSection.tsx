@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { getCatalogProducts } from "@/features/catalog/catalog.service";
+import type { CatalogProduct } from "@/features/catalog/catalog.types";
 
 type Product = {
   title: string;
@@ -14,24 +17,6 @@ type PromoBlock = {
   image: string;
   dark?: boolean;
 };
-
-const newArrivals: Product[] = [
-  { title: "Apple iPhone 14 Pro Max 128GB Deep Purple", price: "$900", image: "/images/iphone.png" },
-  { title: "Blackmagic Pocket Cinema Camera 6k", price: "$2535", image: "/images/image 64.png" },
-  { title: "Apple Watch Series 9 GPS 41mm", price: "$399", image: "/images/applewatch.png" },
-  { title: "AirPods Max Silver Starlight Aluminum", price: "$549", image: "/images/airpodmaxsilver.png" },
-  { title: "Samsung Galaxy Watch 6 Classic", price: "$369", image: "/images/Group 1.png" },
-  { title: "Galaxy Z Fold5 Unlocked", price: "$1799", image: "/images/Iphone 14 pro 1 (4).png", favorite: true },
-  { title: "Galaxy Buds FE Graphite", price: "$99.99", image: "/images/in ear.png" },
-  { title: "Apple iPad 10.9 64GB Wi-Fi", price: "$398", image: "/images/ipad.png" },
-];
-
-const discountProducts: Product[] = [
-  { title: "Apple iPhone 14 Pro 512GB Gold", price: "$1437", image: "/images/iphone14progold.png" },
-  { title: "AirPods Max Silver", price: "$549", image: "/images/airpodmaxsilver.png" },
-  { title: "Apple Watch Series 9 GPS", price: "$399", image: "/images/applewatch.png" },
-  { title: "Apple iPhone 14 Pro 1TB Gold", price: "$1499", image: "/images/Iphone 14 pro 1 (3).png" },
-];
 
 const promos: PromoBlock[] = [
   {
@@ -127,6 +112,19 @@ function ProductGrid({
       </div>
     </section>
   );
+}
+
+function formatMoney(value: number) {
+  return `$${value.toLocaleString("en-US")}`;
+}
+
+function mapProducts(products: CatalogProduct[], favoriteIndex = -1): Product[] {
+  return products.map((product, index) => ({
+    title: product.name,
+    price: formatMoney(product.price),
+    image: product.image,
+    favorite: index === favoriteIndex,
+  }));
 }
 
 function PromoStrip() {
@@ -228,6 +226,23 @@ function BigBanner() {
 }
 
 export default function ProductShowcaseSection() {
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await getCatalogProducts({ limit: 8 });
+      setProducts(response.data);
+    }
+
+    loadProducts();
+  }, []);
+
+  const newArrivals = useMemo(() => mapProducts(products.slice(0, 8), 5), [products]);
+  const discountProducts = useMemo(
+    () => mapProducts(products.filter((item) => item.compareAtPrice).slice(0, 4)),
+    [products]
+  );
+
   return (
     <>
       <ProductGrid title="New Arrival" products={newArrivals} />

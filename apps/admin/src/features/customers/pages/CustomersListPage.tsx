@@ -33,6 +33,7 @@ export function CustomersListPage() {
             orderCount: customer.orderCount,
             totalSpend: customer.totalSpend,
             status: customer.status,
+            createdAt: customer.createdAt,
           }))
         );
       } finally {
@@ -51,6 +52,9 @@ export function CustomersListPage() {
   const activeCount = allRows.filter((item) => item.status === "active").length;
   const vipCount = allRows.filter((item) => item.status === "vip").length;
   const totalSpend = allRows.reduce((sum, item) => sum + item.totalSpend, 0);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const newCustomers = allRows.filter((item) => new Date(item.createdAt) >= thirtyDaysAgo).length;
   const avgOrders =
     allRows.length > 0
       ? allRows.reduce((sum, item) => sum + item.orderCount, 0) / allRows.length
@@ -59,7 +63,7 @@ export function CustomersListPage() {
   const kpi: CustomersKpi = {
     totalCustomers: allRows.length,
     totalCustomersChangePct: 0,
-    newCustomers: allRows.length,
+    newCustomers,
     newCustomersChangePct: 0,
     visitors: totalSpend,
     visitorsChangePct: 0,
@@ -68,7 +72,7 @@ export function CustomersListPage() {
   const metrics: CustomerOverviewMetric[] = [
     { label: "Active Customers", value: String(activeCount) },
     { label: "VIP Customers", value: String(vipCount) },
-    { label: "Total Spend", value: totalSpend.toLocaleString() },
+    { label: "Total Spend", value: totalSpend.toLocaleString("vi-VN") },
     { label: "Avg Orders", value: avgOrders.toFixed(1) },
   ];
 

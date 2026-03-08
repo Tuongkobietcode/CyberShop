@@ -50,7 +50,7 @@ function sanitizeProduct(product) {
   };
 }
 
-function buildProductFilter(query, options = {}) {
+async function buildProductFilter(query, options = {}) {
   const filter = {};
   const search = String(query.search || "").trim();
   const category = String(query.category || "").trim();
@@ -66,7 +66,12 @@ function buildProductFilter(query, options = {}) {
   }
 
   if (category) {
-    filter.categoryId = category;
+    if (/^[a-f\d]{24}$/i.test(category)) {
+      filter.categoryId = category;
+    } else {
+      const matchedCategory = await Category.findOne({ slug: category }).select("_id");
+      filter.categoryId = matchedCategory ? matchedCategory._id : null;
+    }
   }
 
   if (featured !== undefined) {
@@ -119,7 +124,7 @@ async function ensureCategoryExists(categoryId) {
 
 export const listProducts = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
-  const filter = buildProductFilter(req.query, { publicOnly: true });
+  const filter = await buildProductFilter(req.query, { publicOnly: true });
   const sort = buildProductSort(req.query);
 
   const [items, total] = await Promise.all([
@@ -158,7 +163,7 @@ export const getProductDetail = asyncHandler(async (req, res) => {
 
 export const listAdminProducts = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
-  const filter = buildProductFilter(req.query);
+  const filter = await buildProductFilter(req.query);
   const sort = buildProductSort(req.query);
 
   const [items, total] = await Promise.all([

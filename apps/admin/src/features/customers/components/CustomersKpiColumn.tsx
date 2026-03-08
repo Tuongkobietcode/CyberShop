@@ -17,20 +17,20 @@ export function CustomersKpiColumn({ kpi }: Props) {
       <StatCard
         title="Total Customers"
         value={kpi.totalCustomers.toLocaleString()}
-        changeText={`↑ ${kpi.totalCustomersChangePct}%`}
-        subtitle="Last 7 days"
+        changeText={`+${kpi.totalCustomersChangePct}%`}
+        subtitle="Current base"
       />
       <StatCard
         title="New Customers"
         value={kpi.newCustomers.toLocaleString()}
-        changeText={`↑ ${kpi.newCustomersChangePct}%`}
-        subtitle="Last 7 days"
+        changeText={`+${kpi.newCustomersChangePct}%`}
+        subtitle="Last 30 days"
       />
       <StatCard
-        title="Visitor"
+        title="Revenue"
         value={formatCompact(kpi.visitors)}
-        changeText={`↑ ${kpi.visitorsChangePct}%`}
-        subtitle="Last 7 days"
+        changeText={`+${kpi.visitorsChangePct}%`}
+        subtitle="Customer spend"
       />
     </div>
   );

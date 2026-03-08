@@ -31,9 +31,11 @@ export function CategoriesPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [categoryForm, setCategoryForm] = useState({
     name: "",
+    slug: "",
     image: "",
     description: "",
     sortOrder: "1",
+    isActive: true,
   });
 
   const pageSize = 10;
@@ -52,9 +54,12 @@ export function CategoriesPage() {
         categoryResponse.data.map((item) => ({
           id: item.id,
           name: item.name,
+          slug: item.slug,
           image:
             item.image ||
             "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=80",
+          isActive: item.isActive,
+          productCount: productResponse.data.filter((product) => product.category?.id === item.id).length,
         }))
       );
 
@@ -105,9 +110,11 @@ export function CategoriesPage() {
     setSelectedCategoryId("");
     setCategoryForm({
       name: "",
+      slug: "",
       image: "",
       description: "",
       sortOrder: String(categoryRecords.length + 1),
+      isActive: true,
     });
   }
 
@@ -121,9 +128,11 @@ export function CategoriesPage() {
     setSelectedCategoryId(category.id);
     setCategoryForm({
       name: category.name,
+      slug: category.slug,
       image: category.image,
       description: category.description,
       sortOrder: String(category.sortOrder),
+      isActive: category.isActive,
     });
   }
 
@@ -141,9 +150,11 @@ export function CategoriesPage() {
     try {
       const payload = {
         name: categoryForm.name,
+        slug: categoryForm.slug,
         image: categoryForm.image,
         description: categoryForm.description,
         sortOrder: Number(categoryForm.sortOrder) || 0,
+        isActive: categoryForm.isActive,
       };
 
       if (selectedCategoryId) {
@@ -218,6 +229,13 @@ export function CategoriesPage() {
             }
           />
           <Input
+            placeholder="Slug used by user app"
+            value={categoryForm.slug}
+            onChange={(event) =>
+              setCategoryForm((current) => ({ ...current, slug: event.target.value }))
+            }
+          />
+          <Input
             placeholder="Image URL"
             value={categoryForm.image}
             onChange={(event) =>
@@ -235,6 +253,20 @@ export function CategoriesPage() {
           <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
             Categories: {categoryRecords.length}
           </div>
+          <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={categoryForm.isActive}
+              onChange={(event) =>
+                setCategoryForm((current) => ({
+                  ...current,
+                  isActive: event.target.checked,
+                }))
+              }
+              className="h-4 w-4 rounded border-slate-300"
+            />
+            Visible on user storefront
+          </label>
           <textarea
             value={categoryForm.description}
             onChange={(event) =>
@@ -255,6 +287,25 @@ export function CategoriesPage() {
                   : "Create Category"}
             </Button>
           </div>
+          {categoryForm.image ? (
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <img
+                  src={categoryForm.image}
+                  alt={categoryForm.name || "Category preview"}
+                  className="h-16 w-16 rounded-2xl object-cover"
+                />
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    {categoryForm.name || "Category preview"}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {categoryForm.slug || "slug-will-be-generated"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 

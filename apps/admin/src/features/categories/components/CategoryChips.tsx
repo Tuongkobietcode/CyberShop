@@ -26,20 +26,23 @@ export function CategoryChips({ categories, selectedId, onSelect, onDelete }: Pr
               className="h-14 w-14 rounded-xl object-cover"
             />
             <div className="min-w-0 flex-1">
-              <span className="text-sm font-semibold text-slate-800">
-                {category.name}
-              </span>
+              <p className="truncate text-sm font-semibold text-slate-800">{category.name}</p>
+              <p className="mt-1 truncate text-xs text-slate-400">
+                /{category.slug} · {category.productCount} products
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className={[
                   "rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]",
-                  selectedId === category.id
+                  !category.isActive
+                    ? "bg-amber-100 text-amber-700"
+                    : selectedId === category.id
                     ? "bg-emerald-100 text-emerald-700"
                     : "bg-slate-100 text-slate-500",
                 ].join(" ")}
               >
-                {selectedId === category.id ? "Editing" : "Ready"}
+                {!category.isActive ? "Hidden" : selectedId === category.id ? "Editing" : "Live"}
               </span>
               <button
                 type="button"

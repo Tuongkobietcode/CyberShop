@@ -9,6 +9,7 @@ function formatMoney(value: number) {
 export default function OrdersListPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState("");
 
   async function loadOrders() {
     setLoading(true);
@@ -26,11 +27,28 @@ export default function OrdersListPage() {
   }, []);
 
   async function handleConfirm(orderId: string) {
-    await updateAdminOrderStatus(orderId, {
-      orderStatus: "confirmed",
-      paymentStatus: "paid",
-    });
-    await loadOrders();
+    setUpdatingId(orderId);
+    try {
+      await updateAdminOrderStatus(orderId, {
+        orderStatus: "confirmed",
+        paymentStatus: "paid",
+      });
+      await loadOrders();
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
+  async function handleShip(orderId: string) {
+    setUpdatingId(orderId);
+    try {
+      await updateAdminOrderStatus(orderId, {
+        orderStatus: "shipping",
+      });
+      await loadOrders();
+    } finally {
+      setUpdatingId("");
+    }
   }
 
   return (
@@ -50,23 +68,42 @@ export default function OrdersListPage() {
           ) : (
             <div className="space-y-3">
               {orders.map((order) => (
-                <div key={order.id} className="flex flex-col gap-3 rounded-2xl border border-slate-100 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <div
+                  key={order.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-slate-100 px-4 py-4 lg:flex-row lg:items-center lg:justify-between"
+                >
                   <div>
                     <p className="font-medium text-slate-900">{order.orderCode}</p>
-                    <p className="text-sm text-slate-500">{order.customerName} · {order.customerPhone}</p>
+                    <p className="text-sm text-slate-500">
+                      {order.customerName} · {order.customerPhone}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {new Date(order.createdAt).toLocaleString()}
+                    </p>
                   </div>
                   <div className="grid gap-1 text-sm text-slate-600 lg:text-right">
                     <p>Status: {order.orderStatus}</p>
-                    <p>Payment: {order.paymentStatus}</p>
+                    <p>Payment: {order.paymentStatus} · {order.paymentMethod}</p>
                     <p>Total: {formatMoney(order.totalAmount)}</p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleConfirm(order.id)}
-                    className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-                  >
-                    Mark Confirmed
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleConfirm(order.id)}
+                      disabled={updatingId === order.id}
+                      className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {updatingId === order.id ? "Updating..." : "Mark Confirmed"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleShip(order.id)}
+                      disabled={updatingId === order.id}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Ship
+                    </button>
+                  </div>
                 </div>
               ))}
 

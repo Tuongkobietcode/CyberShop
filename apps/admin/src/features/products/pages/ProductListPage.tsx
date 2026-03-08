@@ -30,6 +30,8 @@ export default function ProductListPage() {
     categoryId: "",
     description: "",
     image: "",
+    featured: false,
+    status: "active",
   });
 
   async function loadProducts() {
@@ -63,6 +65,8 @@ export default function ProductListPage() {
       categoryId: categories[0]?.id || "",
       description: "",
       image: "",
+      featured: false,
+      status: "active",
     });
   }
 
@@ -77,6 +81,8 @@ export default function ProductListPage() {
       categoryId: product.category?.id || "",
       description: product.description,
       image: product.image,
+      featured: product.featured,
+      status: product.status,
     });
   }
 
@@ -105,7 +111,8 @@ export default function ProductListPage() {
         categoryId: form.categoryId,
         description: form.description,
         images: form.image ? [{ url: form.image, alt: form.name, sortOrder: 0 }] : [],
-        status: "active",
+        status: form.status,
+        featured: form.featured,
       });
       resetForm();
       await loadProducts();
@@ -190,6 +197,29 @@ export default function ProductListPage() {
               </option>
             ))}
           </select>
+          <select
+            value={form.status}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, status: event.target.value }))
+            }
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900"
+          >
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+            <option value="out_of_stock">Out of stock</option>
+            <option value="archived">Archived</option>
+          </select>
+          <label className="md:col-span-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, featured: event.target.checked }))
+              }
+              className="h-4 w-4 rounded border-slate-300"
+            />
+            Mark as featured on user-facing lists
+          </label>
           <Input
             className="md:col-span-2"
             placeholder="Image URL"
@@ -209,6 +239,25 @@ export default function ProductListPage() {
               {saving ? "Saving..." : "Update Product"}
             </Button>
           </div>
+          {form.image ? (
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <img
+                  src={form.image}
+                  alt={form.name || "Product preview"}
+                  className="h-20 w-20 rounded-2xl object-cover"
+                />
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    {form.name || "Product preview"}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {form.status} · {form.featured ? "featured" : "standard"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -231,13 +280,16 @@ export default function ProductListPage() {
                     />
                     <div>
                       <p className="font-medium text-slate-900">{product.name}</p>
-                      <p className="text-sm text-slate-500">{product.category?.name || "No category"} · SKU {product.sku}</p>
+                      <p className="text-sm text-slate-500">
+                        {product.category?.name || "No category"} · SKU {product.sku}
+                      </p>
                     </div>
                   </div>
                   <div className="grid gap-1 text-sm text-slate-600 lg:text-right">
                     <p>Price: {formatMoney(product.price)}</p>
                     <p>Stock: {product.stock}</p>
-                    <p>Status: {product.displayStatus}</p>
+                    <p>Status: {product.status}</p>
+                    <p>Storefront: {product.featured ? "featured" : product.displayStatus}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button

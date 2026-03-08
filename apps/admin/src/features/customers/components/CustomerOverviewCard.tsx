@@ -16,7 +16,6 @@ export function CustomerOverviewCard({
 }: Props) {
   const [range, setRange] = useState<"this_week" | "last_week">("this_week");
 
-  // demo: range switch chỉ đổi nhẹ data để thấy tương tác
   const chartPoints = useMemo(() => {
     if (range === "this_week") return points;
     return points.map((p) => ({ ...p, value: Math.max(0, Math.round(p.value * 0.9)) }));
@@ -52,7 +51,6 @@ export function CustomerOverviewCard({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* metrics row */}
         <div className="grid grid-cols-4 gap-4">
           {metrics.map((m) => (
             <div key={m.label} className="border-b border-slate-100 pb-2">
@@ -62,7 +60,6 @@ export function CustomerOverviewCard({
           ))}
         </div>
 
-        {/* chart (simple SVG line + filled area) */}
         <div className="rounded-xl bg-linear-to-b from-emerald-50 to-white p-3">
           <SimpleAreaChart points={chartPoints} max={max} />
           <div className="mt-3 flex justify-between text-xs text-slate-500">
@@ -93,15 +90,12 @@ function SimpleAreaChart({ points, max }: { points: CustomerOverviewPoint[]; max
     .map((x, i) => `${i === 0 ? "M" : "L"} ${x} ${ys[i]}`)
     .join(" ");
 
-  const pathArea = `${pathLine} L ${xs[xs.length - 1]} ${h - pad} L ${xs[0]} ${
-    h - pad
-  } Z`;
+  const pathArea = `${pathLine} L ${xs[xs.length - 1]} ${h - pad} L ${xs[0]} ${h - pad} Z`;
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="h-56 w-full">
       <path d={pathArea} fill="rgba(16,185,129,0.15)" />
       <path d={pathLine} fill="none" stroke="rgba(16,185,129,0.9)" strokeWidth="3" />
-      {/* dot on Wed like UI */}
       {points.map((p, i) =>
         p.day === "Wed" ? (
           <g key={p.day}>

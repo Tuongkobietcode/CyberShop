@@ -24,6 +24,8 @@ export default function ProductCreatePage() {
     categoryId: "",
     description: "",
     image: "",
+    featured: false,
+    status: "active",
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -53,8 +55,8 @@ export default function ProductCreatePage() {
         price: Number(form.price),
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : null,
         stock: Number(form.stock),
-        status: "active",
-        featured: true,
+        status: form.status,
+        featured: form.featured,
         categoryId: form.categoryId,
         images: form.image ? [{ url: form.image, alt: form.name, sortOrder: 0 }] : [],
       });
@@ -94,6 +96,24 @@ export default function ProductCreatePage() {
                 </option>
               ))}
             </select>
+            <select
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900"
+            >
+              <option value="active">Active</option>
+              <option value="draft">Draft</option>
+              <option value="out_of_stock">Out of stock</option>
+            </select>
+            <label className="md:col-span-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={form.featured}
+                onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                className="h-4 w-4 rounded border-slate-300"
+              />
+              Show as featured on user-facing lists
+            </label>
             <Input
               className="md:col-span-2"
               placeholder="Image URL"
@@ -111,6 +131,23 @@ export default function ProductCreatePage() {
                 {submitting ? "Creating..." : "Create Product"}
               </Button>
             </div>
+            {form.image ? (
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <img
+                    src={form.image}
+                    alt={form.name || "Product preview"}
+                    className="h-20 w-20 rounded-2xl object-cover"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">
+                      {form.name || "Product preview"}
+                    </p>
+                    <p className="text-xs text-slate-500">Visible in user catalog after save</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
