@@ -1,171 +1,94 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { MoreVertical, PlusCircle } from "lucide-react";
 import { Pagination } from "@/components/data-display/Pagination";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { CategoryChips } from "../components/CategoryChips";
 import { CategoriesTable } from "../components/CategoriesTable";
 import { CategoriesToolbar } from "../components/CategoriesToolbar";
 import type { CategoryItem, ProductItem, ProductStatus } from "../types";
+import {
+  createAdminCategory,
+  deleteAdminCategory,
+  getAdminCategories,
+  updateAdminCategory,
+  type AdminCategory,
+} from "../api/categories.api";
+import { getAdminProducts } from "@/features/products/api/products.api";
 
 export function CategoriesPage() {
-  const categories: CategoryItem[] = [
-    {
-      id: "1",
-      name: "Electronics",
-      image:
-        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=80",
-    },
-    {
-      id: "2",
-      name: "Fashion",
-      image:
-        "https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&q=80",
-    },
-    {
-      id: "3",
-      name: "Accessories",
-      image:
-        "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=200&q=80",
-    },
-    {
-      id: "4",
-      name: "Home & Kitchen",
-      image:
-        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=200&q=80",
-    },
-    {
-      id: "5",
-      name: "Sports & Outdoors",
-      image:
-        "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=200&q=80",
-    },
-    {
-      id: "6",
-      name: "Toys & Games",
-      image:
-        "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=200&q=80",
-    },
-    {
-      id: "7",
-      name: "Health & Fitness",
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=200&q=80",
-    },
-    {
-      id: "8",
-      name: "Books",
-      image:
-        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=200&q=80",
-    },
-  ];
-
-  const allRows: ProductItem[] = [
-    {
-      id: "1",
-      name: "Wireless Bluetooth Headphones",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 25,
-      status: "featured",
-    },
-    {
-      id: "2",
-      name: "Men's T-Shirt",
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 20,
-      status: "normal",
-    },
-    {
-      id: "3",
-      name: "Men's Leather Wallet",
-      image:
-        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 35,
-      status: "sale",
-    },
-    {
-      id: "4",
-      name: "Memory Foam Pillow",
-      image:
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 40,
-      status: "featured",
-    },
-    {
-      id: "5",
-      name: "Coffee Maker",
-      image:
-        "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 45,
-      status: "normal",
-    },
-    {
-      id: "6",
-      name: "Casual Baseball Cap",
-      image:
-        "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 55,
-      status: "sale",
-    },
-    {
-      id: "7",
-      name: "Full HD Webcam",
-      image:
-        "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 20,
-      status: "out_of_stock",
-    },
-    {
-      id: "8",
-      name: "Smart LED Color Bulb",
-      image:
-        "https://images.unsplash.com/photo-1550985616-10810253b84d?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 16,
-      status: "featured",
-    },
-    {
-      id: "9",
-      name: "Desk Lamp Minimal",
-      image:
-        "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 10,
-      status: "normal",
-    },
-    {
-      id: "10",
-      name: "Travel Backpack",
-      image:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80",
-      createdDate: "01-01-2025",
-      order: 35,
-      status: "sale",
-    },
-  ];
-
   const [status, setStatus] = useState<ProductStatus>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categoryRecords, setCategoryRecords] = useState<AdminCategory[]>([]);
+  const [allRows, setAllRows] = useState<ProductItem[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [categoryForm, setCategoryForm] = useState({
+    name: "",
+    image: "",
+    description: "",
+    sortOrder: "1",
+  });
 
   const pageSize = 10;
-  const totalPages = 24;
+
+  async function loadData() {
+    setLoading(true);
+
+    try {
+      const [categoryResponse, productResponse] = await Promise.all([
+        getAdminCategories({ limit: 20 }),
+        getAdminProducts({ limit: 100 }),
+      ]);
+
+      setCategoryRecords(categoryResponse.data);
+      setCategories(
+        categoryResponse.data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          image:
+            item.image ||
+            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=80",
+        }))
+      );
+
+      setAllRows(
+        productResponse.data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          image:
+            item.image ||
+            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=80",
+          createdDate: new Date(item.createdAt).toLocaleDateString(),
+          order: item.stock,
+          status:
+            item.displayStatus === "featured" ||
+            item.displayStatus === "sale" ||
+            item.displayStatus === "out_of_stock"
+              ? item.displayStatus
+              : "normal",
+        }))
+      );
+      setTotalProducts(productResponse.meta?.total || productResponse.data.length);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const filteredRows = useMemo(() => {
     return allRows.filter((row) => {
-      const matchSearch = row.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      const matchStatus =
-        status === "all" ? true : row.status === status;
+      const matchSearch = row.name.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = status === "all" ? true : row.status === status;
 
       return matchSearch && matchStatus;
     });
@@ -176,23 +99,88 @@ export function CategoriesPage() {
     return filteredRows.slice(start, start + pageSize);
   }, [filteredRows, page]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+
+  function resetCategoryForm() {
+    setSelectedCategoryId("");
+    setCategoryForm({
+      name: "",
+      image: "",
+      description: "",
+      sortOrder: String(categoryRecords.length + 1),
+    });
+  }
+
+  function handleSelectCategory(categoryId: string) {
+    const category = categoryRecords.find((item) => item.id === categoryId);
+
+    if (!category) {
+      return;
+    }
+
+    setSelectedCategoryId(category.id);
+    setCategoryForm({
+      name: category.name,
+      image: category.image,
+      description: category.description,
+      sortOrder: String(category.sortOrder),
+    });
+  }
+
+  async function handleDeleteCategory(categoryId: string) {
+    await deleteAdminCategory(categoryId);
+    if (selectedCategoryId === categoryId) {
+      resetCategoryForm();
+    }
+    await loadData();
+  }
+
+  async function handleSubmitCategory() {
+    setSavingCategory(true);
+
+    try {
+      const payload = {
+        name: categoryForm.name,
+        image: categoryForm.image,
+        description: categoryForm.description,
+        sortOrder: Number(categoryForm.sortOrder) || 0,
+      };
+
+      if (selectedCategoryId) {
+        await updateAdminCategory(selectedCategoryId, payload);
+      } else {
+        await createAdminCategory(payload);
+      }
+
+      resetCategoryForm();
+      await loadData();
+    } finally {
+      setSavingCategory(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Discover
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Discover</h1>
+          <p className="mt-1 text-sm text-slate-500">Categories and products are now loaded from the backend.</p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
+<<<<<<< HEAD
           <button
             type="button"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+=======
+          <Link
+            to="/admin/products/new"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+>>>>>>> 58f47076a970edb60a021f1a2ecf97bd030524d2
           >
             <PlusCircle size={18} />
             Add Product
-          </button>
+          </Link>
 
           <button
             type="button"
@@ -204,7 +192,77 @@ export function CategoriesPage() {
         </div>
       </div>
 
-      <CategoryChips categories={categories} />
+      <CategoryChips
+        categories={categories}
+        selectedId={selectedCategoryId}
+        onSelect={handleSelectCategory}
+        onDelete={handleDeleteCategory}
+      />
+
+      <Card className="rounded-3xl">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              {selectedCategoryId ? "Edit Category" : "Create Category"}
+            </h2>
+            <p className="text-sm text-slate-500">
+              Basic category CRUD styled to match the current admin UI.
+            </p>
+          </div>
+          {selectedCategoryId ? (
+            <Button variant="outline" onClick={resetCategoryForm}>
+              Cancel Edit
+            </Button>
+          ) : null}
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          <Input
+            placeholder="Category name"
+            value={categoryForm.name}
+            onChange={(event) =>
+              setCategoryForm((current) => ({ ...current, name: event.target.value }))
+            }
+          />
+          <Input
+            placeholder="Image URL"
+            value={categoryForm.image}
+            onChange={(event) =>
+              setCategoryForm((current) => ({ ...current, image: event.target.value }))
+            }
+          />
+          <Input
+            placeholder="Sort order"
+            type="number"
+            value={categoryForm.sortOrder}
+            onChange={(event) =>
+              setCategoryForm((current) => ({ ...current, sortOrder: event.target.value }))
+            }
+          />
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+            Categories: {categoryRecords.length}
+          </div>
+          <textarea
+            value={categoryForm.description}
+            onChange={(event) =>
+              setCategoryForm((current) => ({
+                ...current,
+                description: event.target.value,
+              }))
+            }
+            placeholder="Description"
+            className="min-h-28 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none md:col-span-2"
+          />
+          <div className="md:col-span-2">
+            <Button onClick={handleSubmitCategory} disabled={savingCategory}>
+              {savingCategory
+                ? "Saving..."
+                : selectedCategoryId
+                  ? "Update Category"
+                  : "Create Category"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="space-y-4 rounded-[5px] border border-slate-200 bg-white p-5">
         <CategoriesToolbar
@@ -218,17 +276,19 @@ export function CategoriesPage() {
             setSearch(value);
             setPage(1);
           }}
-          totalProducts={145}
+          totalProducts={totalProducts}
         />
 
-        <CategoriesTable rows={pagedRows} />
+        {loading ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center text-sm text-slate-500">
+            Loading category inventory...
+          </div>
+        ) : (
+          <CategoriesTable rows={pagedRows} />
+        )}
 
         <div className="px-1">
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       </div>
     </div>
