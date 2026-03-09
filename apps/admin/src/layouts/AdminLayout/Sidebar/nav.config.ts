@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -6,7 +7,7 @@ import {
   Shapes,
   Wallet,
   BadgeCheck,
-  PlusSquare,
+  PlusCircle,
   Image,
   List,
   Star,
@@ -14,15 +15,15 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-export type NavItem = {
+export type SidebarItem = {
   label: string;
   to: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
 };
 
 export type NavGroup = {
   title: string;
-  items: NavItem[];
+  items: SidebarItem[];
 };
 
 export const NAV_GROUPS: NavGroup[] = [
@@ -41,7 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Product",
     items: [
-      { label: "Add Products", to: "/admin/products/new", icon: PlusSquare },
+      { label: "Add Products", to: "/admin/products/new", icon: PlusCircle },
       { label: "Product Media", to: "/admin/products/media", icon: Image },
       { label: "Product List", to: "/admin/products", icon: List },
       { label: "Product Reviews", to: "/admin/products/reviews", icon: Star },
@@ -51,7 +52,11 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Admin",
     items: [
       { label: "Admin role", to: "/admin/admin-role", icon: UserCog },
-      { label: "Control Authority", to: "/admin/control-authority", icon: ShieldCheck },
+      {
+        label: "Control Authority",
+        to: "/admin/control-authority",
+        icon: ShieldCheck,
+      },
     ],
   },
 ];

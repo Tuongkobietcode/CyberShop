@@ -1,52 +1,99 @@
 import { Link, useLocation } from "react-router-dom";
+import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { NAV_GROUPS } from "./nav.config";
 import { NavItemRow } from "./SidebarItem";
 import { SidebarUserCard } from "./UserCard";
+import type { AdminTheme } from "../AdminLayout";
 
-export function Sidebar() {
+type Props = {
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+  theme: AdminTheme;
+};
+
+export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
   const { pathname } = useLocation();
+  const isDark = theme === "dark";
 
   return (
-    <div className="sticky top-4 h-[calc(100vh-32px)] rounded-2xl border border-slate-200 bg-white p-4">
-      {/* Logo row */}
+    <div
+      className={[
+        "sticky top-4 flex h-[calc(100vh-32px)] flex-col rounded-3xl border p-4 transition-colors duration-300",
+        isDark
+          ? "border-slate-800 bg-[#111827] text-slate-100"
+          : "border-slate-200 bg-white text-slate-900",
+      ].join(" ")}
+    >
       <div className="flex items-center justify-between px-1">
-        <Link to="/admin/dashboard" className="flex items-center gap-2">
-          <div className="text-xl font-extrabold text-emerald-600">DEAL</div>
-          <div className="text-xl font-extrabold text-slate-900">PORT</div>
+        <Link
+          to="/admin/dashboard"
+          className={[
+            "flex items-center overflow-hidden transition-all",
+            collapsed ? "justify-center" : "",
+          ].join(" ")}
+        >
+          <div className="text-[22px] font-extrabold tracking-tight text-emerald-500">
+            DEAL
+            {!collapsed && (
+              <span className={isDark ? "text-white" : "text-emerald-500"}>
+                PORT
+              </span>
+            )}
+          </div>
         </Link>
 
         <button
-          className="rounded-lg p-2 hover:bg-slate-100"
+          type="button"
+          onClick={onToggleCollapsed}
+          className={[
+            "flex h-9 w-9 items-center justify-center rounded-xl transition",
+            isDark ? "hover:bg-slate-800" : "hover:bg-slate-100",
+          ].join(" ")}
           aria-label="Collapse sidebar"
-          title="Collapse"
+          title="Collapse sidebar"
         >
-          <span className="block h-4 w-4 rounded bg-slate-200" />
+          {collapsed ? (
+            <ChevronsRight
+              size={18}
+              className={isDark ? "text-slate-300" : "text-slate-500"}
+            />
+          ) : (
+            <ChevronsLeft
+              size={18}
+              className={isDark ? "text-slate-300" : "text-slate-500"}
+            />
+          )}
         </button>
       </div>
 
-      <div className="mt-4 space-y-6">
-        {NAV_GROUPS.map((g) => (
-          <div key={g.title}>
-            <p className="mb-2 px-1 text-xs font-semibold text-slate-400">
-              {g.title}
-            </p>
+      <div className="mt-6 flex-1 overflow-y-auto pr-1">
+        <div className="space-y-7">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title}>
+              {!collapsed && (
+                <p className="mb-3 px-2 text-xs font-medium text-slate-400">
+                  {group.title}
+                </p>
+              )}
 
-            <div className="space-y-1">
-              {g.items.map((item) => (
-                <NavItemRow
-                  key={item.to}
-                  item={item}
-                  active={pathname === item.to}
-                />
-              ))}
+              <div className="space-y-1.5">
+                {group.items.map((item) => (
+                  <NavItemRow
+                    key={item.to}
+                    item={item}
+                    active={pathname === item.to}
+                    collapsed={collapsed}
+                    theme={theme}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* User card bottom */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <SidebarUserCard />
+      <div className="mt-4">
+        <SidebarUserCard collapsed={collapsed} theme={theme} />
       </div>
     </div>
   );
