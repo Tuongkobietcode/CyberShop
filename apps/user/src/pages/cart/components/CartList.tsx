@@ -62,8 +62,8 @@ export const CartList: React.FC = () => {
   };
 
   return (
-    <div className="w-full mx-auto bg-white pb-[58px]">
-      <h2 className="text-2xl font-semibold mb-6">Giỏ hàng</h2>
+    <div className="w-full mx-auto bg-white pb-[145px]">
+      <h2 className="text-2xl font-semibold mb-6">Shopping Cart</h2>
 
       <div className="space-y-6">
         {items.map((item) => (

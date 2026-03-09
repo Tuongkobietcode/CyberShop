@@ -21,38 +21,38 @@ export const RegisterPage: React.FC = () => {
 
   const handleRegister = () => {
     if (!fullName.trim()) {
-        alert("Vui lòng nhập đầy đủ họ tên");
+        alert("Please enter your full name!");
     }
 
     else if (!email.trim()) {
-        alert("Vui lòng nhập đầy đủ email");
+        alert("Please enter your email!");
     }
 
     else if (!phone.trim()) {
-        alert("Vui lòng nhập đầy đủ số điện thoại");
+        alert("Please enter your phone number!");
     }
 
      else if (!address.trim()) {
-        alert("Vui lòng nhập đầy đủ số điện thoại");
+        alert("Please enter your address!");
     }
 
     else if (!password.trim() || !confirmPassword.trim()) {
-        alert("Vui lòng nhập đầy đủ mật khẩu");
+        alert("Please enter your password!");
         return;
     }
 
     else if (password.length < 8) {
-        alert("Mật khẩu phải có ít nhất 8 ký tự");
+        alert("Password must be at least 8 characters long!");
         return;
     }
 
     else if (password !== confirmPassword) {
-        alert("Mật khẩu xác nhận không khớp");
+        alert("Passwords do not match!");
         return;
     }
 
     else {
-        alert("Đăng ký thành công");
+        alert("Registration successful");
     }
   };
 
@@ -60,16 +60,16 @@ export const RegisterPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-md">
         <h1 className="mb-6 text-center text-2xl font-semibold">
-          Đăng ký tài khoản
+          Registration Form
         </h1>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">Họ và tên</label>
+          <label className="mb-1 block text-sm font-medium">Full Name</label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
-              placeholder="Nhập họ tên"
+              placeholder="Enter your full name"
               className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-3 outline-none focus:ring-2 focus:ring-black"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -92,12 +92,12 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">Số điện thoại</label>
+          <label className="mb-1 block text-sm font-medium">Phone Number</label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="tel"
-              placeholder="Nhập số điện thoại"
+              placeholder="Enter your phone number"
               className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-3 outline-none focus:ring-2 focus:ring-black"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -106,12 +106,12 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">Địa chỉ</label>
+          <label className="mb-1 block text-sm font-medium">Address</label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
-              placeholder="Nhập địa chỉ"
+              placeholder="Enter your address"
               className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-3 outline-none focus:ring-2 focus:ring-black"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -120,12 +120,12 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">Mật khẩu</label>
+          <label className="mb-1 block text-sm font-medium">Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu"
+              placeholder="Enter your password"
               className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-10 outline-none focus:ring-2 focus:ring-black"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -142,13 +142,13 @@ export const RegisterPage: React.FC = () => {
 
         <div className="mb-6">
           <label className="mb-1 block text-sm font-medium">
-            Xác nhận mật khẩu
+            Confirm Password
           </label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="Nhập lại mật khẩu"
+              placeholder="Confirm your password"
               className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-10 outline-none focus:ring-2 focus:ring-black"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -165,12 +165,12 @@ export const RegisterPage: React.FC = () => {
 
         <button className="w-full rounded-lg bg-black py-2 font-semibold text-white hover:opacity-90"
                 onClick={handleRegister}>
-          Đăng ký
+          Sign Up
         </button>
 
         <div className="text-center mt-5 text-sm">
-            <span className="mr-1">Đã có tài khoản?</span>
-            <a href="#" className="text-blue-500 hover:text-blue-400">Đăng nhập ngay</a>
+            <span className="mr-1">Already have an account?</span>
+            <a href="#" className="text-blue-500 hover:text-blue-400 hover:underline">Log in</a>
         </div>
       </div>
     </div>
