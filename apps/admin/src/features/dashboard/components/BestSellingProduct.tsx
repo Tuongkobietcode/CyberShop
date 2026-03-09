@@ -37,7 +37,7 @@ const products = [
 
 const BestSellingProduct = () => {
   return (
-    <div className="bg-white rounded-2xl p-6 w-full">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-2/3 h-2/3">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-semibold">Best selling product</h2>
@@ -48,17 +48,17 @@ const BestSellingProduct = () => {
       </div>
 
       {/* Table header */}
-      <div className="grid grid-cols-4 bg-[#EAF8E7] rounded-xl px-4 py-3 text-sm text-gray-600 font-medium">
+      <div className="grid grid-cols-[2fr_1fr_1fr_1fr] bg-[#EAF8E7] rounded-xl px-4 py-3 text-sm text-gray-600 font-medium">
         <span>PRODUCT</span>
         <span>TOTAL ORDER</span>
         <span>STATUS</span>
-        <span className="text-right mr-5">PRICE</span>
+        <span className="text-right pr-15">PRICE</span>
       </div>
 
       {/* Table rows */}
       <div>
         {products.map((item) => (
-          <div className="grid grid-cols-4 items-center px-4 py-4">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center px-4 py-4">
             {/* Product */}
             <div className="flex items-center gap-3">
               <img
@@ -89,7 +89,7 @@ const BestSellingProduct = () => {
             </div>
 
             {/* Price */}
-            <span className="font-semibold text-right text-gray-800">
+            <span className="font-semibold text-right text-gray-800 pr-10">
               {item.price}
             </span>
           </div>

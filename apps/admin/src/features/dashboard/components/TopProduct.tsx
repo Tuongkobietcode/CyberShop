@@ -33,7 +33,7 @@ const products = [
 
 const TopProduct = () => {
   return (
-    <div className="bg-white rounded-2xl p-5 w-[320px]">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-1/4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-lg">Top Products</h3>

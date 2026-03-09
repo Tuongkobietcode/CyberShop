@@ -41,7 +41,7 @@ const products = [
 
 const AddNewProductWidget = () => {
   return (
-    <div className="w-[360px] bg-white rounded-2xl p-4">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-1/3">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Add New Product</h2>
@@ -55,7 +55,7 @@ const AddNewProductWidget = () => {
       <p className="text-sm text-gray-400 mb-5">Categories</p>
       <div className="space-y-2">
         {categories.map((item) => (
-          <div className="flex items-center justify-between p-3 border-gray-50 rounded-xl hover:bg-gray-50 cursor-pointer">
+          <div className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
             <div className="flex items-center gap-3">
               <img src={item.img} alt={item.name} className="w-10 h-10" />
               <span className="font-medium">{item.name}</span>
@@ -73,7 +73,7 @@ const AddNewProductWidget = () => {
       <p className="text-sm text-gray-500 mt-4 mb-2">Product</p>
       <div className="space-y-3">
         {products.map((item) => (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <img src={item.img} alt={item.name} className="w-12 h-12" />
               <div>
