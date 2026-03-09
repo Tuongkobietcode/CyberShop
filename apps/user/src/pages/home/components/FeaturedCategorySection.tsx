@@ -1,318 +1,143 @@
-// 
-
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-type FeaturedItem = {
+type PromoCard = {
   title: string;
-  description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
-  imageSrc: string;
-  imageAlt: string;
+  copy: string;
+  image: string;
+  imageClassName: string;
+  theme: "light" | "dark";
+  action?: boolean;
 };
 
-function cx(...cls: Array<string | undefined | false>) {
-  return cls.filter(Boolean).join(" ");
-}
-
-function renderTitle(title: string) {
-  if (title === "Macbook Air") {
-    return (
-      <>
-        <span className="font-light">Macbook</span>{" "}
-        <span className="font-semibold">Air</span>
-      </>
-    );
-  }
-  if (title === "Apple AirPods Max") {
-    return (
-      <>
-        <span className="font-light">Apple AirPods</span>{" "}
-        <span className="font-semibold">Max</span>
-      </>
-    );
-  }
-  if (title === "Apple Vision Pro") {
-    return (
-      <>
-        <span className="font-light">Apple Vision</span>{" "}
-        <span className="font-semibold">Pro</span>
-      </>
-    );
-  }
-  return title;
-}
-
-/** Motion variants */
-const sectionV = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+const promos: PromoCard[] = [
+  {
+    title: "Playstation 5",
+    copy:
+      "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
+    image: "/images/PlayStation.png",
+    imageClassName:
+      "left-[-18%] bottom-[-2%] w-[58%] max-w-[300px] sm:left-[-10%] sm:w-[42%] 2xl:max-w-[360px]",
+    theme: "light",
   },
-};
-
-const cardV = {
-  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.55, ease: EASE },
+  {
+    title: "Apple AirPods Max",
+    copy: "Computational audio. Listen, it is powerful.",
+    image: "/images/Wireless.png",
+    imageClassName:
+      "left-[-10%] bottom-[2%] w-[48%] max-w-[150px] sm:left-[-6%] sm:w-[40%] 2xl:max-w-[180px]",
+    theme: "light",
   },
-};
-
-const imgV = {
-  hidden: { opacity: 0, scale: 0.98, x: 0 },
-  show: {
-    opacity: 1,
-    scale: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: EASE },
+  {
+    title: "Apple Vision Pro",
+    copy: "An immersive way to experience entertainment.",
+    image: "/images/VisionPro.png",
+    imageClassName:
+      "left-[-8%] bottom-[2%] w-[54%] max-w-[170px] sm:left-[-4%] sm:w-[44%] 2xl:max-w-[190px]",
+    theme: "dark",
   },
-};
+  {
+    title: "Macbook Air",
+    copy:
+      "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
+    image: "/images/MacBookAir.png",
+    imageClassName:
+      "right-[-8%] bottom-[2%] w-[54%] max-w-[320px] sm:right-[-4%] sm:w-[46%] 2xl:max-w-[390px]",
+    theme: "light",
+    action: true,
+  },
+];
 
-export default function FeaturedCategorySection() {
+function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
+  const isDark = item.theme === "dark";
+  const isPlaystation = item.title === "Playstation 5";
+
   return (
-    <section className="w-full bg-white">
-      <motion.div
-        className="mx-auto w-full max-w-[1400px] px-4 py-8 lg:px-6"
-        variants={sectionV}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.25 }}
+    <article
+      className={[
+        "group relative overflow-hidden transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(15,23,42,0.12)]",
+        isDark ? "bg-[#2a2a2a] text-white" : "bg-white text-slate-900",
+        large
+          ? "min-h-[340px] p-6 sm:min-h-[380px] sm:p-8 lg:min-h-[420px] lg:p-10 2xl:min-h-[500px] 2xl:p-12"
+          : "min-h-[220px] p-5 sm:min-h-[210px] sm:p-6 2xl:min-h-[260px]",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100",
+          isDark
+            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.08),transparent_40%)]"
+            : "bg-[radial-gradient(circle_at_80%_10%,rgba(15,23,42,0.06),transparent_40%)]",
+        ].join(" ")}
+      />
+
+      <img
+        src={item.image}
+        alt={item.title}
+        className={[
+          "pointer-events-none absolute object-contain drop-shadow-[0_20px_40px_rgba(15,23,42,0.18)] transition duration-500 group-hover:scale-105",
+          item.imageClassName,
+        ].join(" ")}
+      />
+
+      <div
+        className={[
+          "relative z-10",
+          isPlaystation
+            ? "ml-auto max-w-[52%] sm:max-w-[48%] lg:max-w-[44%]"
+            : large
+              ? "max-w-[58%] sm:max-w-[52%] lg:max-w-[48%]"
+              : "ml-auto max-w-[62%] sm:max-w-[58%]",
+        ].join(" ")}
       >
-        <div className="grid gap-4 lg:grid-cols-2">
-          {/* LEFT COLUMN */}
-          <div className="grid gap-4">
-            {/* PS5 */}
-            <FeatureCard
-              motionProps={{ variants: cardV }}
-              item={{
-                title: "PlayStation 5",
-                description:
-                  "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
-                imageSrc: "/images/PlayStation.png",
-                imageAlt: "Playstation 5",
-              }}
-              variant="light"
-              size="lg"
-              imageSide="left"
-              imageBoxClassName="pl-4"
-              imageClassName="w-[92%] h-[92%] object-contain object-left drop-shadow-sm"
-              parallaxDir="left"
-            />
+        <h2
+          className={[
+            "leading-none tracking-[-0.04em]",
+            large
+              ? "text-[2.5rem] font-light sm:text-5xl lg:text-6xl 2xl:text-7xl"
+              : "text-[1.75rem] font-light sm:text-[2rem] 2xl:text-[2.4rem]",
+          ].join(" ")}
+        >
+          {item.title.split(" ").slice(0, -1).join(" ")}{" "}
+          <span className="font-semibold">{item.title.split(" ").slice(-1)}</span>
+        </h2>
 
-            {/* SMALL CARDS */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FeatureCard
-                motionProps={{ variants: cardV }}
-                item={{
-                  title: "Apple AirPods Max",
-                  description: "Computational audio. Listen, it’s powerful.",
-                  imageSrc: "/images/Wireless.png",
-                  imageAlt: "AirPods Max",
-                }}
-                variant="soft"
-                size="sm"
-                imageSide="left"
-                imageBoxClassName="pl-3"
-                imageClassName="w-[88%] h-[88%] object-contain object-left"
-                parallaxDir="left"
-              />
+        <p
+          className={[
+            "mt-4 text-xs leading-5 sm:text-sm sm:leading-6 2xl:text-base",
+            isDark ? "text-white/70" : "text-slate-500",
+          ].join(" ")}
+        >
+          {item.copy}
+        </p>
 
-              <FeatureCard
-                motionProps={{ variants: cardV }}
-                item={{
-                  title: "Apple Vision Pro",
-                  description: "An immersive way to experience entertainment.",
-                  imageSrc: "/images/VisionPro.png",
-                  imageAlt: "Vision Pro",
-                }}
-                variant="dark"
-                size="sm"
-                imageSide="left"
-                imageBoxClassName="pl-3"
-                imageClassName="w-[88%] h-[88%] object-contain object-left"
-                parallaxDir="left"
-              />
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN */}
-          <FeatureCard
-            motionProps={{ variants: cardV }}
-            item={{
-              title: "Macbook Air",
-              description:
-                "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
-              ctaLabel: "Shop Now",
-              ctaHref: "/products",
-              imageSrc: "/images/MacBookAir.png",
-              imageAlt: "Macbook Air",
-            }}
-            variant="soft"
-            size="xl"
-            imageSide="right"
-            showCta
-            imageBoxClassName="pr-2"
-            imageClassName="w-[96%] h-[96%] object-contain object-right drop-shadow-sm"
-            parallaxDir="right"
-          />
-        </div>
-      </motion.div>
-    </section>
+        {item.action ? (
+          <Link
+            to="/products"
+            className="mt-7 inline-flex items-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white sm:px-6 2xl:px-7"
+          >
+            Shop Now
+            <span className="h-px w-7 bg-current" />
+          </Link>
+        ) : null}
+      </div>
+    </article>
   );
 }
 
-function FeatureCard({
-  item,
-  className,
-  showCta = false,
-  variant = "light",
-  size = "lg",
-  imageSide = "left",
-  imageClassName,
-  imageBoxClassName,
-  // motion
-  motionProps,
-  parallaxDir = "left",
-}: {
-  item: FeaturedItem;
-  className?: string;
-  showCta?: boolean;
-
-  variant?: "light" | "soft" | "dark";
-  size?: "sm" | "lg" | "xl";
-  imageSide?: "left" | "right";
-
-  imageClassName?: string;
-  imageBoxClassName?: string;
-
-  motionProps?: React.ComponentProps<typeof motion.div>;
-  parallaxDir?: "left" | "right";
-}) {
-  const showButton = showCta && item.ctaLabel && item.ctaHref;
-
-  const variantCls =
-    variant === "dark"
-      ? "bg-neutral-900 text-white"
-      : variant === "soft"
-      ? "bg-neutral-100 text-neutral-900"
-      : "bg-white text-neutral-900";
-
-  const sizeCls =
-    size === "sm"
-      ? "h-[260px] p-6"
-      : size === "xl"
-      ? "h-[560px] p-10"
-      : "h-[520px] p-10";
-
-  const layoutCls =
-    imageSide === "left"
-      ? "grid-cols-[48%_52%]"
-      : "grid-cols-[52%_48%]";
-
-  const descColor = variant === "dark" ? "text-neutral-200/80" : "text-neutral-600";
-
-  const parallaxX = parallaxDir === "left" ? -10 : 10;
-
+export default function FeaturedCategorySection() {
   return (
-    <motion.div
-      {...motionProps}
-      className={cx(
-        "group relative overflow-hidden rounded-sm",
-        "transition-transform duration-300 hover:-translate-y-0.5",
-        variantCls,
-        sizeCls,
-        className
-      )}
-      whileHover={{ scale: 1.005 }}
-      transition={{ type: "spring", stiffness: 220, damping: 22 }}
-    >
-      <div className={cx("grid h-full w-full", layoutCls)}>
-        {/* IMAGE */}
-        <div
-          className={cx(
-            "relative flex h-full items-center justify-center",
-            imageSide === "right" && "order-2",
-            imageBoxClassName
-          )}
-        >
-          <motion.img
-            src={item.imageSrc}
-            alt={item.imageAlt}
-            loading="lazy"
-            variants={imgV}
-            className={cx(
-              "pointer-events-none select-none",
-              imageClassName || "h-[90%] w-[90%] object-contain"
-            )}
-            // parallax nhẹ khi hover + “settle” khi bỏ hover
-            whileHover={{ x: parallaxX, scale: 1.03 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          />
+    <section className="bg-[#f6f6f6]">
+      <div className="grid gap-0 px-0 lg:grid-cols-[1.04fr_0.96fr]">
+        <div className="grid gap-0">
+          <Promo item={promos[0]} large />
+          <div className="grid gap-0 sm:grid-cols-2">
+            <Promo item={promos[1]} />
+            <Promo item={promos[2]} />
+          </div>
         </div>
 
-        {/* CONTENT */}
-        <div
-          className={cx(
-            "relative flex h-full flex-col justify-center",
-            "px-6 sm:px-8",
-            imageSide === "right" && "order-1"
-          )}
-        >
-          <motion.h3
-            className={cx(
-              "text-left leading-tight tracking-tight font-semibold",
-              size === "sm" ? "text-3xl" : size === "xl" ? "text-6xl" : "text-5xl"
-            )}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {renderTitle(item.title)}
-          </motion.h3>
-
-          {item.description && (
-            <motion.p
-              className={cx(
-                "mt-4 max-w-[36ch] text-left text-sm sm:text-base leading-relaxed",
-                descColor
-              )}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {item.description}
-            </motion.p>
-          )}
-
-          {showButton && (
-            <motion.div
-              className="mt-6"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Link
-                to={item.ctaHref!}
-                className={cx(
-                  "inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-semibold",
-                  "border border-black/60 bg-white text-neutral-900",
-                  "transition hover:bg-neutral-50 active:scale-[0.99]"
-                )}
-              >
-                {item.ctaLabel}
-              </Link>
-            </motion.div>
-          )}
-        </div>
+        <Promo item={promos[3]} large />
       </div>
-    </motion.div>
+    </section>
   );
 }

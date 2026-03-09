@@ -1,14 +1,30 @@
 import { Search } from "lucide-react";
+import type { AdminTheme } from "../AdminLayout";
 
-export function GlobalSearch() {
+type Props = {
+  theme: AdminTheme;
+};
+
+export function GlobalSearch({ theme }: Props) {
+  const isDark = theme === "dark";
+
   return (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    <div
+      className={[
+        "flex h-12 items-center rounded-full border px-4 transition-colors duration-300",
+        isDark
+          ? "border-slate-700 bg-slate-900"
+          : "border-slate-200 bg-slate-50",
+      ].join(" ")}
+    >
+      <Search size={20} className="text-slate-400" />
       <input
         placeholder="Search data, users, or reports"
         className={[
-          "h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm",
-          "outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100",
+          "ml-3 w-full bg-transparent text-sm outline-none",
+          isDark
+            ? "text-slate-100 placeholder:text-slate-500"
+            : "text-slate-700 placeholder:text-slate-400",
         ].join(" ")}
       />
     </div>
