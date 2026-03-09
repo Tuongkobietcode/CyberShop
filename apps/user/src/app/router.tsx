@@ -1,11 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomePage from "@/pages/home/HomePage";
-import ProductsPage from "@/pages/products/ProductsPage";
-import ProductDetailPage from "@/pages/product-detail/ProductDetailPage";
+import Login from "@/pages/login/Login";
+import PaymentPage from "@/pages/checkout/payment/PaymentPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
-  { path: "/products", element: <ProductsPage /> },
-  { path: "/products/:slug", element: <ProductDetailPage /> },
-  { path: "*", element: <Navigate to="/" replace /> },
+  { path: "/login", element: <Login /> },
+  { path: "/checkout/payment", element: <PaymentPage /> },
 ]);
