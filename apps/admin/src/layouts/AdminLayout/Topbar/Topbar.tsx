@@ -39,7 +39,7 @@ export function Topbar({ theme, onToggleTheme }: Props) {
   return (
     <div
       className={[
-        "flex items-center gap-4 border-b px-5 py-4 transition-colors duration-300",
+        "flex items-center bg-white gap-4 px-5 py-4 transition-colors duration-300",
         isDark ? "border-slate-800" : "border-slate-100",
       ].join(" ")}
     >
