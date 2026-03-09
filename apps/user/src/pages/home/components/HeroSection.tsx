@@ -10,9 +10,9 @@ export default function HeroSection() {
               Pro.Beyond.
             </p>
 
-            <h1 className="mt-4 animate-fade-in-left text-[3rem] font-light leading-none tracking-[-0.05em] sm:text-[4.6rem] lg:text-[6.3rem] 2xl:text-[8.2rem]">
+            <h1 className="mt-4 animate-fade-in-left whitespace-nowrap text-[3rem] font-light leading-[0.95] tracking-[-0.05em] sm:text-[4.6rem] lg:text-[6.3rem] 2xl:text-[8.2rem]">
               iPhone 14{" "}
-              <span className="font-semibold text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+              <span className="inline-block align-baseline font-semibold text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
                 Pro
               </span>
             </h1>
@@ -39,7 +39,7 @@ export default function HeroSection() {
           <img
             src="/images/Iphone14.png"
             alt="iPhone 14 Pro"
-            className="relative z-10 animate-fade-in-right w-full max-w-[360px] object-contain drop-shadow-[0_55px_80px_rgba(0,0,0,0.65)] transition duration-500 hover:scale-[1.02] sm:max-w-[480px] lg:max-w-[620px] 2xl:max-w-[760px]"
+            className="relative z-10 animate-fade-in-right w-full max-w-[92px] object-contain drop-shadow-[0_55px_80px_rgba(0,0,0,0.65)] transition duration-500 hover:scale-[1.02] sm:max-w-[320px] lg:max-w-[420px] 2xl:max-w-[520px]"
           />
         </div>
       </div>

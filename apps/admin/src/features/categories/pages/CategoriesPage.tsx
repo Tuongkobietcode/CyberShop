@@ -168,15 +168,9 @@ export function CategoriesPage() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-<<<<<<< HEAD
-          <button
-            type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
-=======
           <Link
             to="/admin/products/new"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#62b56f] px-5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
->>>>>>> 58f47076a970edb60a021f1a2ecf97bd030524d2
           >
             <PlusCircle size={18} />
             Add Product

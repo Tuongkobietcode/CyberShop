@@ -16,7 +16,7 @@ const promos: PromoCard[] = [
       "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
     image: "/images/PlayStation.png",
     imageClassName:
-      "left-[-18%] bottom-[-2%] w-[58%] max-w-[300px] sm:left-[-10%] sm:w-[42%] 2xl:max-w-[360px]",
+      "left-[calc(-24%+100px)] bottom-[-4%] w-[78%] max-w-[460px] sm:left-[calc(-18%+100px)] sm:w-[58%] lg:w-[62%] 2xl:max-w-[540px]",
     theme: "light",
   },
   {
@@ -41,7 +41,7 @@ const promos: PromoCard[] = [
       "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
     image: "/images/MacBookAir.png",
     imageClassName:
-      "right-[-8%] bottom-[2%] w-[54%] max-w-[320px] sm:right-[-4%] sm:w-[46%] 2xl:max-w-[390px]",
+      "right-0 bottom-[2%] w-[54%] max-w-[320px] sm:right-0 sm:w-[46%] 2xl:max-w-[390px]",
     theme: "light",
     action: true,
   },
@@ -50,6 +50,9 @@ const promos: PromoCard[] = [
 function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
   const isDark = item.theme === "dark";
   const isPlaystation = item.title === "Playstation 5";
+  const isAirpods = item.title === "Apple AirPods Max";
+  const isVisionPro = item.title === "Apple Vision Pro";
+  const isMacbook = item.title === "Macbook Air";
 
   return (
     <article
@@ -83,7 +86,13 @@ function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
         className={[
           "relative z-10",
           isPlaystation
-            ? "ml-auto max-w-[52%] sm:max-w-[48%] lg:max-w-[44%]"
+            ? "ml-auto mt-[100px] max-w-[52%] sm:max-w-[48%] lg:max-w-[44%]"
+            : isMacbook
+              ? "mt-[100px] max-w-[56%] sm:max-w-[52%] lg:mt-[180px] lg:max-w-[48%]"
+              : isAirpods
+                ? "ml-auto mt-[22px] max-w-[58%] sm:mt-[28px] sm:max-w-[55%]"
+                : isVisionPro
+                  ? "ml-auto mt-[26px] max-w-[56%] sm:mt-[30px] sm:max-w-[53%]"
             : large
               ? "max-w-[58%] sm:max-w-[52%] lg:max-w-[48%]"
               : "ml-auto max-w-[62%] sm:max-w-[58%]",

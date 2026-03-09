@@ -45,13 +45,14 @@ const promos: PromoBlock[] = [
     copy:
       "Packed canvas, lightweight form, and a visual language built for modern workflows.",
     image: "/images/ipad.png",
+    dark: true,
   },
   {
     title: "Samsung Galaxy",
     copy:
       "A cinematic fold with luxurious surfaces and compact product storytelling.",
     image: "/images/Iphone 14 pro 1 (5).png",
-    dark: true,
+    dark: false,
   },
   {
     title: "Macbook Pro",
