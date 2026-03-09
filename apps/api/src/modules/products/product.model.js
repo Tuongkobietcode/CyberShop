@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+
+const mongoose = require("mongoose");
 
 const productImageSchema = new mongoose.Schema(
   {
@@ -29,66 +30,52 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
-    sku: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      uppercase: true,
-    },
+
     description: {
       type: String,
       default: "",
-      trim: true,
     },
+
     price: {
       type: Number,
       required: true,
       min: 0,
     },
-    compareAtPrice: {
-      type: Number,
-      default: null,
-      min: 0,
-    },
-    stock: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-    status: {
+
+    image: {
       type: String,
-      enum: ["draft", "active", "archived", "out_of_stock"],
-      default: "draft",
+      default: "",
     },
-    featured: {
-      type: Boolean,
-      default: false,
-    },
+
+    images: [productImageSchema],
+
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
       index: true,
     },
-    images: {
-      type: [productImageSchema],
-      default: [],
+
+    status: {
+      type: String,
+      enum: ["draft", "active", "archived", "out_of_stock"],
+      default: "draft",
+    },
+
+    stock: {
+      type: Number,
+      default: 0,
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
   },
   {
     timestamps: true,
-    versionKey: false,
   }
 );
 
-productSchema.index({ status: 1, featured: 1, createdAt: -1 });
+module.exports = mongoose.model("Product", productSchema);
 
-export const Product = mongoose.model("Product", productSchema);

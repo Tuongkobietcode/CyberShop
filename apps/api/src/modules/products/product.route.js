@@ -1,22 +1,18 @@
-import { Router } from "express";
-import {
-  createProduct,
-  deleteProduct,
-  getProductDetail,
-  listAdminProducts,
-  listProducts,
-  updateProduct,
-} from "./product.controller.js";
-import { requireAdminAuth } from "../../middlewares/requireAdminAuth.js";
 
-export const productRouter = Router();
-export const adminProductRouter = Router();
+const express = require("express");
+const router = express.Router();
+const productController = require("../controllers/product.controller");
 
-productRouter.get("/", listProducts);
-productRouter.get("/:slug", getProductDetail);
+router.post("/", productController.createProduct);
 
-adminProductRouter.use(requireAdminAuth);
-adminProductRouter.get("/", listAdminProducts);
-adminProductRouter.post("/", createProduct);
-adminProductRouter.patch("/:id", updateProduct);
-adminProductRouter.delete("/:id", deleteProduct);
+router.post("/:id/images", productController.addProductImage);
+
+router.get("/", productController.getProducts);
+
+router.get("/:id", productController.getProductById);
+
+router.put("/:id", productController.updateProduct);
+
+router.delete("/:id", productController.deleteProduct);
+
+module.exports = router;
