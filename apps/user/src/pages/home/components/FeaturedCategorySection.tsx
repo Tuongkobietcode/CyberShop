@@ -1,147 +1,143 @@
 import { Link } from "react-router-dom";
 
-type FeaturedItem = {
+type PromoCard = {
   title: string;
-  subtitle?: string;
-  description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
-  imageSrc: string; 
-  imageAlt: string;
+  copy: string;
+  image: string;
+  imageClassName: string;
+  theme: "light" | "dark";
+  action?: boolean;
 };
 
-export default function FeaturedCategorySection() {
+const promos: PromoCard[] = [
+  {
+    title: "Playstation 5",
+    copy:
+      "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
+    image: "/images/PlayStation.png",
+    imageClassName:
+      "left-[-18%] bottom-[-2%] w-[58%] max-w-[300px] sm:left-[-10%] sm:w-[42%] 2xl:max-w-[360px]",
+    theme: "light",
+  },
+  {
+    title: "Apple AirPods Max",
+    copy: "Computational audio. Listen, it is powerful.",
+    image: "/images/Wireless.png",
+    imageClassName:
+      "left-[-10%] bottom-[2%] w-[48%] max-w-[150px] sm:left-[-6%] sm:w-[40%] 2xl:max-w-[180px]",
+    theme: "light",
+  },
+  {
+    title: "Apple Vision Pro",
+    copy: "An immersive way to experience entertainment.",
+    image: "/images/VisionPro.png",
+    imageClassName:
+      "left-[-8%] bottom-[2%] w-[54%] max-w-[170px] sm:left-[-4%] sm:w-[44%] 2xl:max-w-[190px]",
+    theme: "dark",
+  },
+  {
+    title: "Macbook Air",
+    copy:
+      "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
+    image: "/images/MacBookAir.png",
+    imageClassName:
+      "right-[-8%] bottom-[2%] w-[54%] max-w-[320px] sm:right-[-4%] sm:w-[46%] 2xl:max-w-[390px]",
+    theme: "light",
+    action: true,
+  },
+];
+
+function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
+  const isDark = item.theme === "dark";
+  const isPlaystation = item.title === "Playstation 5";
+
   return (
-    <section className="w-full h-175 bg-white">
-      <div className="w-full h-full max-w-8xl ">
-        <div className="grid h-full grid-cols-2">
-          {/* LEFT COLUMN */}
-          <div className="grid">
-            {/* PS5 */}
-            <FeatureCard
-              item={{
-                title: "Playstation 5",
-                description:
-                  "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
-                imageSrc: "/images/PlayStation.png",
-                imageAlt: "Playstation 5",
-              }}
-              className="bg-white text-black min-h-100"
-              imageClassName="left-0 top-0 h-full w-[45%] object-cover"
-              contentClassName="ml-auto max-w-[58%] flex flex-col justify-center text-center"
-            />
+    <article
+      className={[
+        "group relative overflow-hidden transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(15,23,42,0.12)]",
+        isDark ? "bg-[#2a2a2a] text-white" : "bg-white text-slate-900",
+        large
+          ? "min-h-[340px] p-6 sm:min-h-[380px] sm:p-8 lg:min-h-[420px] lg:p-10 2xl:min-h-[500px] 2xl:p-12"
+          : "min-h-[220px] p-5 sm:min-h-[210px] sm:p-6 2xl:min-h-[260px]",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100",
+          isDark
+            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.08),transparent_40%)]"
+            : "bg-[radial-gradient(circle_at_80%_10%,rgba(15,23,42,0.06),transparent_40%)]",
+        ].join(" ")}
+      />
 
-            {/* SMALL CARDS */}
-            <div className="grid grid-cols-2">
-              <FeatureCard
-                item={{
-                  title: "Apple AirPods Max",
-                  description: "Computational audio. Listen, it’s powerful.",
-                  imageSrc: "/images/Wireless.png",
-                  imageAlt: "AirPods Max",
-                }}
-                className="bg-neutral-100 min-h-85"
-                imageClassName="left-0 top-1/2 h-full w-[20%] -translate-y-1/2 object-contain"
-                contentClassName="ml-auto max-w-[52%] text-right"
-              />
+      <img
+        src={item.image}
+        alt={item.title}
+        className={[
+          "pointer-events-none absolute object-contain drop-shadow-[0_20px_40px_rgba(15,23,42,0.18)] transition duration-500 group-hover:scale-105",
+          item.imageClassName,
+        ].join(" ")}
+      />
 
-              <FeatureCard
-                item={{
-                  title: "Apple Vision Pro",
-                  description: "An immersive way to experience entertainment.",
-                  imageSrc: "/images/VisionPro.png",
-                  imageAlt: "Vision Pro",
-                }}
-                className="bg-black text-white min-h-85"
-                imageClassName="left-0 top-1/2 h-full w-[40%] -translate-y-1/2 object-contain"
-                contentClassName="ml-auto max-w-[52%] text-right"
-              />
-            </div>
-          </div>
+      <div
+        className={[
+          "relative z-10",
+          isPlaystation
+            ? "ml-auto max-w-[52%] sm:max-w-[48%] lg:max-w-[44%]"
+            : large
+              ? "max-w-[58%] sm:max-w-[52%] lg:max-w-[48%]"
+              : "ml-auto max-w-[62%] sm:max-w-[58%]",
+        ].join(" ")}
+      >
+        <h2
+          className={[
+            "leading-none tracking-[-0.04em]",
+            large
+              ? "text-[2.5rem] font-light sm:text-5xl lg:text-6xl 2xl:text-7xl"
+              : "text-[1.75rem] font-light sm:text-[2rem] 2xl:text-[2.4rem]",
+          ].join(" ")}
+        >
+          {item.title.split(" ").slice(0, -1).join(" ")}{" "}
+          <span className="font-semibold">{item.title.split(" ").slice(-1)}</span>
+        </h2>
 
-          {/* RIGHT COLUMN */}
-          <FeatureCard
-            item={{
-              title: "Macbook Air",
-              description:
-                "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
-              ctaLabel: "Shop Now",
-              ctaHref: "/products",
-              imageSrc: "/images/MacBookAir.png",
-              imageAlt: "Macbook Air",
-            }}
-            className="bg-neutral-100 min-h-100"
-            imageClassName="right-0 top-1/2 h-[90%] w-[35%] -translate-y-1/2 object-contain"
-            contentClassName="max-w-[52%]"
-            showCta
-          />
-        </div>
+        <p
+          className={[
+            "mt-4 text-xs leading-5 sm:text-sm sm:leading-6 2xl:text-base",
+            isDark ? "text-white/70" : "text-slate-500",
+          ].join(" ")}
+        >
+          {item.copy}
+        </p>
+
+        {item.action ? (
+          <Link
+            to="/products"
+            className="mt-7 inline-flex items-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white sm:px-6 2xl:px-7"
+          >
+            Shop Now
+            <span className="h-px w-7 bg-current" />
+          </Link>
+        ) : null}
       </div>
-    </section>
+    </article>
   );
 }
 
-function FeatureCard({
-  item,
-  className = "",
-  imageClassName = "",
-  contentClassName = "",
-  showCta = false,
-}: {
-  item: FeaturedItem;
-  className?: string;
-  imageClassName?: string;
-  contentClassName?: string;
-  showCta?: boolean;
-}) {
+export default function FeaturedCategorySection() {
   return (
-    <div
-      className={[
-        "relative overflow-hidden sm:p-8",
-        className,
-      ].join(" ")}
-    >
-      {/* Image */}
-      <img
-        src={item.imageSrc}
-        alt={item.imageAlt}
-        className={[
-          "pointer-events-none absolute select-none",
-          imageClassName,
-        ].join(" ")}
-        loading="lazy"
-      />
-
-      {/* Content */}
-      <div className={["relative", contentClassName].join(" ")}>
-        <h3 className="text-9xl font-semibold leading-tight sm:text-3xl">
-          {item.title === "Macbook Air" ? (
-            <>
-              <span className="font-light">Macbook</span>{" "}
-              <span className="font-semibold">Air</span>
-            </>
-          ) : (
-            item.title
-          )}
-        </h3>
-
-        {item.description && (
-          <p className="mt-2 text-base leading-relaxed text-neutral-600">
-            {item.description}
-          </p>
-        )}
-
-        {showCta && item.ctaLabel && item.ctaHref && (
-          <div className="mt-5">
-            <Link
-              to={item.ctaHref}
-              className="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50 active:scale-[0.99]"
-            >
-              {item.ctaLabel}
-            </Link>
+    <section className="bg-[#f6f6f6]">
+      <div className="grid gap-0 px-0 lg:grid-cols-[1.04fr_0.96fr]">
+        <div className="grid gap-0">
+          <Promo item={promos[0]} large />
+          <div className="grid gap-0 sm:grid-cols-2">
+            <Promo item={promos[1]} />
+            <Promo item={promos[2]} />
           </div>
-        )}
+        </div>
+
+        <Promo item={promos[3]} large />
       </div>
-    </div>
+    </section>
   );
 }
