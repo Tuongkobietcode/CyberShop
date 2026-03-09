@@ -21,27 +21,23 @@ type PromoBlock = {
 const promos: PromoBlock[] = [
   {
     title: "Popular Products",
-    copy:
-      "Minimal hardware and lifestyle picks arranged to feel premium, tactile, and ready to sell.",
+    copy: "Minimal hardware and lifestyle picks arranged to feel premium, tactile, and ready to sell.",
     image: "/images/Group 1.png",
   },
   {
     title: "Ipad Pro",
-    copy:
-      "Packed canvas, lightweight form, and a visual language built for modern workflows.",
+    copy: "Packed canvas, lightweight form, and a visual language built for modern workflows.",
     image: "/images/ipad.png",
   },
   {
     title: "Samsung Galaxy",
-    copy:
-      "A cinematic fold with luxurious surfaces and compact product storytelling.",
+    copy: "A cinematic fold with luxurious surfaces and compact product storytelling.",
     image: "/images/Iphone 14 pro 1 (5).png",
     dark: true,
   },
   {
     title: "Macbook Pro",
-    copy:
-      "Industrial materials and focused hierarchy to make premium hardware feel effortless.",
+    copy: "Industrial materials and focused hierarchy to make premium hardware feel effortless.",
     image: "/images/MacBookAir.png",
     dark: true,
   },
@@ -61,10 +57,16 @@ function ProductGrid({
           <h2 className="border-b border-black pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-900 sm:text-sm">
             {title}
           </h2>
-          <button type="button" className="text-sm text-slate-400 transition hover:text-slate-800">
+          <button
+            type="button"
+            className="text-sm text-slate-400 transition hover:text-slate-800"
+          >
             Bestseller
           </button>
-          <button type="button" className="text-sm text-slate-400 transition hover:text-slate-800">
+          <button
+            type="button"
+            className="text-sm text-slate-400 transition hover:text-slate-800"
+          >
             Featured Products
           </button>
         </div>
@@ -118,7 +120,10 @@ function formatMoney(value: number) {
   return `$${value.toLocaleString("en-US")}`;
 }
 
-function mapProducts(products: CatalogProduct[], favoriteIndex = -1): Product[] {
+function mapProducts(
+  products: CatalogProduct[],
+  favoriteIndex = -1,
+): Product[] {
   return products.map((product, index) => ({
     title: product.name,
     price: formatMoney(product.price),
@@ -204,12 +209,11 @@ function BigBanner() {
 
           <div className="relative z-10 max-w-2xl">
             <p className="text-[2.8rem] font-light tracking-[-0.05em] sm:text-6xl 2xl:text-7xl">
-              Big Summer{" "}
-              <span className="font-semibold text-white">Sale</span>
+              Big Summer <span className="font-semibold text-white">Sale</span>
             </p>
             <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/65 sm:text-base sm:leading-7 2xl:max-w-2xl">
-              Commodo fames vitae vitae leo mauris in. Eu consequat.
-              Faster layouts, cleaner styling, and premium summer energy.
+              Commodo fames vitae vitae leo mauris in. Eu consequat. Faster
+              layouts, cleaner styling, and premium summer energy.
             </p>
             <Link
               to="/products"
@@ -237,10 +241,14 @@ export default function ProductShowcaseSection() {
     loadProducts();
   }, []);
 
-  const newArrivals = useMemo(() => mapProducts(products.slice(0, 8), 5), [products]);
+  const newArrivals = useMemo(
+    () => mapProducts(products.slice(0, 8), 5),
+    [products],
+  );
   const discountProducts = useMemo(
-    () => mapProducts(products.filter((item) => item.compareAtPrice).slice(0, 4)),
-    [products]
+    () =>
+      mapProducts(products.filter((item) => item.compareAtPrice).slice(0, 4)),
+    [products],
   );
 
   return (
