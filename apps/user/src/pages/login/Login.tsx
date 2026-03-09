@@ -10,14 +10,14 @@ const Login = () => {
 
   const handleLogin = () => {
     if (!email.trim() || !password.trim()) {
-      alert("Vui lòng nhập đầy đủ email và mật khẩu!");
+      alert("Please enter both email and password!");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
-      alert("Vui lòng nhập địa chỉ email hợp lệ!");
+      alert("Please enter a valid email address!");
       return;
     }
   };
@@ -25,7 +25,17 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">Đăng nhập</h2>
+        <div
+          className="flex 
+         gap-3 mb-6"
+        >
+          <div>
+            <p className="text-xs tracking-widest text-gray-400 font-semibold">
+              CYBERSHOP
+            </p>
+            <h2 className="text-2xl font-bold text-gray-800">Login</h2>
+          </div>
+        </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Email</label>
@@ -42,12 +52,12 @@ const Login = () => {
         </div>
 
         <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Mật khẩu</label>
+          <label className="block text-sm font-medium mb-1">Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu"
+              placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pl-10 pr-10 py-2 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black"
@@ -68,7 +78,7 @@ const Login = () => {
             onClick={() => setShowForgotModal(true)}
             className="text-sm text-blue-600 hover:underline cursor-pointer"
           >
-            Quên mật khẩu?
+            Forgot password?
           </button>
         </div>
 
@@ -76,13 +86,13 @@ const Login = () => {
           onClick={handleLogin}
           className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:opacity-90 transition cursor-pointer"
         >
-          Đăng nhập
+          Login
         </button>
 
         <p className="text-center text-sm mt-6">
-          Chưa có tài khoản?{" "}
+          Don't have an account?{" "}
           <a href="#" className="text-blue-600 font-medium hover:underline">
-            Đăng ký ngay
+            Sign up now
           </a>
         </p>
       </div>
@@ -97,11 +107,11 @@ const Login = () => {
             </button>
 
             <h3 className="text-lg font-bold mb-4 text-center">
-              Quên mật khẩu
+              Forgot password
             </h3>
 
             <p className="text-sm text-gray-600 mb-4 ">
-              Nhập email để nhận mật khẩu mới
+              Enter your email to receive a new password
             </p>
 
             <div className="relative mb-4">
@@ -132,7 +142,7 @@ const Login = () => {
               }}
               className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:opacity-90 cursor-pointer"
             >
-              Gửi yêu cầu
+              Send request
             </button>
           </div>
         </div>

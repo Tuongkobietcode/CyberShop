@@ -11,11 +11,12 @@ const VnPayForm: React.FC = () => {
       />
 
       <p className="mb-6 text-sm text-gray-600">
-        Bạn sẽ được chuyển sang cổng thanh toán VNPay để hoàn tất giao dịch.
+        You will be redirected to the VNPay payment gateway to complete the
+        transaction.
       </p>
 
       <button className="w-full rounded-md bg-black py-3 text-sm font-medium text-white">
-        Thanh toán qua VNPay
+        Pay with VNPay
       </button>
     </div>
   );

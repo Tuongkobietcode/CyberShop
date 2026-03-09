@@ -15,20 +15,20 @@ const CreditCardForm: React.FC = () => {
       <div className="space-y-4">
         <input
           type="text"
-          placeholder="Tên chủ thẻ"
+          placeholder="Cardholder Name"
           className="w-full rounded-md border px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
         />
 
         <input
           type="text"
-          placeholder="Số thẻ"
+          placeholder="Card Number"
           className="w-full rounded-md border px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
         />
 
         <div className="flex gap-4">
           <input
             type="text"
-            placeholder="Ngày hết hạn"
+            placeholder="Exp Date"
             className="w-1/2 rounded-md border px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
           />
           <input
@@ -40,7 +40,7 @@ const CreditCardForm: React.FC = () => {
 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" defaultChecked />
-          Giống địa chỉ thanh toán
+          Same as billing address
         </label>
       </div>
     </>

@@ -45,7 +45,7 @@ const PaymentSummary: React.FC = () => {
 
   return (
     <div className="max-w-md rounded-xl border border-gray-50 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-semibold">Đơn hàng của bạn</h2>
+      <h2 className="mb-4 text-lg font-semibold">Summary</h2>
 
       <div className="space-y-3">
         {products.map((product) => (
@@ -69,31 +69,31 @@ const PaymentSummary: React.FC = () => {
       </div>
 
       <div className="mt-5 text-sm">
-        <p className="font-medium">Địa chỉ nhận hàng</p>
+        <p className="font-medium">Address</p>
         <p className="text-gray-600">123 Nguyễn Trãi, Ba Đình Hà Nội</p>
       </div>
 
       <div className="mt-3 text-sm">
-        <p className="font-medium">Phương thức vận chuyển</p>
-        <p className="text-gray-600">Giao hàng tiêu chuẩn</p>
+        <p className="font-medium">Shipping method</p>
+        <p className="text-gray-600">Free</p>
       </div>
 
       <div className="mt-5 space-y-2 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-600">Tạm tính</span>
+          <span className="text-gray-600">Subtotal</span>
           <span>{formatVND(subtotal)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Thuế ước tính</span>
+          <span className="text-gray-600">Estimated Tax</span>
           <span>{formatVND(tax)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Phí vận chuyển</span>
+          <span className="text-gray-600">Estimated shipping & Handling</span>
           <span>{formatVND(shipping)}</span>
         </div>
 
         <div className="flex justify-between border-t pt-3 text-base font-semibold">
-          <span>Tổng cộng</span>
+          <span>Total</span>
           <span>{formatVND(total)}</span>
         </div>
       </div>

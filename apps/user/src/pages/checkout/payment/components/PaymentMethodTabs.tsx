@@ -9,7 +9,7 @@ const PaymentMethodTabs: React.FC = () => {
 
   return (
     <div className="max-w-lg rounded-xl border border-gray-50 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold">Thanh toán</h2>
+      <h2 className="mb-4 text-xl font-semibold">Payment</h2>
 
       <div className="mb-6 flex gap-6 text-sm">
         <button
@@ -18,7 +18,7 @@ const PaymentMethodTabs: React.FC = () => {
             method === "card" ? "border-b-2 border-black" : "text-gray-400"
           }`}
         >
-          Thẻ tín dụng
+          Credit Card
         </button>
 
         <button
@@ -36,12 +36,12 @@ const PaymentMethodTabs: React.FC = () => {
 
       <div className="mt-8 flex gap-4">
         <button className="w-1/2 rounded-md border py-2 text-sm font-medium">
-          Quay lại
+          Back
         </button>
 
         {method === "card" && (
           <button className="w-1/2 rounded-md bg-black py-2 text-sm font-medium text-white">
-            Thanh toán
+            Pay
           </button>
         )}
       </div>
