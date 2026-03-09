@@ -1,0 +1,305 @@
+import { Category } from "../categories/category.model.js";
+import { Product } from "./product.model.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { buildMeta, getPagination } from "../../utils/pagination.js";
+import { createHttpError } from "../../utils/createHttpError.js";
+import { toSlug } from "../../utils/slug.js";
+
+function mapProductStatus(product) {
+  if (product.stock === 0 || product.status === "out_of_stock") {
+    return "out_of_stock";
+  }
+
+  if (product.featured) {
+    return "featured";
+  }
+
+  if (product.compareAtPrice && product.compareAtPrice > product.price) {
+    return "sale";
+  }
+
+  return "normal";
+}
+
+function sanitizeProduct(product) {
+  const category = product.categoryId && typeof product.categoryId === "object"
+    ? {
+        id: product.categoryId.id,
+        name: product.categoryId.name,
+        slug: product.categoryId.slug,
+      }
+    : null;
+
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    sku: product.sku,
+    description: product.description,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice,
+    stock: product.stock,
+    featured: product.featured,
+    status: product.status,
+    displayStatus: mapProductStatus(product),
+    category,
+    image: product.images[0]?.url || "",
+    images: product.images,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+  };
+}
+
+async function buildProductFilter(query, options = {}) {
+  const filter = {};
+  const search = String(query.search || "").trim();
+  const category = String(query.category || "").trim();
+  const status = String(query.status || "").trim();
+  const featured = query.featured;
+
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { slug: { $regex: search, $options: "i" } },
+      { sku: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  if (category) {
+    if (/^[a-f\d]{24}$/i.test(category)) {
+      filter.categoryId = category;
+    } else {
+      const matchedCategory = await Category.findOne({ slug: category }).select("_id");
+      filter.categoryId = matchedCategory ? matchedCategory._id : null;
+    }
+  }
+
+  if (featured !== undefined) {
+    filter.featured = String(featured) === "true";
+  }
+
+  if (status) {
+    if (status === "sale") {
+      filter.compareAtPrice = { $gt: 0 };
+    } else if (status === "featured") {
+      filter.featured = true;
+    } else if (status === "out_of_stock") {
+      filter.$or = [
+        ...(filter.$or || []),
+        { status: "out_of_stock" },
+        { stock: 0 },
+      ];
+    } else {
+      filter.status = status;
+    }
+  }
+
+  if (options.publicOnly) {
+    filter.status = "active";
+  }
+
+  return filter;
+}
+
+function buildProductSort(query) {
+  const sortBy = String(query.sortBy || "createdAt");
+  const order = String(query.order || "desc") === "asc" ? 1 : -1;
+
+  if (["name", "price", "stock", "createdAt"].includes(sortBy)) {
+    return { [sortBy]: order };
+  }
+
+  return { createdAt: -1 };
+}
+
+async function ensureCategoryExists(categoryId) {
+  const category = await Category.findById(categoryId);
+
+  if (!category) {
+    throw createHttpError(400, "Category does not exist");
+  }
+
+  return category;
+}
+
+export const listProducts = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = getPagination(req.query);
+  const filter = await buildProductFilter(req.query, { publicOnly: true });
+  const sort = buildProductSort(req.query);
+
+  const [items, total] = await Promise.all([
+    Product.find(filter)
+      .populate("categoryId", "name slug")
+      .sort(sort)
+      .skip(skip)
+      .limit(limit),
+    Product.countDocuments(filter),
+  ]);
+
+  res.json({
+    success: true,
+    message: "Products fetched successfully",
+    data: items.map(sanitizeProduct),
+    meta: buildMeta(page, limit, total),
+  });
+});
+
+export const getProductDetail = asyncHandler(async (req, res) => {
+  const product = await Product.findOne({
+    slug: req.params.slug,
+    status: "active",
+  }).populate("categoryId", "name slug");
+
+  if (!product) {
+    throw createHttpError(404, "Product not found");
+  }
+
+  res.json({
+    success: true,
+    message: "Product fetched successfully",
+    data: sanitizeProduct(product),
+  });
+});
+
+export const listAdminProducts = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = getPagination(req.query);
+  const filter = await buildProductFilter(req.query);
+  const sort = buildProductSort(req.query);
+
+  const [items, total] = await Promise.all([
+    Product.find(filter)
+      .populate("categoryId", "name slug")
+      .sort(sort)
+      .skip(skip)
+      .limit(limit),
+    Product.countDocuments(filter),
+  ]);
+
+  res.json({
+    success: true,
+    message: "Admin products fetched successfully",
+    data: items.map(sanitizeProduct),
+    meta: buildMeta(page, limit, total),
+  });
+});
+
+export const createProduct = asyncHandler(async (req, res) => {
+  const name = String(req.body.name || "").trim();
+  const sku = String(req.body.sku || "").trim().toUpperCase();
+  const categoryId = String(req.body.categoryId || "").trim();
+
+  if (!name || !sku || !categoryId) {
+    throw createHttpError(400, "Name, SKU, and categoryId are required");
+  }
+
+  await ensureCategoryExists(categoryId);
+
+  const slug = String(req.body.slug || toSlug(name)).trim().toLowerCase();
+  const duplicate = await Product.findOne({
+    $or: [{ slug }, { sku }],
+  });
+
+  if (duplicate) {
+    throw createHttpError(409, "Product slug or SKU already exists");
+  }
+
+  const product = await Product.create({
+    name,
+    slug,
+    sku,
+    description: String(req.body.description || "").trim(),
+    price: Number(req.body.price),
+    compareAtPrice:
+      req.body.compareAtPrice === undefined || req.body.compareAtPrice === null
+        ? null
+        : Number(req.body.compareAtPrice),
+    stock: Number(req.body.stock ?? 0),
+    status: String(req.body.status || "draft"),
+    featured: Boolean(req.body.featured),
+    categoryId,
+    images: Array.isArray(req.body.images) ? req.body.images : [],
+  });
+
+  await product.populate("categoryId", "name slug");
+
+  res.status(201).json({
+    success: true,
+    message: "Product created successfully",
+    data: sanitizeProduct(product),
+  });
+});
+
+export const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    throw createHttpError(404, "Product not found");
+  }
+
+  const nextName = req.body.name === undefined ? product.name : String(req.body.name).trim();
+  const nextSku = req.body.sku === undefined ? product.sku : String(req.body.sku).trim().toUpperCase();
+  const nextSlug =
+    req.body.slug === undefined
+      ? product.slug
+      : String(req.body.slug || toSlug(nextName)).trim().toLowerCase();
+
+  if (req.body.categoryId !== undefined) {
+    await ensureCategoryExists(String(req.body.categoryId).trim());
+  }
+
+  const duplicate = await Product.findOne({
+    _id: { $ne: product._id },
+    $or: [{ slug: nextSlug }, { sku: nextSku }],
+  });
+
+  if (duplicate) {
+    throw createHttpError(409, "Product slug or SKU already exists");
+  }
+
+  product.name = nextName;
+  product.slug = nextSlug;
+  product.sku = nextSku;
+  product.description =
+    req.body.description === undefined ? product.description : String(req.body.description || "").trim();
+  product.price = req.body.price === undefined ? product.price : Number(req.body.price);
+  product.compareAtPrice =
+    req.body.compareAtPrice === undefined ? product.compareAtPrice : req.body.compareAtPrice === null
+      ? null
+      : Number(req.body.compareAtPrice);
+  product.stock = req.body.stock === undefined ? product.stock : Number(req.body.stock);
+  product.status = req.body.status === undefined ? product.status : String(req.body.status);
+  product.featured =
+    req.body.featured === undefined ? product.featured : Boolean(req.body.featured);
+  product.categoryId =
+    req.body.categoryId === undefined ? product.categoryId : String(req.body.categoryId).trim();
+  product.images = Array.isArray(req.body.images) ? req.body.images : product.images;
+
+  await product.save();
+  await product.populate("categoryId", "name slug");
+
+  res.json({
+    success: true,
+    message: "Product updated successfully",
+    data: sanitizeProduct(product),
+  });
+});
+
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    throw createHttpError(404, "Product not found");
+  }
+
+  product.status = "archived";
+  await product.save();
+  await product.populate("categoryId", "name slug");
+
+  res.json({
+    success: true,
+    message: "Product archived successfully",
+    data: sanitizeProduct(product),
+  });
+});
+
+
