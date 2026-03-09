@@ -28,26 +28,25 @@ const statusStyle = {
 };
 
 const statusText = {
-  complete: "Hoàn thành",
-  pending: "Đang chờ xử lý",
-  canceled: "Đã huỷ",
+  complete: "Complete",
+  pending: "Pending",
+  canceled: "Canceled",
 };
 
 export const TransactionsTable: React.FC = () => {
   return (
     <div className="bg-white overflow-hidden">
 
-      {/* Table */}
       <table className="w-full text-sm">
         <thead className="bg-green-100 text-gray-700">
           <tr>
-            <th className="text-left px-6 py-3 font-medium">Mã khách hàng</th>
-            <th className="text-left px-6 py-3 font-medium">Tên</th>
-            <th className="text-left px-6 py-3 font-medium">Ngày</th>
-            <th className="text-left px-6 py-3 font-medium">Tổng</th>
-            <th className="text-left px-6 py-3 font-medium">Phương thức</th>
-            <th className="text-left px-6 py-3 font-medium">Trạng thái</th>
-            <th className="text-left px-6 py-3 font-medium">Hoạt động</th>
+            <th className="text-left px-6 py-3 font-medium">Customer ID</th>
+            <th className="text-left px-6 py-3 font-medium">Name</th>
+            <th className="text-left px-6 py-3 font-medium">Date</th>
+            <th className="text-left px-6 py-3 font-medium">Total</th>
+            <th className="text-left px-6 py-3 font-medium">Method</th>
+            <th className="text-left px-6 py-3 font-medium">Status</th>
+            <th className="text-left px-6 py-3 font-medium">Action</th>
           </tr>
         </thead>
 
@@ -60,7 +59,6 @@ export const TransactionsTable: React.FC = () => {
               <td className="px-6 py-4">{t.total}</td>
               <td className="px-6 py-4">{t.method}</td>
 
-              {/* Status */}
               <td className="px-6 py-4">
                 <span className={`flex items-center gap-2 ${statusStyle[t.status]}`}>
                   <span className="w-2 h-2 rounded-full bg-current"></span>
@@ -68,10 +66,9 @@ export const TransactionsTable: React.FC = () => {
                 </span>
               </td>
 
-              {/* Action */}
               <td className="px-6 py-4">
                 <button className="text-blue-600 hover:underline">
-                  Xem chi tiết
+                  View Details
                 </button>
               </td>
             </tr>
@@ -79,11 +76,10 @@ export const TransactionsTable: React.FC = () => {
         </tbody>
       </table>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between p-4">
 
         <button className="px-4 py-2 shadow-sm rounded-lg hover:bg-gray-50">
-          ← Trước
+          ← Previous
         </button>
 
         <div className="flex gap-2">
@@ -97,7 +93,7 @@ export const TransactionsTable: React.FC = () => {
         </div>
 
         <button className="px-4 py-2 shadow-sm rounded-lg hover:bg-gray-50">
-          Sau →
+          Next →
         </button>
 
       </div>

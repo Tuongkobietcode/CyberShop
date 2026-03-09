@@ -13,7 +13,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, change, positive }) => 
     <div className="bg-white rounded-xl shadow-sm p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-600">{title}</h3>
-        <MoreVertical size={16} className="text-gray-400 cursor-pointer" />
+        <MoreVertical size={16} className="text-gray-500 cursor-pointer" />
       </div>
 
       <div className="flex items-end gap-3">
@@ -28,7 +28,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, change, positive }) => 
         </span>
       </div>
 
-      <span className="text-xs text-gray-400">7 ngày qua</span>
+      <span className="text-xs text-gray-400">Last 7 days</span>
     </div>
   );
 };
@@ -37,28 +37,28 @@ export const TransactionKpiRow: React.FC = () => {
   return (
     <div className="grid grid-cols-2 gap-5">
       <KpiCard
-        title="Tổng doanh thu"
+        title="Total Revenue"
         value="$15,045"
         change="14.4%"
         positive
       />
 
       <KpiCard
-        title="Giao dịch đã hoàn tất"
+        title="Completed Transactions"
         value="3,150"
         change="20%"
         positive
       />
 
       <KpiCard
-        title="Giao dịch đang chờ xử lý"
+        title="Pending Transactions"
         value="150"
         change="85%"
         positive
       />
 
       <KpiCard
-        title="Giao dịch thất bại"
+        title="Failed Transactions"
         value="75"
         change="15%"
         positive={false}
