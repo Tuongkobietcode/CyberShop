@@ -8,6 +8,8 @@ type ApiResponse<T> = {
 };
 
 export async function getDashboardSummary() {
-  const response = await http.get<ApiResponse<DashboardSummary>>("/admin/dashboard/summary");
+  const response = await http.get<ApiResponse<DashboardSummary>>(
+    "/admin/dashboard/summary",
+  );
   return response.data.data;
 }
