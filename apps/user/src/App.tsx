@@ -8,7 +8,9 @@
 
 // import { RegisterPage } from "./pages/register/RegisterPage";
 
-import { CustomerDetailPage } from "./pages/customer-detail/CustomerDetailPage";
+// import { CustomerDetailPage } from "./pages/customer-detail/CustomerDetailPage";
+
+import { Page404 } from "./pages/404/404Page";
 
 function App() {
     // return <OrderSummary />
@@ -21,7 +23,9 @@ function App() {
     
     // return <RegisterPage />
 
-    return <CustomerDetailPage />
+    // return <CustomerDetailPage />
+
+    return <Page404 />
 }
 
 export default App;
