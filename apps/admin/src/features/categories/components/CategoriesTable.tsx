@@ -7,7 +7,7 @@ type Props = {
 
 export function CategoriesTable({ rows }: Props) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-[5px] border border-slate-200 bg-white">
       <div className="overflow-x-auto">
         <table className="w-full min-w-190 border-separate border-spacing-0 text-sm">
           <thead>
@@ -38,7 +38,7 @@ export function CategoriesTable({ rows }: Props) {
                     <img
                       src={row.image}
                       alt={row.name}
-                      className="h-11 w-11 rounded-xl object-cover"
+                      className="h-11 w-11 rounded-[5px] object-cover"
                     />
                     <span className="font-medium text-slate-800">{row.name}</span>
                   </div>
