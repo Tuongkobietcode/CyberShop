@@ -1,0 +1,541 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>CyberShop Mentor Guide</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.55; color: #111; margin: 36px; }
+    h1, h2, h3, h4 { color: #0f172a; margin-top: 28px; margin-bottom: 10px; }
+    h1 { font-size: 28px; border-bottom: 2px solid #111; padding-bottom: 8px; }
+    h2 { font-size: 22px; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; }
+    h3 { font-size: 18px; }
+    h4 { font-size: 15px; }
+    p, li { font-size: 13px; }
+    code { background: #f1f5f9; padding: 1px 4px; border-radius: 4px; font-family: Consolas, monospace; font-size: 12px; }
+    pre { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; white-space: pre-wrap; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
+    th, td { border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; font-size: 12px; }
+    th { background: #f8fafc; text-align: left; }
+    .muted { color: #475569; }
+    .note { background: #fff7ed; border-left: 4px solid #f97316; padding: 10px 12px; margin: 12px 0; }
+    .good { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 10px 12px; margin: 12px 0; }
+    .warn { background: #fef2f2; border-left: 4px solid #ef4444; padding: 10px 12px; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>CyberShop Mentor Guide</h1>
+  <p><b>Mục tiêu tài liệu</b>: giúp bạn hiểu flow dự án, kiến trúc hệ thống, cách đọc code, lý do kỹ thuật đằng sau từng phần, và có đủ kiến thức để thuyết trình trước hội đồng trong 2 ngày.</p>
+  <p class="muted">Tài liệu này được viết theo vai trò mentor: giải thích từ bức tranh lớn đến file cụ thể, kèm kiến thức nền, câu hỏi review, và cách trả lời.</p>
+
+  <h2>1. Dự Án Này Là Gì</h2>
+  <p>CyberShop là một dự án ecommerce dạng monorepo gồm 3 ứng dụng:</p>
+  <ul>
+    <li><b>User app</b>: storefront cho khách xem sản phẩm, đăng ký, đăng nhập, wishlist, cart, checkout, profile.</li>
+    <li><b>Admin app</b>: giao diện quản trị để xem dashboard, orders, customers, categories, products, transactions.</li>
+    <li><b>API app</b>: backend Node.js + Express + MongoDB, cung cấp dữ liệu và xử lý nghiệp vụ cho cả user và admin.</li>
+  </ul>
+  <h3>Mục tiêu demo của dự án</h3>
+  <ul>
+    <li>Guest có thể vào web để xem trang, xem sản phẩm, tìm kiếm, đọc blog, about, contact.</li>
+    <li>Customer phải đăng ký / đăng nhập mới được thêm wishlist, thêm cart, checkout.</li>
+    <li>Admin đăng nhập vào khu vực quản trị để xem dữ liệu kinh doanh.</li>
+  </ul>
+  <div class="good">Điểm mạnh của dự án khi demo: có flow đầy đủ từ người dùng xem sản phẩm đến mua hàng, sau đó admin nhìn thấy dữ liệu phát sinh ở dashboard / orders / customers.</div>
+
+  <h2>2. Flow Nghiệp Vụ Toàn Hệ Thống</h2>
+  <h3>2.1. Flow Guest</h3>
+  <ol>
+    <li>Người dùng vào <code>/</code> thấy auth landing.</li>
+    <li>Người dùng bấm chữ <b>Cyber</b> để vào storefront guest tại <code>/home</code>.</li>
+    <li>Guest được xem home, products, product detail, search, about, contact, blog.</li>
+    <li>Nếu guest bấm <code>Add to Wishlist</code>, <code>Add to Cart</code>, vào <code>/wishlist</code>, <code>/cart</code> hoặc checkout thì bị yêu cầu đăng nhập.</li>
+  </ol>
+  <h3>2.2. Flow Customer</h3>
+  <ol>
+    <li>Customer sign up tại <code>/sign-up</code>.</li>
+    <li>Đăng ký xong được đưa về <code>/sign-in</code>.</li>
+    <li>Customer đăng nhập.</li>
+    <li>Có thể thêm wishlist, thêm cart, đi checkout 3 bước: address - shipping - payment.</li>
+    <li>Khi bấm pay, backend tạo order thật trong MongoDB.</li>
+    <li>Customer vào profile để xem thông tin, địa chỉ, lịch sử đơn.</li>
+  </ol>
+  <h3>2.3. Flow Admin</h3>
+  <ol>
+    <li>Admin đăng nhập.</li>
+    <li>Xem dashboard tổng quan.</li>
+    <li>Xem order mới từ customer.</li>
+    <li>Xem customer đã đăng ký.</li>
+    <li>Quản lý category và product.</li>
+  </ol>
+  <h3>2.4. Flow dữ liệu đi như thế nào</h3>
+  <pre>User/Admin UI -> Axios service -> Express API -> Controller -> Model(Mongoose) -> MongoDB
+MongoDB -> Controller -> JSON Response -> Axios -> React state -> UI render</pre>
+
+  <h2>3. Kiến Thức Nền Cần Có Để Hiểu Dự Án</h2>
+  <h3>3.1. Monorepo là gì</h3>
+  <p>Monorepo là một repository chứa nhiều ứng dụng con. Ở đây: <code>apps/user</code>, <code>apps/admin</code>, <code>apps/api</code>. Lợi ích: FE và BE nằm cùng một chỗ, dễ đồng bộ, dễ chia sẻ assets và cách setup.</p>
+  <h3>3.2. REST API là gì</h3>
+  <p>REST API là cách backend cung cấp dữ liệu qua HTTP endpoint như <code>GET /api/products</code>, <code>POST /api/orders</code>, <code>POST /api/auth/customer/login</code>.</p>
+  <h3>3.3. JWT và Refresh Token</h3>
+  <p>Access token dùng cho request hằng ngày, thời gian sống ngắn. Refresh token dùng để xin access token mới khi token cũ hết hạn.</p>
+  <h3>3.4. Mongoose và MongoDB</h3>
+  <p>MongoDB là NoSQL database, lưu dữ liệu dưới dạng document. Mongoose là lớp model/schema cho Node.js.</p>
+  <h3>3.5. State management trong React</h3>
+  <p>Dự án chủ yếu dùng React context + hooks thay vì Redux. Ví dụ: <code>auth.context.tsx</code> quản lý customer session, <code>cart.context.tsx</code> quản lý cart/wishlist/checkout.</p>
+  <h3>3.6. Protected Route là gì</h3>
+  <p>Protected route là route chỉ cho phép user đã đăng nhập vào được. Dự án dùng component guard như <code>RequireCustomerAuth</code>.</p>
+  <h3>3.7. Shared assets qua backend là gì</h3>
+  <p>Ảnh dùng chung được đặt tại <code>shared/assets/images</code>. Backend serve thư mục này qua URL chung <code>/assets/images/...</code>. Cả admin và user đều render từ URL này.</p>
+
+  <h2>4. Cách Đọc Code Toàn Dự Án</h2>
+  <ol>
+    <li>Bức tranh hệ thống: package.json, apps nào có trong repo.</li>
+    <li>Entry point: <code>main.tsx</code> hoặc <code>server.js</code>.</li>
+    <li>Router: route nào map tới page nào.</li>
+    <li>Service/API layer: frontend gọi backend thế nào.</li>
+    <li>Context/store: state ở đâu.</li>
+    <li>Pages: trang lớn lấy data và ghép component.</li>
+    <li>Components: UI nhỏ bên trong page.</li>
+    <li>Backend controller -> model -> seed.</li>
+  </ol>
+  <div class="note">Khi thuyết trình, đừng nói “em đọc hết code”. Hãy nói “em đọc theo kiến trúc hệ thống: entry points, routing, state, API layer, business modules”.</div>
+
+  <h2>5. Cấu Trúc Thư Mục Tổng Quan</h2>
+  <table>
+    <tr><th>Thư mục</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api</code></td><td>Backend Express + MongoDB</td></tr>
+    <tr><td><code>apps/user</code></td><td>Frontend storefront cho guest/customer</td></tr>
+    <tr><td><code>apps/admin</code></td><td>Frontend quản trị</td></tr>
+    <tr><td><code>shared/assets/images</code></td><td>Ảnh dùng chung, được backend serve</td></tr>
+    <tr><td><code>README.md</code></td><td>Tài liệu setup chạy dự án</td></tr>
+    <tr><td><code>package.json</code></td><td>Scripts và workspace ở root</td></tr>
+  </table>
+
+  <h2>6. Root Level: File Cần Hiểu Trước</h2>
+  <h3>6.1. <code>package.json</code></h3>
+  <p>Đây là file gốc của monorepo. Em cần nhìn vào workspace đang quản lý các app nào và cách npm workspace được dùng để chạy từng app bằng <code>npm --workspace apps/user run dev</code>.</p>
+  <h3>6.2. <code>README.md</code></h3>
+  <p>README giải thích cách cài và chạy dự án trên máy khác. Đây là file rất quan trọng khi làm việc nhóm.</p>
+  <h3>6.3. <code>.gitignore</code></h3>
+  <p>File này nói Git bỏ qua file nào, ví dụ <code>node_modules</code>, <code>.env</code>, log và cache. Kiến thức liên quan: không commit bí mật thật lên GitHub.</p>
+
+  <h2>7. Backend: Giải Thích Hệ Thống Và File Chính</h2>
+  <h3>7.1. Entry point backend</h3>
+  <h4><code>apps/api/src/server.js</code></h4>
+  <p>Vai trò: load environment variables, kết nối MongoDB, khởi động Express app. Kiến thức cần hiểu: server bootstrap là nơi app bắt đầu chạy, nếu DB không kết nối được thì app backend không ổn định.</p>
+  <h4><code>apps/api/src/app.js</code></h4>
+  <p>Vai trò: tạo Express app, gắn middleware như CORS, JSON parser, helmet, cookie parser, logger, serve assets chung tại <code>/assets/images</code>, mount routes dưới <code>/api</code>.</p>
+  <p>Kiến thức: middleware, CORS, helmet, express.static.</p>
+
+  <h3>7.2. DB config</h3>
+  <h4><code>apps/api/src/config/db.js</code></h4>
+  <p>File này tập trung phần connect MongoDB. Tách riêng ra để <code>server.js</code> gọn hơn.</p>
+
+  <h3>7.3. Root router</h3>
+  <h4><code>apps/api/src/routes/index.js</code></h4>
+  <p>Đây là “cổng phân phối” của backend. Nó mount tất cả route module như auth admin, auth customer, me/profile, products, categories, orders, dashboard, contact.</p>
+  <p>Kiến thức cần hiểu: route composition, chia module theo domain thay vì nhét hết vào 1 file.</p>
+
+  <h3>7.4. Auth admin</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th><th>Kiến thức</th></tr>
+    <tr><td><code>apps/api/src/modules/auth/admin.model.js</code></td><td>Schema admin</td><td>Mongoose schema, unique email, role/status</td></tr>
+    <tr><td><code>apps/api/src/modules/auth/refresh-token.model.js</code></td><td>Lưu refresh token</td><td>Refresh token persistence</td></tr>
+    <tr><td><code>apps/api/src/modules/auth/auth.service.js</code></td><td>Logic login/refresh/logout admin</td><td>Service layer, bcrypt compare, token issue</td></tr>
+    <tr><td><code>apps/api/src/modules/auth/auth.controller.js</code></td><td>Nhận request và gọi service</td><td>Controller pattern</td></tr>
+    <tr><td><code>apps/api/src/modules/auth/auth.route.js</code></td><td>Định nghĩa endpoint admin auth</td><td>REST routing</td></tr>
+    <tr><td><code>apps/api/src/middlewares/requireAdminAuth.js</code></td><td>Bảo vệ route admin</td><td>Authorization middleware</td></tr>
+    <tr><td><code>apps/api/src/utils/token.js</code></td><td>Tạo/verify token, cookie config</td><td>JWT utility</td></tr>
+  </table>
+  <p><b>Điểm nên nói khi thuyết trình</b>: admin auth tách service/controller để business logic và HTTP layer không trộn lẫn.</p>
+
+  <h3>7.5. Auth customer và profile customer</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th><th>Giải thích</th></tr>
+    <tr><td><code>apps/api/src/modules/customers/customer.model.js</code></td><td>Schema customer</td><td>Lưu account, addresses, flags như isRegistered, lastLoginAt</td></tr>
+    <tr><td><code>apps/api/src/modules/customers/customer-auth.controller.js</code></td><td>Register/login/logout/refresh/me</td><td>Auth riêng cho customer</td></tr>
+    <tr><td><code>apps/api/src/modules/customers/customer-auth.route.js</code></td><td>Route auth customer</td><td>Mount dưới /api/auth/customer</td></tr>
+    <tr><td><code>apps/api/src/modules/customers/customer-me.controller.js</code></td><td>Profile, order history, address CRUD</td><td>“me” endpoint cho chính customer đang login</td></tr>
+    <tr><td><code>apps/api/src/modules/customers/customer-me.route.js</code></td><td>Route /api/me/*</td><td>Profile/address/order API</td></tr>
+    <tr><td><code>apps/api/src/middlewares/requireCustomerAuth.js</code></td><td>Bảo vệ route customer</td><td>Xác thực customer trước khi cho vào cart/checkout/profile</td></tr>
+  </table>
+  <p>Kiến thức cần nắm: <b>me endpoint</b> nghĩa là backend dùng token để biết “tôi là ai”, thay vì frontend gửi user id lung tung; <b>Address CRUD</b> là create/read/update/delete địa chỉ của customer.</p>
+
+  <h3>7.6. Category module</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api/src/modules/categories/category.model.js</code></td><td>Schema category</td></tr>
+    <tr><td><code>apps/api/src/modules/categories/category.controller.js</code></td><td>List public, list admin, create, update, disable</td></tr>
+    <tr><td><code>apps/api/src/modules/categories/category.route.js</code></td><td>Route cho categories</td></tr>
+  </table>
+  <p>Category là cầu nối giữa home categories, catalog filter, và admin quản lý.</p>
+
+  <h3>7.7. Product module</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api/src/modules/products/product.model.js</code></td><td>Schema product</td></tr>
+    <tr><td><code>apps/api/src/modules/products/product.controller.js</code></td><td>List, detail, admin CRUD, filter theo category/status/featured</td></tr>
+    <tr><td><code>apps/api/src/modules/products/product.route.js</code></td><td>Routes products</td></tr>
+  </table>
+  <p>Kiến thức cần hiểu: slug, featured, status.</p>
+
+  <h3>7.8. Order module</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api/src/modules/orders/order.model.js</code></td><td>Schema order và order items</td></tr>
+    <tr><td><code>apps/api/src/modules/orders/order.controller.js</code></td><td>Create order public/customer, admin list/update status</td></tr>
+    <tr><td><code>apps/api/src/modules/orders/order.route.js</code></td><td>Routes orders</td></tr>
+  </table>
+  <p>Checkout kết thúc ở đây: khi customer bấm pay, frontend gọi create order. Backend ghi order vào DB.</p>
+
+  <h3>7.9. Dashboard module</h3>
+  <p><code>apps/api/src/modules/dashboard/dashboard.controller.js</code> tổng hợp số liệu từ orders, customers, products để admin dashboard render KPI. Kiến thức: dashboard thường không dùng 1 model, mà là dữ liệu tổng hợp từ nhiều collection.</p>
+
+  <h3>7.10. Contact module</h3>
+  <p>Contact form của user gửi vào các file contact model/controller/route. Hiện tại contact form lưu vào MongoDB, chưa gửi mail ngoài.</p>
+
+  <h3>7.11. Middleware lỗi</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api/src/middlewares/errorHandler.js</code></td><td>Xử lý lỗi tập trung</td></tr>
+    <tr><td><code>apps/api/src/middlewares/notFoundHandler.js</code></td><td>Trả lỗi khi route không tồn tại</td></tr>
+  </table>
+  <p>Kiến thức: centralized error handling giúp controller gọn hơn và response lỗi nhất quán.</p>
+  <h3>7.12. Seed scripts</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/api/src/scripts/seed-admin.js</code></td><td>Tạo admin demo</td></tr>
+    <tr><td><code>apps/api/src/scripts/seed-categories.js</code></td><td>Seed category</td></tr>
+    <tr><td><code>apps/api/src/scripts/seed-products.js</code></td><td>Seed products đúng concept user</td></tr>
+    <tr><td><code>apps/api/src/scripts/seed-customers.js</code></td><td>Seed customer đăng ký thật</td></tr>
+    <tr><td><code>apps/api/src/scripts/seed-orders.js</code></td><td>Seed orders</td></tr>
+    <tr><td><code>apps/api/src/scripts/seed-demo.js</code></td><td>Chạy toàn bộ seed theo thứ tự</td></tr>
+  </table>
+  <p>Kiến thức: seed giúp mọi máy clone dự án về có dữ liệu giống nhau để demo.</p>
+
+  <h2>8. Frontend User: Kiến Trúc Và File Chính</h2>
+  <h3>8.1. Entry point user</h3>
+  <h4><code>apps/user/src/main.tsx</code></h4>
+  <p>Vai trò: render React app vào DOM, wrap các provider như auth/cart, và gắn router cho user app. Kiến thức: provider là nơi cấp state/context cho toàn app.</p>
+
+  <h3>8.2. Router user</h3>
+  <h4><code>apps/user/src/app/router.tsx</code></h4>
+  <p>Đây là xương sống điều hướng của user app. Em cần hiểu các route chính:</p>
+  <ul>
+    <li><code>/</code> auth landing</li>
+    <li><code>/home</code> storefront guest</li>
+    <li><code>/products</code></li>
+    <li><code>/products/:slug</code></li>
+    <li><code>/wishlist</code> protected</li>
+    <li><code>/cart</code> protected</li>
+    <li><code>/checkout/address</code>, <code>/shipping</code>, <code>/payment</code> protected</li>
+    <li><code>/profile</code> protected</li>
+    <li><code>/about</code>, <code>/contact</code>, <code>/blog</code>, <code>/blog/:slug</code></li>
+  </ul>
+
+  <h3>8.3. HTTP client và assets</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/user/src/services/http.ts</code></td><td>Axios client dùng cho API</td></tr>
+    <tr><td><code>apps/user/src/utils/assets.ts</code></td><td>Resolve path ảnh /assets/images thông qua backend URL</td></tr>
+  </table>
+  <p>Kiến thức: Axios instance, env var <code>VITE_API_URL</code>, và tại sao frontend không hard-code domain.</p>
+
+  <h3>8.4. Auth customer ở frontend</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th><th>Kiến thức</th></tr>
+    <tr><td><code>apps/user/src/features/auth/auth.context.tsx</code></td><td>Auth state, signIn, signUp, signOut, refreshProfile</td><td>React Context</td></tr>
+    <tr><td><code>apps/user/src/features/auth/auth.service.ts</code></td><td>Gọi API auth/me/profile/address</td><td>Service layer</td></tr>
+    <tr><td><code>apps/user/src/features/auth/auth.storage.ts</code></td><td>Lưu token/customer vào storage</td><td>Persistence</td></tr>
+    <tr><td><code>apps/user/src/features/auth/auth.types.ts</code></td><td>Type cho customer, address, payload</td><td>Type modeling</td></tr>
+    <tr><td><code>apps/user/src/features/auth/RequireCustomerAuth.tsx</code></td><td>Guard route protected</td><td>Protected route</td></tr>
+    <tr><td><code>apps/user/src/features/auth/AuthExperience.tsx</code></td><td>Shared auth UI engine cho sign-in/sign-up</td><td>Shared presentation + route state</td></tr>
+  </table>
+
+  <h3>8.5. Pages sign-in / sign-up</h3>
+  <ul>
+    <li><code>apps/user/src/pages/sign-in/SignInPage.tsx</code></li>
+    <li><code>apps/user/src/pages/sign-up/SignUpPage.tsx</code></li>
+  </ul>
+  <p>Đây là auth landing theo concept của dự án: người dùng thấy auth trước, nhưng vẫn có thể bấm <b>Cyber</b> để vào web dưới dạng guest.</p>
+
+  <h3>8.6. Cart, wishlist, checkout state</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/user/src/features/cart/cart.context.tsx</code></td><td>Trung tâm state cho cart, wishlist, checkout, addresses</td></tr>
+    <tr><td><code>apps/user/src/features/cart/cart.types.ts</code></td><td>Định nghĩa item, summary, shipping method...</td></tr>
+    <tr><td><code>apps/user/src/features/order/order.service.ts</code></td><td>Gọi API tạo order</td></tr>
+  </table>
+  <p>Kiến thức cần hiểu ở <code>cart.context.tsx</code>:</p>
+  <ul>
+    <li>State được namespaced theo customer id, nên cart/wishlist của từng customer không bị lẫn.</li>
+    <li>Guest không được quyền thêm cart/wishlist theo nghiệp vụ mới.</li>
+    <li>Checkout state gồm selected address, shipping method, payment method.</li>
+  </ul>
+
+  <h3>8.7. Layout user</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/user/src/components/layout/MainLayout.tsx</code></td><td>Khung chung cho trang public/protected</td></tr>
+    <tr><td><code>apps/user/src/components/layout/Header.tsx</code></td><td>Header user, nav, search, icons, guest/customer logic</td></tr>
+    <tr><td><code>apps/user/src/components/layout/Footer.tsx</code></td><td>Footer chung</td></tr>
+    <tr><td><code>apps/user/src/components/layout/Breadcrumb.tsx</code></td><td>Hiển thị đường dẫn trang</td></tr>
+  </table>
+  <p>Điểm cần nói: Header không chỉ là UI. Nó còn thể hiện nghiệp vụ guest/customer qua icon heart, cart, user.</p>
+
+  <h3>8.8. Home page</h3>
+  <p>Nhóm file trong <code>apps/user/src/pages/home</code>:</p>
+  <ul>
+    <li><code>HomePage.tsx</code>: page tổng, ghép các section.</li>
+    <li><code>components/HeroSection.tsx</code>: hero lớn, CTA đi product detail.</li>
+    <li><code>components/FeaturedCategorySection.tsx</code>: promo blocks, CTA đi đúng product detail.</li>
+    <li><code>components/BrowseCategorySection.tsx</code>: click category để vào catalog với filter tương ứng.</li>
+    <li><code>components/ProductShowcaseSection.tsx</code>: list sản phẩm từ API, card click sang product detail.</li>
+  </ul>
+  <p>Kiến thức: UI section-based composition, điều hướng dựa trên slug hoặc query string category.</p>
+
+  <h3>8.9. Products page (catalog)</h3>
+  <p>Nhóm file trong <code>apps/user/src/pages/products</code>:</p>
+  <ul>
+    <li><code>ProductsPage.tsx</code>: trang catalog chính.</li>
+    <li><code>components/FilterSidebar.tsx</code>: filter category.</li>
+    <li><code>components/SortBar.tsx</code>: chọn sort.</li>
+    <li><code>components/ProductGrid.tsx</code>: render grid card sản phẩm.</li>
+  </ul>
+  <p>Kiến thức: query params trong URL để giữ trạng thái lọc; catalog là nơi ghép API data và filter UI.</p>
+
+  <h3>8.10. Product detail</h3>
+  <p>Nhóm file trong <code>apps/user/src/pages/product-detail</code>:</p>
+  <ul>
+    <li><code>ProductDetailPage.tsx</code></li>
+    <li><code>components/ProductGallery.tsx</code></li>
+    <li><code>components/ProductInfo.tsx</code></li>
+    <li><code>components/VariantSelector.tsx</code></li>
+    <li><code>components/AddToCartSection.tsx</code></li>
+    <li><code>components/ProductSpecs.tsx</code></li>
+    <li><code>components/ReviewSection.tsx</code></li>
+    <li><code>data/product-content.ts</code></li>
+  </ul>
+  <p>API cung cấp core product data. <code>product-content.ts</code> bổ sung content giàu hơn cho UI như specs/reviews/gallery phụ, nhất là cho các product cần bám Figma.</p>
+
+  <h3>8.11. Wishlist</h3>
+  <p><code>apps/user/src/pages/wishlist/WishlistPage.tsx</code> là trang hiển thị các sản phẩm customer đã lưu. Các heart icon trên card hoặc detail đều đi qua context wishlist.</p>
+
+  <h3>8.12. Cart + checkout pages</h3>
+  <table>
+    <tr><th>File/nhóm file</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/user/src/pages/cart/CartPage.tsx</code> và components</td><td>Giỏ hàng, summary</td></tr>
+    <tr><td><code>apps/user/src/pages/checkout/CheckoutShell.tsx</code></td><td>Khung stepper 3 bước</td></tr>
+    <tr><td><code>apps/user/src/pages/checkout/address/*</code></td><td>Chọn/tạo/sửa địa chỉ</td></tr>
+    <tr><td><code>apps/user/src/pages/checkout/shipping/*</code></td><td>Chọn shipping method</td></tr>
+    <tr><td><code>apps/user/src/pages/checkout/payment/*</code></td><td>Chọn payment và submit order</td></tr>
+  </table>
+  <p>Điểm cần nắm: address step gắn với customer addresses thật từ backend; payment step tạo order thật, không phải chỉ đổi state frontend.</p>
+
+  <h3>8.13. Profile</h3>
+  <p><code>apps/user/src/pages/profile/ProfilePage.tsx</code> là nơi customer xem và sửa thông tin tài khoản, quản lý địa chỉ và xem lịch sử đơn. Đây là bằng chứng mạnh khi demo rằng checkout đã lưu DB.</p>
+
+  <h3>8.14. Public pages khác</h3>
+  <ul>
+    <li><code>apps/user/src/pages/about/AboutPage.tsx</code></li>
+    <li><code>apps/user/src/pages/contact/ContactPage.tsx</code></li>
+    <li><code>apps/user/src/pages/blog/BlogPage.tsx</code></li>
+    <li><code>apps/user/src/pages/blog/BlogDetailPage.tsx</code></li>
+  </ul>
+  <p>Những trang này cho thấy storefront không chỉ có mua hàng, mà còn có brand story và content.</p>
+
+  <h2>9. Frontend Admin: Kiến Trúc Và File Chính</h2>
+  <h3>9.1. Entry point admin</h3>
+  <p><code>apps/admin/src/main.tsx</code> tương tự user: mount React app, providers, router.</p>
+
+  <h3>9.2. Router admin</h3>
+  <p><code>apps/admin/src/app/router/routes.tsx</code> map route admin tới các feature pages. Đây là nơi em nhìn để biết admin có module nào đã thật, module nào mới là placeholder concept.</p>
+
+  <h3>9.3. Admin layout</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/admin/src/layouts/AdminLayout/AdminLayout.tsx</code></td><td>Khung admin chung</td></tr>
+    <tr><td><code>apps/admin/src/layouts/AdminLayout/Sidebar/*</code></td><td>Sidebar, item, user card</td></tr>
+    <tr><td><code>apps/admin/src/layouts/AdminLayout/Topbar/*</code></td><td>Search, notification, theme toggle, user menu</td></tr>
+  </table>
+  <p>Layout admin đã được giữ nguyên cấu trúc nhưng đổi visual theme từ xanh mint sang concept gần storefront hơn.</p>
+
+  <h3>9.4. Admin auth</h3>
+  <table>
+    <tr><th>File</th><th>Vai trò</th></tr>
+    <tr><td><code>apps/admin/src/features/auth/pages/AdminLoginPage.tsx</code></td><td>UI login admin</td></tr>
+    <tr><td><code>apps/admin/src/features/auth/auth.api.ts</code></td><td>Gọi admin auth API</td></tr>
+    <tr><td><code>apps/admin/src/features/auth/RequireAdminAuth.tsx</code></td><td>Guard route admin</td></tr>
+    <tr><td><code>apps/admin/src/services/http.ts</code></td><td>Axios admin client</td></tr>
+  </table>
+
+  <h3>9.5. Dashboard</h3>
+  <p><code>apps/admin/src/features/dashboard/pages/DashboardPage.tsx</code> dùng dữ liệu thật từ backend để render KPI, recent orders, top products, categories, quick insights.</p>
+
+  <h3>9.6. Orders</h3>
+  <p><code>apps/admin/src/features/orders/pages/OrdersListPage.tsx</code> thể hiện order management: KPI, filter, list, status update cơ bản. Đây là nơi admin nhìn thấy đơn phát sinh từ flow checkout của customer.</p>
+
+  <h3>9.7. Customers</h3>
+  <p><code>apps/admin/src/features/customers/pages/CustomersListPage.tsx</code> giờ phản ánh customer thật đã đăng ký, với table, KPI, overview panel. Đây là phần chứng minh sign-up của user được lưu vào hệ thống thật.</p>
+
+  <h3>9.8. Categories</h3>
+  <p><code>apps/admin/src/features/categories/pages/CategoriesPage.tsx</code> quản lý category dùng chung với storefront user. Nếu admin ẩn category hoặc đổi ảnh/slug thì catalog user bị ảnh hưởng theo.</p>
+
+  <h3>9.9. Products</h3>
+  <p>Các file chính:</p>
+  <ul>
+    <li><code>apps/admin/src/features/products/pages/ProductListPage.tsx</code></li>
+    <li><code>apps/admin/src/features/products/pages/ProductCreatePage.tsx</code></li>
+  </ul>
+  <p>Product list và add product hiện đã được chỉnh lại để gần concept admin mới hơn, đồng thời dữ liệu khớp với user side.</p>
+
+  <h3>9.10. Transactions</h3>
+  <p><code>apps/admin/src/features/transactions/pages/TransactionsPage.tsx</code> dùng order/payment data để thể hiện payment history theo format quản trị.</p>
+
+  <h3>9.11. Admin role / profile</h3>
+  <p><code>apps/admin/src/features/admin/pages/AdminRolePage.tsx</code> là page profile/settings cho admin, theo UI mockup tham khảo.</p>
+
+  <h3>9.12. Placeholder modules</h3>
+  <p>Các route như coupons, brands, media, reviews, control-authority hiện chưa có nghiệp vụ đầy đủ. Thay vì để trống, dự án đã có <code>apps/admin/src/components/feedback/ModulePlaceholderPage.tsx</code>.</p>
+
+  <h3>9.13. Shared components admin</h3>
+  <p>Nhóm file trong <code>apps/admin/src/components</code> như <code>ui/Button.tsx</code>, <code>ui/Input.tsx</code>, <code>data-display/StatCard.tsx</code>, <code>data-display/Pagination.tsx</code> là design primitives dùng lặp lại ở nhiều page. Khi chỉnh theme, sửa các component này sẽ lan ra toàn hệ thống. Đây là tư duy design system.</p>
+
+  <h2>10. Shared Assets Và Tại Sao Phải Làm Như Hiện Tại</h2>
+  <p>Ảnh hiện nằm trong <code>shared/assets/images</code> và backend serve thành <code>/assets/images/...</code>. Lý do: không bị duplicate ảnh giữa admin và user, seed backend chỉ cần lưu path tương đối, cả admin và user dùng chung một nguồn ảnh.</p>
+
+  <h2>11. Environment Và Cách Chạy</h2>
+  <ul>
+    <li><code>apps/api/.env.example</code></li>
+    <li><code>apps/admin/.env.example</code></li>
+    <li><code>apps/user/.env.example</code></li>
+  </ul>
+  <pre>npm install
+copy apps\api\.env.example apps\api\.env
+copy apps\admin\.env.example apps\admin\.env
+copy apps\user\.env.example apps\user\.env
+npm --workspace apps/api run seed:demo
+npm --workspace apps/api run start
+npm --workspace apps/admin run dev
+npm --workspace apps/user run dev</pre>
+  <p>Kiến thức: đây là local development workflow cho monorepo với backend làm nguồn dữ liệu và nguồn asset public.</p>
+
+  <h2>12. Những Quyết Định Thiết Kế Hệ Thống Quan Trọng</h2>
+  <table>
+    <tr><th>Quyết định</th><th>Lý do</th><th>Cách giải thích khi bị hỏi</th></tr>
+    <tr><td>Tách user/admin/api thành 3 app</td><td>Phân tách trách nhiệm rõ</td><td>Giúp storefront và backoffice độc lập UI/route nhưng dùng chung backend</td></tr>
+    <tr><td>Dùng Express + MongoDB</td><td>Phù hợp demo, đi nhanh, schema linh hoạt</td><td>Stack đơn giản, đủ cho CRUD/auth/order flow</td></tr>
+    <tr><td>Dùng context thay Redux</td><td>Project vừa, state scope rõ</td><td>Giảm boilerplate, đủ cho auth/cart/wishlist</td></tr>
+    <tr><td>Guest chỉ browse</td><td>Nghiệp vụ rõ và an toàn dữ liệu</td><td>Tách biệt hành vi xem và hành vi mua</td></tr>
+    <tr><td>Shared assets qua backend</td><td>Đồng nhất hình ảnh admin-user</td><td>Tránh copy ảnh hai nơi và tránh path lệch</td></tr>
+  </table>
+
+  <h2>13. Những Gì Chưa Làm Hoặc Cố Ý Không Làm</h2>
+  <ul>
+    <li>Chưa có payment gateway thật. Nút Pay hiện tạo order thật trong DB, không kết nối cổng thanh toán ngoài.</li>
+    <li>Chưa có coupon, brand, product media, product reviews module đầy đủ.</li>
+    <li>Chưa có email outbound thật cho contact và auth.</li>
+    <li>Một vài ảnh sản phẩm vẫn là placeholder hoặc dùng tạm.</li>
+  </ul>
+  <p>Cách trả lời khi bị hỏi: “Nhóm ưu tiên flow cốt lõi end-to-end trước, còn các module mở rộng được khoanh phạm vi để giữ dự án ổn định và demo tốt.”</p>
+  <h2>14. Cách Thuyết Trình Dự Án Trong 5-7 Phút</h2>
+  <ol>
+    <li>Giới thiệu mục tiêu dự án: storefront + admin + backend.</li>
+    <li>Giải thích 3 vai trò: guest, customer, admin.</li>
+    <li>Demo guest vào home, xem products, product detail.</li>
+    <li>Demo sign-up, sign-in.</li>
+    <li>Demo add wishlist, add cart, checkout.</li>
+    <li>Demo profile thấy order mới.</li>
+    <li>Chuyển sang admin, demo dashboard, orders, customers.</li>
+    <li>Kết luận bằng kiến trúc: monorepo, Express, MongoDB, shared assets.</li>
+  </ol>
+
+  <h2>15. Câu Hỏi Mentor Review + Đáp Án Chi Tiết</h2>
+  <h3>Câu 1. Vì sao dự án tách thành user, admin và api thay vì nhét chung?</h3>
+  <p><b>Trả lời</b>: Vì ba phần này có vai trò khác nhau. User là storefront cho khách hàng, admin là backoffice cho quản trị, còn api là lớp xử lý dữ liệu và nghiệp vụ. Tách ra giúp UI của user và admin không ảnh hưởng nhau, route rõ hơn, và backend có thể phục vụ cả hai phía cùng lúc. Đây cũng là kiến trúc dễ mở rộng hơn so với một app frontend duy nhất.</p>
+
+  <h3>Câu 2. Guest và customer khác nhau thế nào trong dự án?</h3>
+  <p><b>Trả lời</b>: Guest chỉ được xem web, xem sản phẩm, search, đọc blog, about, contact. Customer là người đã đăng ký và đăng nhập, nên có thêm quyền wishlist, cart, checkout, profile. Nhóm cố ý tách hai vai trò này để nghiệp vụ rõ ràng và tránh việc dữ liệu cart/wishlist bị vô danh.</p>
+
+  <h3>Câu 3. Add to cart trong dự án này hoạt động ra sao?</h3>
+  <p><b>Trả lời</b>: Ở frontend user, thao tác add to cart đi qua <code>cart.context.tsx</code>. Nếu chưa đăng nhập thì hệ thống chặn và chuyển sang sign-in. Nếu đã đăng nhập thì item được lưu vào cart state đã namespaced theo customer id. Sau đó cart page và checkout dùng cùng state này. Đến payment step, frontend gọi API tạo order thật.</p>
+
+  <h3>Câu 4. Vì sao dùng MongoDB thay vì SQL?</h3>
+  <p><b>Trả lời</b>: Dự án này ưu tiên tốc độ phát triển và sự linh hoạt. Product, customer addresses, order items, review-like content là dữ liệu khá phù hợp với document model. Với Mongoose, nhóm có thể định nghĩa schema rõ mà vẫn đi nhanh. Đây là lựa chọn thực dụng cho đồ án/demo.</p>
+
+  <h3>Câu 5. Access token và refresh token khác nhau thế nào?</h3>
+  <p><b>Trả lời</b>: Access token dùng cho request hằng ngày, thời gian sống ngắn. Refresh token dùng để xin access token mới khi token cũ hết hạn. Cách này tăng an toàn hơn việc để một token sống rất lâu.</p>
+
+  <h3>Câu 6. Vì sao profile customer và checkout address phải nối với backend thật?</h3>
+  <p><b>Trả lời</b>: Vì nếu address chỉ ở frontend thì không tạo thành dữ liệu tài khoản. Khi customer checkout nhiều lần, họ cần các địa chỉ cũ được lưu lại. Khi nối backend, address trở thành một phần của hồ sơ customer và được dùng xuyên suốt giữa profile và checkout.</p>
+
+  <h3>Câu 7. Vì sao admin dashboard không lấy từ một bảng riêng?</h3>
+  <p><b>Trả lời</b>: Dashboard là dữ liệu tổng hợp từ nhiều nguồn như orders, customers, products. Nếu lưu dashboard thành một bảng riêng thì dễ lệch dữ liệu. Với demo này, backend tính toán trực tiếp từ collection hiện có để dữ liệu nhất quán hơn.</p>
+
+  <h3>Câu 8. Ảnh sản phẩm vì sao không để riêng trong user/public?</h3>
+  <p><b>Trả lời</b>: Vì dự án có cả admin và user. Nếu chỉ để trong user/public thì admin sẽ phải duplicate hoặc path sẽ không thống nhất. Nhóm chuyển ảnh sang thư mục dùng chung và để backend serve ra URL chung, từ đó cả hai app cùng dùng một nguồn asset.</p>
+
+  <h3>Câu 9. Vì sao sign up xong lại quay về sign in thay vì tự login?</h3>
+  <p><b>Trả lời</b>: Đây là lựa chọn nghiệp vụ. Nhóm muốn flow rõ ràng: đăng ký thành công rồi quay về sign-in để xác nhận user chủ động đăng nhập. Điều này cũng làm cho behavior nhất quán hơn khi giải thích với người dùng.</p>
+
+  <h3>Câu 10. Tại sao vẫn còn một số module admin chưa hoàn thiện?</h3>
+  <p><b>Trả lời</b>: Nhóm ưu tiên module cốt lõi cho flow demo: dashboard, orders, customers, categories, products, transactions. Các module như coupons, brands, reviews, media được giữ dưới dạng placeholder có kiểm soát để tránh loãng phạm vi và phát sinh bug không cần thiết trước buổi thuyết trình.</p>
+
+  <h2>16. Câu Hỏi Kiến Thức Lập Trình + Đáp Án</h2>
+  <h3>Câu 1. Middleware trong Express là gì?</h3>
+  <p><b>Đáp án</b>: Middleware là hàm chạy trong vòng đời xử lý request. Nó có thể đọc request, sửa request, chặn request, hoặc chuyển sang middleware tiếp theo bằng <code>next()</code>. Ví dụ trong dự án có CORS middleware, auth middleware, error handler.</p>
+  <h3>Câu 2. React Context dùng để làm gì?</h3>
+  <p><b>Đáp án</b>: React Context dùng để chia sẻ state cho nhiều component mà không phải truyền props qua nhiều tầng. Trong dự án này auth context và cart context là ví dụ điển hình.</p>
+  <h3>Câu 3. Slug là gì và vì sao cần?</h3>
+  <p><b>Đáp án</b>: Slug là chuỗi URL-friendly, ví dụ <code>macbook-air-15-inch</code>. Nó giúp URL đẹp, dễ SEO, dễ đọc, và dùng để tìm product detail.</p>
+  <h3>Câu 4. Khác nhau giữa controller và service?</h3>
+  <p><b>Đáp án</b>: Controller xử lý lớp HTTP: lấy req/res, validate mức cơ bản, trả response. Service chứa business logic như kiểm tra password, tạo token, xử lý domain. Tách ra giúp code sạch và dễ test hơn.</p>
+  <h3>Câu 5. Vì sao cần seed?</h3>
+  <p><b>Đáp án</b>: Seed giúp tạo dữ liệu mẫu nhất quán cho tất cả thành viên trong nhóm và cho buổi demo. Không seed thì database trống, UI dễ nhìn như lỗi.</p>
+
+  <h2>17. Bộ Câu Hỏi Tự Kiểm Tra Nhanh</h2>
+  <ol>
+    <li>Hãy mô tả flow guest từ lúc vào web đến lúc bị chặn add to cart.</li>
+    <li>Hãy giải thích vì sao checkout phải nối với order API thật.</li>
+    <li>Hãy mô tả vai trò của <code>cart.context.tsx</code>.</li>
+    <li>Hãy giải thích tại sao admin có thể thấy customer vừa sign up.</li>
+    <li>Hãy mô tả vai trò của <code>routes/index.js</code> trong backend.</li>
+    <li>Hãy giải thích shared assets qua backend hoạt động thế nào.</li>
+    <li>Hãy nêu 3 lý do dùng monorepo trong dự án này.</li>
+    <li>Hãy nêu điểm khác nhau giữa access token và refresh token.</li>
+  </ol>
+
+  <h2>18. Câu Trả Lời Mẫu Cho Phần Thuyết Trình</h2>
+  <p><b>Khi hội đồng hỏi “Điểm khó nhất của dự án là gì?”</b></p>
+  <p>Điểm khó nhất là làm cho luồng dữ liệu giữa user, admin và backend nhất quán. Ví dụ customer đăng ký và checkout ở user thì admin phải nhìn thấy đúng customer và order đó. Vì vậy nhóm phải đồng bộ model, API contract, UI flow và seed data.</p>
+  <p><b>Khi hội đồng hỏi “Nếu có thêm thời gian em sẽ làm gì?”</b></p>
+  <p>Em sẽ hoàn thiện payment gateway thật, thêm media/reviews/coupons/brands module thật, thay các ảnh placeholder bằng ảnh đúng sản phẩm, và bổ sung email notification cho contact và order.</p>
+
+  <h2>19. Kế Hoạch Học Trong 2 Ngày</h2>
+  <h3>Ngày 1</h3>
+  <ol>
+    <li>Đọc mục 1-5 để nắm hệ thống.</li>
+    <li>Đọc backend mục 7, nhất là auth, product, order, customer.</li>
+    <li>Tự chạy flow: seed demo, chạy api/admin/user.</li>
+    <li>Tự nói lại flow guest/customer/admin không nhìn tài liệu.</li>
+  </ol>
+  <h3>Ngày 2</h3>
+  <ol>
+    <li>Đọc frontend user và admin mục 8-9.</li>
+    <li>Đọc bộ câu hỏi mục 15-17.</li>
+    <li>Tự demo một lượt từ sign-up đến admin orders.</li>
+    <li>Chuẩn bị 3 câu trả lời ngắn cho: kiến trúc, auth, checkout.</li>
+  </ol>
+
+  <h2>20. Kết Luận Mentor</h2>
+  <p>Nếu bạn nắm chắc 5 điểm sau thì buổi thuyết trình sẽ ổn:</p>
+  <ol>
+    <li>Dự án có 3 phần: user, admin, api.</li>
+    <li>Guest chỉ xem; customer mới được wishlist, cart, checkout.</li>
+    <li>Order tạo ở user sẽ phản ánh sang admin qua backend MongoDB thật.</li>
+    <li>Ảnh dùng chung được backend serve từ thư mục shared.</li>
+    <li>Nhóm ưu tiên flow cốt lõi end-to-end hơn là ôm quá nhiều module phụ.</li>
+  </ol>
+  <div class="good">Cách nói tốt nhất khi thuyết trình không phải là liệt kê hết file, mà là chứng minh bạn hiểu hệ thống: route đi đâu, state ở đâu, API xử lý gì, dữ liệu lưu ở đâu, và vì sao nhóm chọn cách tổ chức như vậy.</div>
+</body>
+</html>

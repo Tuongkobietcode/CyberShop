@@ -10,11 +10,14 @@ import {
   productRouter,
 } from "../modules/products/product.route.js";
 import { customerRouter } from "../modules/customers/customer.route.js";
+import { customerAuthRouter } from "../modules/customers/customer-auth.route.js";
+import { customerMeRouter } from "../modules/customers/customer-me.route.js";
 import {
   adminOrderRouter,
   orderRouter,
 } from "../modules/orders/order.route.js";
 import { dashboardRouter } from "../modules/dashboard/dashboard.route.js";
+import { contactRouter } from "../modules/contact/contact.route.js";
 
 export const apiRouter = Router();
 const adminRouter = Router();
@@ -24,6 +27,9 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/categories", categoryRouter);
 apiRouter.use("/products", productRouter);
 apiRouter.use("/orders", orderRouter);
+apiRouter.use("/contact", contactRouter);
+apiRouter.use("/auth/customer", customerAuthRouter);
+apiRouter.use("/me", customerMeRouter);
 
 adminRouter.use("/categories", adminCategoryRouter);
 adminRouter.use("/products", adminProductRouter);

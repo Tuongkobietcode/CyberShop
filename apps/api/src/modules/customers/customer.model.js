@@ -1,7 +1,21 @@
 import mongoose from "mongoose";
 
+function createAddressId() {
+  return new mongoose.Types.ObjectId().toString();
+}
+
 const customerAddressSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      default: createAddressId,
+    },
+    label: {
+      type: String,
+      default: "HOME",
+      trim: true,
+      uppercase: true,
+    },
     fullName: {
       type: String,
       required: true,
@@ -70,10 +84,18 @@ const customerSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    passwordHash: {
+      type: String,
+      default: "",
+    },
     phone: {
       type: String,
       required: true,
       trim: true,
+    },
+    isRegistered: {
+      type: Boolean,
+      default: false,
     },
     status: {
       type: String,
@@ -93,6 +115,10 @@ const customerSchema = new mongoose.Schema(
     addresses: {
       type: [customerAddressSchema],
       default: [],
+    },
+    lastLoginAt: {
+      type: Date,
+      default: null,
     },
   },
   {

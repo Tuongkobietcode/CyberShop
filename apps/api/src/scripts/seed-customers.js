@@ -1,9 +1,12 @@
-import dotenv from "dotenv";
+﻿import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { connectDatabase } from "../config/db.js";
 import { Customer } from "../modules/customers/customer.model.js";
 
 dotenv.config();
+
+const DEMO_CUSTOMER_PASSWORD = process.env.SEED_CUSTOMER_PASSWORD || "Customer@123";
 
 const customers = [
   {
@@ -11,10 +14,13 @@ const customers = [
     email: "minhanh@cybershop.com",
     phone: "0901000001",
     status: "vip",
+    isRegistered: true,
     totalSpend: 0,
     orderCount: 0,
+    lastLoginAt: new Date("2026-03-08T08:15:00.000Z"),
     addresses: [
       {
+        label: "HOME",
         fullName: "Nguyen Minh Anh",
         phone: "0901000001",
         addressLine1: "12 Nguyen Hue",
@@ -33,10 +39,13 @@ const customers = [
     email: "baochau@cybershop.com",
     phone: "0901000002",
     status: "active",
+    isRegistered: true,
     totalSpend: 0,
     orderCount: 0,
+    lastLoginAt: new Date("2026-03-09T10:05:00.000Z"),
     addresses: [
       {
+        label: "OFFICE",
         fullName: "Tran Bao Chau",
         phone: "0901000002",
         addressLine1: "48 Le Loi",
@@ -55,10 +64,13 @@ const customers = [
     email: "quocviet@cybershop.com",
     phone: "0901000003",
     status: "active",
+    isRegistered: true,
     totalSpend: 0,
     orderCount: 0,
+    lastLoginAt: new Date("2026-03-10T07:40:00.000Z"),
     addresses: [
       {
+        label: "HOME",
         fullName: "Pham Quoc Viet",
         phone: "0901000003",
         addressLine1: "101 Tran Phu",
@@ -77,10 +89,13 @@ const customers = [
     email: "thutrang@cybershop.com",
     phone: "0901000004",
     status: "inactive",
+    isRegistered: true,
     totalSpend: 0,
     orderCount: 0,
+    lastLoginAt: null,
     addresses: [
       {
+        label: "HOME",
         fullName: "Le Thu Trang",
         phone: "0901000004",
         addressLine1: "22 Vo Van Tan",
@@ -99,18 +114,20 @@ const customers = [
 async function seedCustomers() {
   await connectDatabase(process.env.MONGODB_URI);
 
+  const passwordHash = await bcrypt.hash(DEMO_CUSTOMER_PASSWORD, 10);
   const phones = customers.map((item) => item.phone);
   await Customer.deleteMany({ phone: { $nin: phones } });
 
   for (const item of customers) {
     await Customer.findOneAndUpdate(
       { phone: item.phone },
-      item,
+      { ...item, passwordHash },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
   }
 
   console.log(`Seeded ${customers.length} customers`);
+  console.log(`Demo customer password: ${DEMO_CUSTOMER_PASSWORD}`);
 }
 
 seedCustomers()

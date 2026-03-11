@@ -5,9 +5,11 @@ export type AdminCustomer = {
   name: string;
   email: string;
   phone: string;
+  isRegistered: boolean;
   status: "active" | "inactive" | "vip";
   totalSpend: number;
   orderCount: number;
+  lastLoginAt: string | null;
   addresses: Array<{
     fullName: string;
     phone: string;

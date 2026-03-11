@@ -7,6 +7,14 @@ export type AdminOrder = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  items: Array<{
+    productId: string;
+    name: string;
+    image: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+  }>;
   paymentMethod: string;
   paymentStatus: string;
   orderStatus: string;
