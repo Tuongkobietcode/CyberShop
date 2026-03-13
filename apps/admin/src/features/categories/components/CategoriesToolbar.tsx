@@ -24,7 +24,7 @@ export function CategoriesToolbar({
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-[#f3f4f6] p-1.5">
           {tabs.map((tab) => {
@@ -36,7 +36,7 @@ export function CategoriesToolbar({
                 type="button"
                 onClick={() => onChange(tab.key)}
                 className={[
-                  "rounded-[5px] px-4 py-2.5 text-sm font-medium transition",
+                  "rounded-xl px-4 py-2.5 text-sm font-medium transition",
                   isActive
                     ? "bg-white text-slate-900 shadow-sm"
                     : "text-slate-600 hover:text-slate-900",
@@ -49,7 +49,7 @@ export function CategoriesToolbar({
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex h-11 min-w-70 items-center gap-2 rounded-[5px] border border-slate-200 bg-white px-3">
+          <div className="flex h-11 min-w-70 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3">
             <input
               value={search}
               onChange={(e) => onSearch(e.target.value)}
@@ -61,21 +61,21 @@ export function CategoriesToolbar({
 
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-[5px] border border-slate-200 bg-white text-slate-600"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600"
           >
             <Filter size={18} />
           </button>
 
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-[5px] border border-slate-200 bg-white text-slate-600"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600"
           >
             <Plus size={18} />
           </button>
 
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-[5px] border border-slate-200 bg-white text-slate-600"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600"
           >
             <MoreHorizontal size={18} />
           </button>

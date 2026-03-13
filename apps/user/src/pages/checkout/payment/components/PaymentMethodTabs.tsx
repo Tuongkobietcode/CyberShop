@@ -22,9 +22,7 @@ export default function PaymentMethodTabs({
           onClick={() => onChange(tab.id)}
           className={[
             "pb-3 transition",
-            value === tab.id
-              ? "border-b-2 border-black font-medium text-black"
-              : "text-black/45",
+            value === tab.id ? "border-b-2 border-black font-medium text-black" : "text-black/45",
           ].join(" ")}
         >
           {tab.label}

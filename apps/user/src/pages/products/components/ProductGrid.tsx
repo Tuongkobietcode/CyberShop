@@ -9,11 +9,7 @@ function formatMoney(value: number) {
   return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
 }
 
-export default function ProductGrid({
-  products,
-}: {
-  products: CatalogProduct[];
-}) {
+export default function ProductGrid({ products }: { products: CatalogProduct[] }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isInWishlist, toggleWishlist } = useCart();
@@ -21,18 +17,13 @@ export default function ProductGrid({
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {products.map((product) => (
-        <article
-          key={product.id}
-          className="rounded-2xl bg-[#f6f6f6] p-6 text-center transition hover:-translate-y-1 hover:shadow-lg"
-        >
+        <article key={product.id} className="rounded-2xl bg-[#f6f6f6] p-6 text-center transition hover:-translate-y-1 hover:shadow-lg">
           <div className="flex justify-end">
             <button
               type="button"
               onClick={() => {
                 if (!isAuthenticated) {
-                  navigate(
-                    `/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`,
-                  );
+                  navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`);
                   return;
                 }
                 toggleWishlist(product);
@@ -47,25 +38,15 @@ export default function ProductGrid({
               <Heart
                 className={[
                   "h-6 w-6",
-                  isInWishlist(product.id, product.slug)
-                    ? "text-rose-500"
-                    : "text-black/25",
+                  isInWishlist(product.id, product.slug) ? "text-rose-500" : "text-black/25",
                 ].join(" ")}
-                fill={
-                  isInWishlist(product.id, product.slug)
-                    ? "currentColor"
-                    : "none"
-                }
+                fill={isInWishlist(product.id, product.slug) ? "currentColor" : "none"}
               />
             </button>
           </div>
           <Link to={`/products/${product.slug}`} className="block">
             <div className="mx-auto flex h-[220px] items-center justify-center">
-              <img
-                src={resolveAssetUrl(product.image)}
-                alt={product.name}
-                className="max-h-full object-contain"
-              />
+              <img src={resolveAssetUrl(product.image)} alt={product.name} className="max-h-full object-contain" />
             </div>
             <h3 className="mx-auto mt-6 max-w-[270px] text-[1.05rem] font-medium leading-8 text-black">
               {product.name}

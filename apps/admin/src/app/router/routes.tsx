@@ -13,14 +13,10 @@ import TransactionsPage from "@/features/transactions/pages/TransactionsPage";
 import AdminRolePage from "@/features/admin/pages/AdminRolePage";
 import ModulePlaceholderPage from "@/components/feedback/ModulePlaceholderPage";
 
-function Placeholder({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return <ModulePlaceholderPage title={title} description={description} />;
+function Placeholder({ title, description }: { title: string; description: string }) {
+  return (
+    <ModulePlaceholderPage title={title} description={description} />
+  );
 }
 
 export default function AppRoutes() {
@@ -87,6 +83,7 @@ export default function AppRoutes() {
           <Route path="*" element={<Navigate to={PATHS.dashboard} replace />} />
         </Route>
       </Route>
+
       <Route path="*" element={<Navigate to="/admin/login" replace />} />
     </Routes>
   );

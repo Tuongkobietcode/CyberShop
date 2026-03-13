@@ -28,9 +28,7 @@ export default function FilterSidebar({
     <aside className="space-y-6">
       <div>
         <div className="mb-4 flex items-center justify-between border-b border-black/10 pb-4">
-          <h3 className="text-[1.9rem] font-medium tracking-[-0.04em] text-black">
-            Category
-          </h3>
+          <h3 className="text-[1.9rem] font-medium tracking-[-0.04em] text-black">Category</h3>
           <span className="text-xl text-black">^</span>
         </div>
 
@@ -56,18 +54,11 @@ export default function FilterSidebar({
             <span className="text-black/30">{categories.length}</span>
           </label>
           {categories.map((category) => (
-            <label
-              key={category.id}
-              className="flex cursor-pointer items-center gap-3"
-            >
+            <label key={category.id} className="flex cursor-pointer items-center gap-3">
               <input
                 type="checkbox"
                 checked={activeCategory === category.id}
-                onChange={() =>
-                  onSelectCategory(
-                    activeCategory === category.id ? "" : category.id,
-                  )
-                }
+                onChange={() => onSelectCategory(activeCategory === category.id ? "" : category.id)}
                 className="h-4 w-4 rounded border-black/20"
               />
               <span>{category.name}</span>
@@ -77,10 +68,7 @@ export default function FilterSidebar({
       </div>
 
       {staticFilters.map((item) => (
-        <div
-          key={item}
-          className="flex items-center justify-between border-b border-black/10 pb-4 text-[1.1rem] text-black/92"
-        >
+        <div key={item} className="flex items-center justify-between border-b border-black/10 pb-4 text-[1.1rem] text-black/92">
           <span>{item}</span>
           <span>?</span>
         </div>

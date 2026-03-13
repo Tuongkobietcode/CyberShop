@@ -1,11 +1,5 @@
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Heart, Search, ShoppingCart, User } from "lucide-react";
 import { useAuth } from "@/features/auth/auth.context";
 import { useCart } from "@/features/cart/cart.context";
@@ -35,10 +29,7 @@ export default function Header() {
 
   function isNavActive(path: string) {
     if (path === "/home") {
-      return (
-        location.pathname === "/home" ||
-        location.pathname.startsWith("/products")
-      );
+      return location.pathname === "/home" || location.pathname.startsWith("/products");
     }
 
     return location.pathname === path;
@@ -56,18 +47,12 @@ export default function Header() {
   return (
     <header className="border-b border-black/12 bg-white/96 backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
-        <Link
-          to="/home"
-          className="text-[1.95rem] font-black tracking-[-0.07em] text-black"
-        >
+        <Link to="/home" className="text-[1.95rem] font-black tracking-[-0.07em] text-black">
           cyber
         </Link>
 
         <div className="hidden flex-1 md:block">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex h-[56px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-5 text-[#989898]"
-          >
+          <form onSubmit={handleSearchSubmit} className="flex h-[56px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-5 text-[#989898]">
             <Search className="h-[18px] w-[18px]" />
             <input
               type="text"
@@ -86,9 +71,7 @@ export default function Header() {
               to={item.to}
               className={[
                 "text-sm font-medium transition",
-                isNavActive(item.to)
-                  ? "text-black"
-                  : "text-black/45 hover:text-black",
+                isNavActive(item.to) ? "text-black" : "text-black/45 hover:text-black",
               ].join(" ")}
             >
               {item.label}
@@ -97,26 +80,15 @@ export default function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-4 sm:gap-5">
-          <Link
-            to={isAuthenticated ? "/wishlist" : "/sign-in?redirect=%2Fwishlist"}
-            className="relative text-black transition hover:scale-105"
-          >
-            <Heart
-              className={[
-                "h-6 w-6",
-                wishlistCount > 0 ? "fill-rose-500 text-rose-500" : "",
-              ].join(" ")}
-            />
+          <Link to={isAuthenticated ? "/wishlist" : "/sign-in?redirect=%2Fwishlist"} className="relative text-black transition hover:scale-105">
+            <Heart className={["h-6 w-6", wishlistCount > 0 ? "fill-rose-500 text-rose-500" : ""].join(" ")} />
             {wishlistCount > 0 ? (
               <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
                 {wishlistCount}
               </span>
             ) : null}
           </Link>
-          <Link
-            to={isAuthenticated ? "/cart" : "/sign-in?redirect=%2Fcart"}
-            className="relative text-black transition hover:scale-105"
-          >
+          <Link to={isAuthenticated ? "/cart" : "/sign-in?redirect=%2Fcart"} className="relative text-black transition hover:scale-105">
             <ShoppingCart className="h-6 w-6" />
             {itemCount > 0 ? (
               <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold text-white">
@@ -124,10 +96,7 @@ export default function Header() {
               </span>
             ) : null}
           </Link>
-          <Link
-            to={isAuthenticated ? "/profile" : "/sign-in"}
-            className="text-black transition hover:scale-105"
-          >
+          <Link to={isAuthenticated ? "/profile" : "/sign-in"} className="text-black transition hover:scale-105">
             <User className="h-6 w-6" />
           </Link>
         </div>

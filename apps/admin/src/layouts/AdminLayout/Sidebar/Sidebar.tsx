@@ -18,7 +18,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
   return (
     <div
       className={[
-        "sticky top-4 flex h-[calc(100vh-32px)] flex-col border p-4 transition-colors duration-300",
+        "sticky top-4 flex h-[calc(100vh-32px)] flex-col rounded-3xl border p-4 transition-colors duration-300",
         isDark
           ? "border-slate-800 bg-[#111827] text-slate-100"
           : "border-slate-200 bg-white text-slate-900",

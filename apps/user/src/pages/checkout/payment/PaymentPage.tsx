@@ -26,13 +26,10 @@ export default function PaymentPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const selectedAddress = useMemo(
-    () =>
-      checkout.addresses.find((item) => item.id === checkout.selectedAddressId),
-    [checkout.addresses, checkout.selectedAddressId],
+    () => checkout.addresses.find((item) => item.id === checkout.selectedAddressId),
+    [checkout.addresses, checkout.selectedAddressId]
   );
-  const shippingMethod = shippingMethods.find(
-    (item) => item.id === checkout.shippingMethodId,
-  );
+  const shippingMethod = shippingMethods.find((item) => item.id === checkout.shippingMethodId);
 
   if (items.length === 0) {
     return <Navigate to="/cart" replace />;
@@ -52,30 +49,16 @@ export default function PaymentPage() {
         />
 
         <div>
-          <h2 className="text-[2.4rem] font-semibold tracking-[-0.04em] text-black">
-            Payment
-          </h2>
+          <h2 className="text-[2.4rem] font-semibold tracking-[-0.04em] text-black">Payment</h2>
           <div className="mt-8">
-            <PaymentMethodTabs
-              value={checkout.paymentMethod}
-              onChange={setPaymentMethod}
-            />
+            <PaymentMethodTabs value={checkout.paymentMethod} onChange={setPaymentMethod} />
           </div>
           <div className="mt-8">
-            <CreditCardForm
-              sameAsBilling={checkout.sameAsBilling}
-              onToggleSameAsBilling={setSameAsBilling}
-            />
+            <CreditCardForm sameAsBilling={checkout.sameAsBilling} onToggleSameAsBilling={setSameAsBilling} />
           </div>
 
           <div className="mt-10 flex gap-4">
-            <button
-              type="button"
-              onClick={() => navigate("/checkout/shipping")}
-              className="h-16 min-w-[220px] rounded-xl border border-black text-[1.15rem] font-medium text-black"
-            >
-              Back
-            </button>
+            <button type="button" onClick={() => navigate("/checkout/shipping")} className="h-16 min-w-[220px] rounded-xl border border-black text-[1.15rem] font-medium text-black">Back</button>
             <button
               type="button"
               disabled={submitting || !selectedAddress || !shippingMethod}

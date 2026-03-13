@@ -13,18 +13,13 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <div
-              key={`${item.label}-${index}`}
-              className="flex items-center gap-3"
-            >
+            <div key={`${item.label}-${index}`} className="flex items-center gap-3">
               {item.to && !isLast ? (
                 <Link to={item.to} className="transition hover:text-black/70">
                   {item.label}
                 </Link>
               ) : (
-                <span className={isLast ? "font-medium text-black" : ""}>
-                  {item.label}
-                </span>
+                <span className={isLast ? "font-medium text-black" : ""}>{item.label}</span>
               )}
               {!isLast ? <ChevronRight className="h-[15px] w-[15px]" /> : null}
             </div>

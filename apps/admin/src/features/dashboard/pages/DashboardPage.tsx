@@ -99,7 +99,6 @@ export default function DashboardPage() {
     return <div className="rounded-3xl border border-rose-200 bg-rose-50 px-6 py-12 text-center text-sm text-rose-600">Dashboard data is unavailable.</div>;
   }
 
-const DashboardPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 xl:grid-cols-3">

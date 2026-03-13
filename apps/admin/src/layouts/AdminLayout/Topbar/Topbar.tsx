@@ -40,18 +40,11 @@ export function Topbar({ theme, onToggleTheme }: Props) {
     <div
       className={[
         "flex flex-col gap-4 border-b px-5 py-5 transition-colors duration-300 xl:flex-row xl:items-center xl:justify-between",
-        isDark
-          ? "border-slate-800"
-          : "border-slate-100 bg-white/90 backdrop-blur",
+        isDark ? "border-slate-800" : "border-slate-100 bg-white/90 backdrop-blur",
       ].join(" ")}
     >
       <div>
-        <p
-          className={[
-            "text-xs uppercase tracking-[0.18em]",
-            isDark ? "text-slate-500" : "text-slate-400",
-          ].join(" ")}
-        >
+        <p className={["text-xs uppercase tracking-[0.18em]", isDark ? "text-slate-500" : "text-slate-400"].join(" ")}>
           Cyber admin
         </p>
         <h1
