@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { resolveAssetUrl } from "@/utils/assets";
 
 type PromoCard = {
   title: string;
@@ -7,6 +8,7 @@ type PromoCard = {
   imageClassName: string;
   theme: "light" | "dark";
   action?: boolean;
+  productSlug?: string;
 };
 
 const promos: PromoCard[] = [
@@ -14,7 +16,7 @@ const promos: PromoCard[] = [
     title: "Playstation 5",
     copy:
       "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
-    image: "/images/PlayStation.png",
+    image: "/assets/images/playstation-5.png",
     imageClassName:
       "left-[-18%] bottom-[-2%] w-[58%] max-w-[300px] sm:left-[-10%] sm:w-[42%] 2xl:max-w-[360px]",
     theme: "light",
@@ -22,7 +24,7 @@ const promos: PromoCard[] = [
   {
     title: "Apple AirPods Max",
     copy: "Computational audio. Listen, it is powerful.",
-    image: "/images/Wireless.png",
+    image: "/assets/images/wireless-headphones.png",
     imageClassName:
       "left-[-10%] bottom-[2%] w-[48%] max-w-[150px] sm:left-[-6%] sm:w-[40%] 2xl:max-w-[180px]",
     theme: "light",
@@ -30,7 +32,7 @@ const promos: PromoCard[] = [
   {
     title: "Apple Vision Pro",
     copy: "An immersive way to experience entertainment.",
-    image: "/images/VisionPro.png",
+    image: "/assets/images/apple-vision-pro.png",
     imageClassName:
       "left-[-8%] bottom-[2%] w-[54%] max-w-[170px] sm:left-[-4%] sm:w-[44%] 2xl:max-w-[190px]",
     theme: "dark",
@@ -39,11 +41,12 @@ const promos: PromoCard[] = [
     title: "Macbook Air",
     copy:
       "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
-    image: "/images/MacBookAir.png",
+    image: "/assets/images/macbook-air-main.png",
     imageClassName:
       "right-[-8%] bottom-[2%] w-[54%] max-w-[320px] sm:right-[-4%] sm:w-[46%] 2xl:max-w-[390px]",
     theme: "light",
     action: true,
+    productSlug: "macbook-air-15-inch",
   },
 ];
 
@@ -71,7 +74,7 @@ function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
       />
 
       <img
-        src={item.image}
+        src={resolveAssetUrl(item.image)}
         alt={item.title}
         className={[
           "pointer-events-none absolute object-contain drop-shadow-[0_20px_40px_rgba(15,23,42,0.18)] transition duration-500 group-hover:scale-105",
@@ -112,7 +115,7 @@ function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
 
         {item.action ? (
           <Link
-            to="/products"
+            to={item.productSlug ? `/products/${item.productSlug}` : "/products"}
             className="mt-7 inline-flex items-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white sm:px-6 2xl:px-7"
           >
             Shop Now
@@ -141,3 +144,5 @@ export default function FeaturedCategorySection() {
     </section>
   );
 }
+
+

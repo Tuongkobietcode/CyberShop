@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { resolveAssetUrl } from "@/utils/assets";
 
 export default function HeroSection() {
   return (
@@ -24,7 +25,7 @@ export default function HeroSection() {
 
             <div className="mt-8 animate-fade-in-left">
               <Link
-                to="/products"
+                to="/products/apple-iphone-14-pro-max-128gb-deep-purple"
                 className="group inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition duration-300 hover:border-white/40 hover:bg-white/10 sm:px-7 2xl:px-8 2xl:py-4"
               >
                 Shop Now
@@ -37,7 +38,7 @@ export default function HeroSection() {
         <div className="relative flex min-h-[320px] items-end justify-center sm:min-h-[380px] lg:min-h-[560px] 2xl:min-h-[720px]">
           <div className="absolute left-1/2 top-10 h-52 w-52 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(107,56,255,0.55),_rgba(24,18,31,0)_68%)] blur-2xl sm:h-64 sm:w-64 2xl:top-20 2xl:h-80 2xl:w-80" />
           <img
-            src="/images/Iphone14.png"
+            src={resolveAssetUrl("/assets/images/iphone-14-front.png")}
             alt="iPhone 14 Pro"
             className="relative z-10 animate-fade-in-right w-full max-w-[360px] object-contain drop-shadow-[0_55px_80px_rgba(0,0,0,0.65)] transition duration-500 hover:scale-[1.02] sm:max-w-[480px] lg:max-w-[620px] 2xl:max-w-[760px]"
           />
@@ -46,3 +47,5 @@ export default function HeroSection() {
     </section>
   );
 }
+
+

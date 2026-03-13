@@ -26,7 +26,7 @@ export function CategoriesToolbar({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-[#eef7ea] p-1.5">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-[#f3f4f6] p-1.5">
           {tabs.map((tab) => {
             const isActive = active === tab.key;
 

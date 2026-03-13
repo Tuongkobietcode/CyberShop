@@ -1,4 +1,4 @@
-import { ExternalLink, LogOut, Store } from "lucide-react";
+﻿import { ExternalLink, LogOut, Store } from "lucide-react";
 import type { AdminTheme } from "../AdminLayout";
 
 type Props = {
@@ -12,11 +12,9 @@ export function SidebarUserCard({ collapsed, theme }: Props) {
   if (collapsed) {
     return (
       <div className="flex flex-col items-center gap-3">
-        <img
-          src="https://i.pravatar.cc/80?img=12"
-          alt="User avatar"
-          className="h-11 w-11 rounded-full object-cover"
-        />
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
+          A
+        </div>
 
         <button
           type="button"
@@ -37,11 +35,9 @@ export function SidebarUserCard({ collapsed, theme }: Props) {
     <div className="space-y-3">
       <div className="flex items-center justify-between px-2 py-1">
         <div className="flex min-w-0 items-center gap-3">
-          <img
-            src="https://i.pravatar.cc/80?img=12"
-            alt="Dealport"
-            className="h-11 w-11 rounded-full object-cover"
-          />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
+            A
+          </div>
           <div className="min-w-0">
             <p
               className={[
@@ -49,10 +45,10 @@ export function SidebarUserCard({ collapsed, theme }: Props) {
                 isDark ? "text-white" : "text-slate-900",
               ].join(" ")}
             >
-              Dealport
+              Cyber Admin
             </p>
             <p className="truncate text-sm text-slate-400">
-              Mark@thedesigner...
+              admin@cybershop.com
             </p>
           </div>
         </div>
@@ -75,7 +71,7 @@ export function SidebarUserCard({ collapsed, theme }: Props) {
         ].join(" ")}
       >
         <div className="flex items-center gap-3">
-          <Store size={18} className="text-emerald-600" />
+          <Store size={18} className="text-black" />
           <span className="text-sm font-medium">Your Shop</span>
         </div>
 

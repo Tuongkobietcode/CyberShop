@@ -34,7 +34,7 @@ export function CustomerOverviewCard({
           <Button
             size="sm"
             variant={range === "this_week" ? "solid" : "ghost"}
-            className={range === "this_week" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" : ""}
+            className={range === "this_week" ? "bg-black text-white hover:bg-black" : ""}
             onClick={() => setRange("this_week")}
           >
             This week
@@ -42,7 +42,7 @@ export function CustomerOverviewCard({
           <Button
             size="sm"
             variant={range === "last_week" ? "solid" : "ghost"}
-            className={range === "last_week" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" : ""}
+            className={range === "last_week" ? "bg-black text-white hover:bg-black" : ""}
             onClick={() => setRange("last_week")}
           >
             Last week
@@ -60,7 +60,7 @@ export function CustomerOverviewCard({
           ))}
         </div>
 
-        <div className="rounded-xl bg-linear-to-b from-emerald-50 to-white p-3">
+        <div className="rounded-xl bg-gradient-to-b from-slate-50 to-white p-3">
           <SimpleAreaChart points={chartPoints} max={max} />
           <div className="mt-3 flex justify-between text-xs text-slate-500">
             {chartPoints.map((p) => (
@@ -94,13 +94,13 @@ function SimpleAreaChart({ points, max }: { points: CustomerOverviewPoint[]; max
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="h-56 w-full">
-      <path d={pathArea} fill="rgba(16,185,129,0.15)" />
-      <path d={pathLine} fill="none" stroke="rgba(16,185,129,0.9)" strokeWidth="3" />
+      <path d={pathArea} fill="rgba(15,23,42,0.08)" />
+      <path d={pathLine} fill="none" stroke="rgba(15,23,42,0.85)" strokeWidth="3" />
       {points.map((p, i) =>
         p.day === "Wed" ? (
           <g key={p.day}>
-            <circle cx={xs[i]} cy={ys[i]} r="6" fill="white" stroke="rgba(16,185,129,0.9)" strokeWidth="3" />
-            <line x1={xs[i]} y1={ys[i]} x2={xs[i]} y2={h - 16} stroke="rgba(16,185,129,0.35)" strokeDasharray="4 6" />
+            <circle cx={xs[i]} cy={ys[i]} r="6" fill="white" stroke="rgba(15,23,42,0.85)" strokeWidth="3" />
+            <line x1={xs[i]} y1={ys[i]} x2={xs[i]} y2={h - 16} stroke="rgba(15,23,42,0.18)" strokeDasharray="4 6" />
           </g>
         ) : null
       )}

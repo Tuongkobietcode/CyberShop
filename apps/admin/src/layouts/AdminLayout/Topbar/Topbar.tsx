@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+﻿import { useLocation } from "react-router-dom";
 import { PATHS } from "@/app/router/paths";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotiButton } from "./NotiButton";
@@ -39,14 +39,17 @@ export function Topbar({ theme, onToggleTheme }: Props) {
   return (
     <div
       className={[
-        "flex items-center gap-4 border-b px-5 py-4 transition-colors duration-300",
-        isDark ? "border-slate-800" : "border-slate-100",
+        "flex flex-col gap-4 border-b px-5 py-5 transition-colors duration-300 xl:flex-row xl:items-center xl:justify-between",
+        isDark ? "border-slate-800" : "border-slate-100 bg-white/90 backdrop-blur",
       ].join(" ")}
     >
-      <div className="min-w-45">
+      <div>
+        <p className={["text-xs uppercase tracking-[0.18em]", isDark ? "text-slate-500" : "text-slate-400"].join(" ")}>
+          Cyber admin
+        </p>
         <h1
           className={[
-            "text-lg font-semibold",
+            "mt-2 text-[1.8rem] font-semibold tracking-[-0.05em]",
             isDark ? "text-white" : "text-slate-900",
           ].join(" ")}
         >
@@ -54,14 +57,16 @@ export function Topbar({ theme, onToggleTheme }: Props) {
         </h1>
       </div>
 
-      <div className="mx-auto w-full max-w-xl">
-        <GlobalSearch theme={theme} />
-      </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:min-w-[620px] xl:justify-end">
+        <div className="w-full sm:flex-1 xl:max-w-[560px]">
+          <GlobalSearch theme={theme} />
+        </div>
 
-      <div className="flex items-center gap-2">
-        <NotiButton theme={theme} />
-        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-        <UserMenu theme={theme} />
+        <div className="flex items-center justify-end gap-2.5">
+          <NotiButton theme={theme} />
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <UserMenu theme={theme} />
+        </div>
       </div>
     </div>
   );
