@@ -12,6 +12,7 @@ import { RequireAdminAuth } from "@/features/auth/RequireAdminAuth";
 import TransactionsPage from "@/features/transactions/pages/TransactionsPage";
 import AdminRolePage from "@/features/admin/pages/AdminRolePage";
 import ModulePlaceholderPage from "@/components/feedback/ModulePlaceholderPage";
+import { BlogPage } from "@/features/blog/BlogPage";
 
 function Placeholder({
   title,
@@ -34,6 +35,7 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="orders" element={<OrdersListPage />} />
           <Route path="customers" element={<CustomersListPage />} />
+          <Route path="blog" element={<BlogPage />} />
           <Route
             path="coupons"
             element={

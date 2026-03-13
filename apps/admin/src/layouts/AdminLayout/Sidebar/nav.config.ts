@@ -13,6 +13,7 @@ import {
   Star,
   UserCog,
   ShieldCheck,
+  FileText, 
 } from "lucide-react";
 
 export type SidebarItem = {
@@ -37,6 +38,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Categories", to: "/admin/categories", icon: Shapes },
       { label: "Transaction", to: "/admin/transactions", icon: Wallet },
       { label: "Brand", to: "/admin/brands", icon: BadgeCheck },
+      { label: "Blog", to: "/admin/blog", icon: FileText }, 
     ],
   },
   {
