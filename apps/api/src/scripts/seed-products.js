@@ -17,6 +17,12 @@ const products = [
     stock: 11,
     status: "active",
     featured: true,
+    brand: "Apple",
+    batteryCapacity: "4323 mAh",
+    screenType: "OLED",
+    screenDiagonal: "6.7\"",
+    protectionClass: "IP68",
+    builtInMemory: "128GB",
     categorySlug: "phones",
     images: [
       {
@@ -36,6 +42,12 @@ const products = [
     stock: 4,
     status: "active",
     featured: true,
+    brand: "Blackmagic",
+    batteryCapacity: "",
+    screenType: "LCD",
+    screenDiagonal: "5\"",
+    protectionClass: "",
+    builtInMemory: "CFast 2.0 / SD",
     categorySlug: "cameras",
     images: [
       {
@@ -55,6 +67,12 @@ const products = [
     stock: 14,
     status: "active",
     featured: false,
+    brand: "Apple",
+    batteryCapacity: "308 mAh",
+    screenType: "OLED",
+    screenDiagonal: "41mm",
+    protectionClass: "50m water resistant",
+    builtInMemory: "64GB",
     categorySlug: "smart-watches",
     images: [
       {
@@ -74,6 +92,12 @@ const products = [
     stock: 7,
     status: "active",
     featured: true,
+    brand: "Apple",
+    batteryCapacity: "20 hours",
+    screenType: "",
+    screenDiagonal: "",
+    protectionClass: "",
+    builtInMemory: "",
     categorySlug: "headphones",
     images: [
       {
@@ -93,6 +117,12 @@ const products = [
     stock: 9,
     status: "active",
     featured: false,
+    brand: "Samsung",
+    batteryCapacity: "425 mAh",
+    screenType: "Super AMOLED",
+    screenDiagonal: "47mm",
+    protectionClass: "5ATM + IP68",
+    builtInMemory: "16GB",
     categorySlug: "smart-watches",
     images: [
       {
@@ -112,6 +142,12 @@ const products = [
     stock: 5,
     status: "active",
     featured: true,
+    brand: "Samsung",
+    batteryCapacity: "4400 mAh",
+    screenType: "Dynamic AMOLED 2X",
+    screenDiagonal: "7.6\"",
+    protectionClass: "IPX8",
+    builtInMemory: "256GB",
     categorySlug: "phones",
     images: [
       {
@@ -131,6 +167,12 @@ const products = [
     stock: 16,
     status: "active",
     featured: false,
+    brand: "Samsung",
+    batteryCapacity: "30 hours",
+    screenType: "",
+    screenDiagonal: "",
+    protectionClass: "IPX2",
+    builtInMemory: "",
     categorySlug: "headphones",
     images: [
       {
@@ -150,6 +192,12 @@ const products = [
     stock: 12,
     status: "active",
     featured: false,
+    brand: "Apple",
+    batteryCapacity: "28.6 Wh",
+    screenType: "Liquid Retina",
+    screenDiagonal: "10.9\"",
+    protectionClass: "",
+    builtInMemory: "64GB",
     categorySlug: "computers",
     images: [
       {
@@ -169,6 +217,12 @@ const products = [
     stock: 6,
     status: "active",
     featured: true,
+    brand: "Apple",
+    batteryCapacity: "Up to 18 hours",
+    screenType: "Liquid Retina",
+    screenDiagonal: "15.3\"",
+    protectionClass: "",
+    builtInMemory: "256GB",
     categorySlug: "computers",
     images: [
       {
@@ -205,6 +259,12 @@ async function seedProducts() {
         stock: item.stock,
         status: item.status,
         featured: item.featured,
+        brand: item.brand,
+        batteryCapacity: item.batteryCapacity,
+        screenType: item.screenType,
+        screenDiagonal: item.screenDiagonal,
+        protectionClass: item.protectionClass,
+        builtInMemory: item.builtInMemory,
         categoryId: category._id,
         images: item.images,
       },

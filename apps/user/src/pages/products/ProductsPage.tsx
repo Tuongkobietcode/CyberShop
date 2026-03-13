@@ -1,13 +1,48 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { getCatalogCategories, getCatalogProducts } from "@/features/catalog/catalog.service";
-import type { CatalogCategory, CatalogProduct } from "@/features/catalog/catalog.types";
+import {
+  getCatalogCategories,
+  getCatalogProductFilters,
+  getCatalogProducts,
+} from "@/features/catalog/catalog.service";
+import type {
+  CatalogCategory,
+  CatalogProduct,
+  CatalogProductFilters,
+} from "@/features/catalog/catalog.types";
 import FilterSidebar from "./components/FilterSidebar";
 import ProductGrid from "./components/ProductGrid";
 import SortBar from "./components/SortBar";
 
 type SortOption = "rating" | "price_asc" | "price_desc" | "newest";
+type FilterKey =
+  | "brand"
+  | "batteryCapacity"
+  | "screenType"
+  | "screenDiagonal"
+  | "protectionClass"
+  | "builtInMemory";
+
+const filterKeys: FilterKey[] = [
+  "brand",
+  "batteryCapacity",
+  "screenType",
+  "screenDiagonal",
+  "protectionClass",
+  "builtInMemory",
+];
+
+function emptyFilters(): CatalogProductFilters {
+  return {
+    brands: [],
+    batteryCapacity: [],
+    screenType: [],
+    screenDiagonal: [],
+    protectionClass: [],
+    builtInMemory: [],
+  };
+}
 
 function getUserCategoryName(category?: CatalogCategory) {
   if (!category) return "Catalog";
@@ -15,16 +50,29 @@ function getUserCategoryName(category?: CatalogCategory) {
   return category.name;
 }
 
+function buildSelectedFilters(searchParams: URLSearchParams): Record<FilterKey, string[]> {
+  return {
+    brand: searchParams.getAll("brand"),
+    batteryCapacity: searchParams.getAll("batteryCapacity"),
+    screenType: searchParams.getAll("screenType"),
+    screenDiagonal: searchParams.getAll("screenDiagonal"),
+    protectionClass: searchParams.getAll("protectionClass"),
+    builtInMemory: searchParams.getAll("builtInMemory"),
+  };
+}
+
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [filters, setFilters] = useState<CatalogProductFilters>(emptyFilters());
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(() => searchParams.get("search") || "");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortOption>("rating");
 
   const activeCategory = searchParams.get("category") || "";
+  const selectedFilters = useMemo(() => buildSelectedFilters(searchParams), [searchParams]);
 
   useEffect(() => {
     setSearch(searchParams.get("search") || "");
@@ -34,11 +82,25 @@ export default function ProductsPage() {
     async function loadData() {
       setLoading(true);
       try {
-        const [categoryResponse, productResponse] = await Promise.all([
+        const productParams: Record<string, string | number | boolean | string[]> = { limit: 100 };
+        if (activeCategory) {
+          productParams.category = activeCategory;
+        }
+
+        filterKeys.forEach((key) => {
+          if (selectedFilters[key].length) {
+            productParams[key] = selectedFilters[key];
+          }
+        });
+
+        const [categoryResponse, filterResponse, productResponse] = await Promise.all([
           getCatalogCategories({ limit: 20 }),
-          getCatalogProducts(activeCategory ? { category: activeCategory, limit: 100 } : { limit: 100 }),
+          getCatalogProductFilters(activeCategory ? { category: activeCategory } : undefined),
+          getCatalogProducts(productParams),
         ]);
+
         setCategories(categoryResponse.data);
+        setFilters(filterResponse.data);
         setProducts(productResponse.data);
       } finally {
         setLoading(false);
@@ -46,7 +108,7 @@ export default function ProductsPage() {
     }
 
     loadData();
-  }, [activeCategory]);
+  }, [activeCategory, selectedFilters]);
 
   const visibleProducts = useMemo(() => {
     const filtered = products.filter((product) =>
@@ -71,7 +133,38 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [activeCategory, search, sort]);
+  }, [activeCategory, search, sort, selectedFilters]);
+
+  function buildParamsForCategory(categoryId: string) {
+    const params = new URLSearchParams();
+    if (categoryId) {
+      params.set("category", categoryId);
+    }
+    if (search.trim()) {
+      params.set("search", search.trim());
+    }
+    return params;
+  }
+
+  function toggleFilter(key: FilterKey, value: string) {
+    const params = new URLSearchParams(searchParams);
+    const currentValues = params.getAll(key);
+    params.delete(key);
+
+    const nextValues = currentValues.includes(value)
+      ? currentValues.filter((item) => item !== value)
+      : [...currentValues, value];
+
+    nextValues.forEach((item) => params.append(key, item));
+
+    if (search.trim()) {
+      params.set("search", search.trim());
+    } else {
+      params.delete("search");
+    }
+
+    setSearchParams(params);
+  }
 
   return (
     <div className="bg-[#fafafa] pb-20">
@@ -83,22 +176,18 @@ export default function ProductsPage() {
         ]}
       />
 
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-8">
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:px-8">
         <FilterSidebar
           categories={categories}
           activeCategory={activeCategory}
           search={search}
+          filters={filters}
+          selectedFilters={selectedFilters}
           onSearch={setSearch}
           onSelectCategory={(categoryId) => {
-            const params = new URLSearchParams();
-            if (categoryId) {
-              params.set("category", categoryId);
-            }
-            if (search.trim()) {
-              params.set("search", search.trim());
-            }
-            setSearchParams(params);
+            setSearchParams(buildParamsForCategory(categoryId));
           }}
+          onToggleFilter={toggleFilter}
         />
 
         <div className="space-y-8">
