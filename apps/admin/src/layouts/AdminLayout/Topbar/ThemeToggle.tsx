@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react";
+﻿import { Moon, Sun } from "lucide-react";
 import type { AdminTheme } from "../AdminLayout";
 
 type Props = {
@@ -15,7 +15,7 @@ export function ThemeToggle({ theme, onToggle }: Props) {
       onClick={onToggle}
       className={[
         "relative flex h-12 w-15.5 items-center rounded-full px-1 transition-colors",
-        isDark ? "bg-slate-800" : "bg-[#e8f4e8]",
+        isDark ? "bg-slate-800" : "bg-slate-200",
       ].join(" ")}
       aria-label="Toggle theme"
       title="Toggle theme"
@@ -29,7 +29,7 @@ export function ThemeToggle({ theme, onToggle }: Props) {
         {isDark ? (
           <Moon size={18} className="text-slate-700" />
         ) : (
-          <Sun size={18} className="text-emerald-600" />
+          <Sun size={18} className="text-slate-700" />
         )}
       </div>
     </button>

@@ -1,135 +1,87 @@
-import React, { useState } from "react";
-import favoriteIcon from "../../../assets/icons/Favorite_duotone.png";
-import likeIcon from "../../../assets/icons/Like.png";
+import { Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import type { CatalogProduct } from "@/features/catalog/catalog.types";
+import { useAuth } from "@/features/auth/auth.context";
+import { useCart } from "@/features/cart/cart.context";
+import { resolveAssetUrl } from "@/utils/assets";
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-};
+function formatMoney(value: number) {
+  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+}
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Apple iPhone 14 Pro 512GB Gold (MQ233)",
-    price: 1437,
-    image:
-      "https://img.vn.my-best.com/contents/48cb375765f1b555ed1819f27f1a5584.png",
-  },
-  {
-    id: 2,
-    name: "Apple iPhone 11 128GB White (MQ233)",
-    price: 510,
-    image:
-      "https://www.tncstore.vn/media/product/250-8011-rix-g15-g513rm-hq055w.jpg",
-  },
-  {
-    id: 3,
-    name: "Apple iPhone 11 128GB White (MQ233)",
-    price: 550,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 4,
-    name: "Apple iPhone 14 Pro 1TB Gold (MQ2V3)",
-    price: 1499,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 5,
-    name: "Apple iPhone 14 Pro 1TB Gold (MQ2V3)",
-    price: 1399,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 6,
-    name: "Apple iPhone 14 Pro 128GB Deep Purple (MQ0G3)",
-    price: 1600,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 7,
-    name: "Apple iPhone 14 Pro 128GB Deep Purple (MQ0G3)",
-    price: 1600,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 8,
-    name: "Apple iPhone 14 Pro 128GB Deep Purple (MQ0G3)",
-    price: 1600,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-  {
-    id: 9,
-    name: "Apple iPhone 14 Pro 128GB Deep Purple (MQ0G3)",
-    price: 1600,
-    image:
-      "https://cdn1.viettelstore.vn/Images/Product/ProductImage/444965480.jpeg",
-  },
-];
-
-const ProductGrid: React.FC = () => {
-  const [favorites, setFavorites] = useState<Set<number>>(new Set());
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) => {
-      const newSet = new Set(prev);
-      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
-      return newSet;
-    });
-  };
+export default function ProductGrid({
+  products,
+}: {
+  products: CatalogProduct[];
+}) {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggleWishlist } = useCart();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map((product) => {
-          const isLiked = favorites.has(product.id);
-
-          return (
-            <div
-              key={product.id}
-              className="bg-gray-50 rounded-2xl p-5 relative flex flex-col items-center"
+    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {products.map((product) => (
+        <article
+          key={product.id}
+          className="rounded-2xl bg-[#f6f6f6] p-6 text-center transition hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate(
+                    `/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`,
+                  );
+                  return;
+                }
+                toggleWishlist(product);
+              }}
+              className={[
+                "inline-flex h-10 w-10 items-center justify-center rounded-full transition focus:outline-none",
+                isInWishlist(product.id, product.slug)
+                  ? "text-rose-500"
+                  : "text-black/25 hover:text-black/40",
+              ].join(" ")}
             >
-              <div className="w-full flex justify-end mb-4">
-                <button onClick={() => toggleFavorite(product.id)}>
-                  <img
-                    src={isLiked ? likeIcon : favoriteIcon}
-                    alt="favorite"
-                    className="w-9 h-9 transition-transform hover:scale-110"
-                  />
-                </button>
-              </div>
-
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-60 h-60 object-contain mb-4"
+              <Heart
+                className={[
+                  "h-6 w-6",
+                  isInWishlist(product.id, product.slug)
+                    ? "text-rose-500"
+                    : "text-black/25",
+                ].join(" ")}
+                fill={
+                  isInWishlist(product.id, product.slug)
+                    ? "currentColor"
+                    : "none"
+                }
               />
-
-              <h3 className="text-sm text-center font-medium text-gray-900 leading-snug mb-2 line-clamp-2">
-                {product.name}
-              </h3>
-
-              <p className="text-xl font-bold text-black mb-4">
-                ${product.price}
-              </p>
-
-              <button className="mt-auto w-[70%] bg-black text-white py-2 rounded-lg text-sm hover:bg-gray-800 transition">
-                Buy Now
-              </button>
+            </button>
+          </div>
+          <Link to={`/products/${product.slug}`} className="block">
+            <div className="mx-auto flex h-[220px] items-center justify-center">
+              <img
+                src={resolveAssetUrl(product.image)}
+                alt={product.name}
+                className="max-h-full object-contain"
+              />
             </div>
-          );
-        })}
-      </div>
+            <h3 className="mx-auto mt-6 max-w-[270px] text-[1.05rem] font-medium leading-8 text-black">
+              {product.name}
+            </h3>
+            <p className="mt-5 text-[2.1rem] font-semibold tracking-[-0.04em] text-black">
+              {formatMoney(product.price)}
+            </p>
+          </Link>
+          <Link
+            to={`/products/${product.slug}`}
+            className="mt-6 inline-flex h-14 w-full items-center justify-center rounded-[10px] bg-black text-[15px] font-medium text-white transition hover:bg-[#1f1f1f]"
+          >
+            Buy Now
+          </Link>
+        </article>
+      ))}
     </div>
   );
-};
-
-export default ProductGrid;
+}

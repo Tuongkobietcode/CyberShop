@@ -20,7 +20,7 @@ const products = [
     categorySlug: "phones",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=900&q=80",
+        url: "/assets/images/iphone-14-pro-angle-2.png",
         alt: "Apple iPhone 14 Pro Max",
         sortOrder: 0,
       },
@@ -39,7 +39,7 @@ const products = [
     categorySlug: "cameras",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&q=80",
+        url: "/assets/images/profile-image-41.png",
         alt: "Blackmagic Pocket Cinema Camera 6K",
         sortOrder: 0,
       },
@@ -58,7 +58,7 @@ const products = [
     categorySlug: "smart-watches",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=900&q=80",
+        url: "/assets/images/apple-watch.png",
         alt: "Apple Watch Series 9",
         sortOrder: 0,
       },
@@ -77,7 +77,7 @@ const products = [
     categorySlug: "headphones",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=80",
+        url: "/assets/images/airpods-max-silver.png",
         alt: "AirPods Max",
         sortOrder: 0,
       },
@@ -96,7 +96,7 @@ const products = [
     categorySlug: "smart-watches",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=80",
+        url: "/assets/images/apple-watch.png",
         alt: "Samsung Galaxy Watch 6 Classic",
         sortOrder: 0,
       },
@@ -115,7 +115,7 @@ const products = [
     categorySlug: "phones",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=900&q=80",
+        url: "/assets/images/galaxy-z-fold-5.png",
         alt: "Galaxy Z Fold5",
         sortOrder: 0,
       },
@@ -134,7 +134,7 @@ const products = [
     categorySlug: "headphones",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=900&q=80",
+        url: "/assets/images/galaxy-buds-fe.png",
         alt: "Galaxy Buds FE",
         sortOrder: 0,
       },
@@ -153,8 +153,27 @@ const products = [
     categorySlug: "computers",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=900&q=80",
+        url: "/assets/images/ipad-10-9-wifi.png",
         alt: "Apple iPad",
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: "MacBook Air 15-inch",
+    slug: "macbook-air-15-inch",
+    sku: "LAP-MBA15-256",
+    description: "Lightweight laptop with a spacious display and all-day battery life.",
+    price: 31990000,
+    compareAtPrice: 33990000,
+    stock: 6,
+    status: "active",
+    featured: true,
+    categorySlug: "computers",
+    images: [
+      {
+        url: "/assets/images/macbook-air-main.png",
+        alt: "MacBook Air",
         sortOrder: 0,
       },
     ],
@@ -204,3 +223,5 @@ seedProducts()
   .finally(async () => {
     await mongoose.connection.close();
   });
+
+

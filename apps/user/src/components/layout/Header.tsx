@@ -1,108 +1,136 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { FiSearch, FiHeart, FiShoppingCart, FiUser } from "react-icons/fi";
+import { FormEvent, useEffect, useState } from "react";
 import {
-  MdPhoneIphone,
-  MdComputer,
-  MdWatch,
-  MdCameraAlt,
-  MdHeadphones,
-  MdSportsEsports,
-} from "react-icons/md";
-import logo from "../../assets/images/Logo.png";
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import { Heart, Search, ShoppingCart, User } from "lucide-react";
+import { useAuth } from "@/features/auth/auth.context";
+import { useCart } from "@/features/cart/cart.context";
 
-const Header = () => {
+const navigation = [
+  { label: "Home", to: "/home" },
+  { label: "About", to: "/about" },
+  { label: "Contact Us", to: "/contact" },
+  { label: "Blog", to: "/blog" },
+];
+
+export default function Header() {
+  const { itemCount, wishlistCount } = useCart();
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [routeSearchParams] = useSearchParams();
+  const [keyword, setKeyword] = useState("");
+
+  useEffect(() => {
+    if (location.pathname === "/products") {
+      setKeyword(routeSearchParams.get("search") || "");
+    } else {
+      setKeyword("");
+    }
+  }, [location.pathname, routeSearchParams]);
+
+  function isNavActive(path: string) {
+    if (path === "/home") {
+      return (
+        location.pathname === "/home" ||
+        location.pathname.startsWith("/products")
+      );
+    }
+
+    return location.pathname === path;
+  }
+
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const params = new URLSearchParams();
+    if (keyword.trim()) {
+      params.set("search", keyword.trim());
+    }
+    navigate(`/products${params.toString() ? `?${params.toString()}` : ""}`);
+  }
+
   return (
-    <header className="w-full">
-      {/* =w= TOP HEADER =w= */}
-      <div className="bg-white border-b">
-        <div className="max-w-full h-[80px] flex items-center gap-10 px-30">
-          {/* LOGO */}
-          <NavLink to="/">
-            <img src={logo} alt="logo" />
-          </NavLink>
+    <header className="border-b border-black/12 bg-white/96 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
+        <Link
+          to="/home"
+          className="text-[1.95rem] font-black tracking-[-0.07em] text-black"
+        >
+          cyber
+        </Link>
 
-          {/* SEARCH */}
-          <div className="flex items-center bg-gray-100 rounded-md px-4 h-11 flex-1">
-            <FiSearch className="text-gray-400 text-lg mr-2" />
+        <div className="hidden flex-1 md:block">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex h-[56px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-5 text-[#989898]"
+          >
+            <Search className="h-[18px] w-[18px]" />
             <input
               type="text"
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
               placeholder="Search"
-              className="bg-transparent outline-none w-full text-sm"
+              className="w-full border-0 bg-transparent text-sm text-black outline-none placeholder:text-[#989898]"
             />
-          </div>
-
-          {/* RIGHT MENU */}
-          <div className="flex items-center gap-12">
-            {/* NAV */}
-            <nav className="flex gap-6 text-sm">
-              {[
-                { to: "/", label: "Home" },
-                { to: "/about", label: "About" },
-                { to: "/contact", label: "Contact Us" },
-                { to: "/blog", label: "Blog" },
-              ].map((item) => (
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-black font-medium border-b-2 border-black pb-1"
-                      : "text-gray-500 hover:text-black"
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            {/* ICONS */}
-            <div className="flex items-center gap-6 text-xl">
-              <NavLink to="/wishlist">
-                <FiHeart />
-              </NavLink>
-              <NavLink to="/cart">
-                <FiShoppingCart />
-              </NavLink>
-              <NavLink to="/login">
-                <FiUser />
-              </NavLink>
-            </div>
-          </div>
+          </form>
         </div>
-      </div>
 
-      {/* =w= BOTTOM HEADER =w= */}
-      <div className="bg-[#2E2E2E]">
-        <div className="max-w-full h-11 flex items-center justify-center">
-          <div className="flex items-center text-sm text-gray-400">
-            {[
-              { to: "/phones", label: "Phones", icon: <MdPhoneIphone /> },
-              { to: "/computers", label: "Computers", icon: <MdComputer /> },
-              { to: "/watches", label: "Smart Watches", icon: <MdWatch /> },
-              { to: "/cameras", label: "Cameras", icon: <MdCameraAlt /> },
-              {
-                to: "/headphones",
-                label: "Headphones",
-                icon: <MdHeadphones />,
-              },
-              { to: "/gaming", label: "Gaming", icon: <MdSportsEsports /> },
-            ].map((item) => (
-              <NavLink
-                to={item.to}
-                className="relative flex items-center gap-2 px-14 hover:text-white
-                     after:absolute after:right-0 after:top-1/2
-                     after:-translate-y-1/2 after:h-5 after:w-px
-                     after:bg-gray-600 last:after:hidden"
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
-              </NavLink>
-            ))}
-          </div>
+        <nav className="hidden items-center gap-10 lg:flex">
+          {navigation.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={[
+                "text-sm font-medium transition",
+                isNavActive(item.to)
+                  ? "text-black"
+                  : "text-black/45 hover:text-black",
+              ].join(" ")}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ml-auto flex items-center gap-4 sm:gap-5">
+          <Link
+            to={isAuthenticated ? "/wishlist" : "/sign-in?redirect=%2Fwishlist"}
+            className="relative text-black transition hover:scale-105"
+          >
+            <Heart
+              className={[
+                "h-6 w-6",
+                wishlistCount > 0 ? "fill-rose-500 text-rose-500" : "",
+              ].join(" ")}
+            />
+            {wishlistCount > 0 ? (
+              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
+                {wishlistCount}
+              </span>
+            ) : null}
+          </Link>
+          <Link
+            to={isAuthenticated ? "/cart" : "/sign-in?redirect=%2Fcart"}
+            className="relative text-black transition hover:scale-105"
+          >
+            <ShoppingCart className="h-6 w-6" />
+            {itemCount > 0 ? (
+              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold text-white">
+                {itemCount}
+              </span>
+            ) : null}
+          </Link>
+          <Link
+            to={isAuthenticated ? "/profile" : "/sign-in"}
+            className="text-black transition hover:scale-105"
+          >
+            <User className="h-6 w-6" />
+          </Link>
         </div>
       </div>
     </header>
   );
-};
-
-export default Header;
+}

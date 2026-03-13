@@ -15,7 +15,7 @@ export function CustomersTable({ rows }: Props) {
   return (
     <Card>
       <CardHeader className="pb-0">
-        <div className="rounded-lg bg-emerald-50 px-4 py-3">
+        <div className="rounded-lg bg-[#f7f7f8] px-4 py-3">
           <div className="grid grid-cols-7 gap-3 text-xs font-semibold text-slate-700">
             <div>Customer Id</div>
             <div>Name</div>

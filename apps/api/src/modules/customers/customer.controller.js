@@ -10,10 +10,12 @@ function sanitizeCustomer(customer) {
     name: customer.name,
     email: customer.email,
     phone: customer.phone,
+    isRegistered: customer.isRegistered,
     status: customer.status,
     totalSpend: customer.totalSpend,
     orderCount: customer.orderCount,
     addresses: customer.addresses,
+    lastLoginAt: customer.lastLoginAt,
     createdAt: customer.createdAt,
     updatedAt: customer.updatedAt,
   };

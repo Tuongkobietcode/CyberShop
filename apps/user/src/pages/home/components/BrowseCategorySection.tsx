@@ -8,6 +8,7 @@ import {
   Watch,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getCatalogCategories } from "@/features/catalog/catalog.service";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -20,13 +21,17 @@ const categoryIconMap: Record<string, LucideIcon> = {
 };
 
 export default function BrowseCategorySection() {
-  const [categories, setCategories] = useState<Array<{ label: string; slug: string; icon: LucideIcon }>>([]);
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState<
+    Array<{ id: string; label: string; slug: string; icon: LucideIcon }>
+  >([]);
 
   useEffect(() => {
     async function loadCategories() {
       const response = await getCatalogCategories({ limit: 6 });
       setCategories(
         response.data.map((item) => ({
+          id: item.id,
           label: item.name,
           slug: item.slug,
           icon: categoryIconMap[item.slug] || Smartphone,
@@ -69,6 +74,7 @@ export default function BrowseCategorySection() {
               <button
                 key={item.label}
                 type="button"
+                onClick={() => navigate(`/products?category=${item.id}`)}
                 className="group rounded-[24px] border border-white/60 bg-white/80 px-4 py-6 text-center shadow-sm backdrop-blur transition duration-300 hover:-translate-y-1 hover:bg-[#18121f] hover:text-white hover:shadow-[0_24px_60px_rgba(24,18,31,0.18)] sm:px-5 sm:py-7 2xl:py-8"
                 style={{ animationDelay: `${index * 80}ms` }}
               >

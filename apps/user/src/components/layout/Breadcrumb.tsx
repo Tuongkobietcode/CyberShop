@@ -1,47 +1,36 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Breadcrumb = () => {
-  const baseClass = "text-gray-500 hover:text-black transition-colors";
-  const activeClass = "text-black font-medium";
+export type BreadcrumbItem = {
+  label: string;
+  to?: string;
+};
 
+export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <div className="w-full h-[80px] bg-white flex items-center">
-      <div className=" pl-20">
-        <nav className="flex items-center text-sm gap-4">
-          {/* Home */}
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => (isActive ? activeClass : baseClass)}
-          >
-            Home
-          </NavLink>
-
-          <span className="text-gray-400">{">"}</span>
-
-          {/* Catalog */}
-          <NavLink
-            to="/catalog"
-            end
-            className={({ isActive }) => (isActive ? activeClass : baseClass)}
-          >
-            Catalog
-          </NavLink>
-
-          <span className="text-gray-400">{">"}</span>
-
-          {/* Smartphones */}
-          <NavLink
-            to="/catalog/smartphones"
-            className={({ isActive }) => (isActive ? activeClass : baseClass)}
-          >
-            Smartphones
-          </NavLink>
-        </nav>
+    <div className="border-b border-black/8">
+      <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-4 py-8 text-[15px] text-black/38 sm:px-6 lg:px-8">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+          return (
+            <div
+              key={`${item.label}-${index}`}
+              className="flex items-center gap-3"
+            >
+              {item.to && !isLast ? (
+                <Link to={item.to} className="transition hover:text-black/70">
+                  {item.label}
+                </Link>
+              ) : (
+                <span className={isLast ? "font-medium text-black" : ""}>
+                  {item.label}
+                </span>
+              )}
+              {!isLast ? <ChevronRight className="h-[15px] w-[15px]" /> : null}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-};
-
-export default Breadcrumb;
+}
