@@ -14,25 +14,27 @@ function getJwtSecret(name) {
   return secret;
 }
 
-export function signAccessToken(admin) {
+export function signAccessToken(subject, audience = "admin") {
   return jwt.sign(
     {
-      sub: admin.id,
-      email: admin.email,
-      role: admin.role,
+      sub: subject.id,
+      email: subject.email,
+      role: subject.role || "customer",
       type: "access",
+      aud: audience,
     },
     getJwtSecret("JWT_ACCESS_SECRET"),
     { expiresIn: ACCESS_TOKEN_TTL }
   );
 }
 
-export function signRefreshToken(admin) {
+export function signRefreshToken(subject, audience = "admin") {
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
   const token = jwt.sign(
     {
-      sub: admin.id,
+      sub: subject.id,
       type: "refresh",
+      aud: audience,
     },
     getJwtSecret("JWT_REFRESH_SECRET"),
     { expiresIn: Math.floor(REFRESH_TOKEN_TTL_MS / 1000) }

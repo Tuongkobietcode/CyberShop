@@ -5,7 +5,7 @@ type Props = {
   title: string;
   value: string;
   subtitle?: string;
-  changeText?: string; // "↑ 14.4%"
+  changeText?: string;
 };
 
 export function StatCard({ title, value, subtitle, changeText }: Props) {
@@ -16,15 +16,9 @@ export function StatCard({ title, value, subtitle, changeText }: Props) {
           <p className="text-sm font-semibold text-slate-900">{title}</p>
           <div className="flex items-end gap-2">
             <p className="text-2xl font-semibold text-slate-900">{value}</p>
-            {changeText ? (
-              <span className="text-xs font-medium text-emerald-600">
-                {changeText}
-              </span>
-            ) : null}
+            {changeText ? <span className="text-xs font-medium text-slate-500">{changeText}</span> : null}
           </div>
-          {subtitle ? (
-            <p className="text-xs text-slate-500">{subtitle}</p>
-          ) : null}
+          {subtitle ? <p className="text-xs text-slate-500">{subtitle}</p> : null}
         </div>
 
         <button className="rounded-md p-2 hover:bg-slate-100" aria-label="More">

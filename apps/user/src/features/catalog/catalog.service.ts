@@ -1,5 +1,5 @@
 import { http } from "@/services/http";
-import type { CatalogCategory, CatalogProduct } from "./catalog.types";
+import type { CatalogCategory, CatalogProduct, CatalogProductFilters } from "./catalog.types";
 
 type ApiResponse<T> = {
   success: boolean;
@@ -21,8 +21,20 @@ export async function getCatalogCategories(params?: Record<string, string | numb
   return response.data;
 }
 
-export async function getCatalogProducts(params?: Record<string, string | number | boolean>) {
+export async function getCatalogProducts(
+  params?: Record<string, string | number | boolean | Array<string | number | boolean>>
+) {
   const response = await http.get<ApiResponse<CatalogProduct[]>>("/products", {
+    params,
+  });
+
+  return response.data;
+}
+
+export async function getCatalogProductFilters(
+  params?: Record<string, string | number | boolean | Array<string | number | boolean>>
+) {
+  const response = await http.get<ApiResponse<CatalogProductFilters>>("/products/filters", {
     params,
   });
 

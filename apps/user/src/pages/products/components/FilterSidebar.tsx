@@ -1,217 +1,201 @@
-import { useState } from "react";
-import ArrowDownIcon from "../../../assets/icons/expand_more.png";
-import SearchIcon from "../../../assets/icons/Search.png";
+import { useState, useMemo } from "react";
+import FilterSidebar from "./FilterSidebar";
+import type {
+  CatalogCategory,
+  CatalogProduct,
+  CatalogProductFilters
+} from "@/features/catalog/catalog.types";
 
-type BrandItem = {
-  label: string;
-  count?: number;
-};
+type FilterKey =
+  | "brand"
+  | "batteryCapacity"
+  | "screenType"
+  | "screenDiagonal"
+  | "protectionClass"
+  | "builtInMemory";
 
-type OptionItem = {
-  label: string;
-  count?: number;
-};
+/* ---------------- utils ---------------- */
 
-type FilterSection = {
-  key: string;
-  title: string;
-  options: OptionItem[];
-};
+function extractFilters(products: CatalogProduct[]): CatalogProductFilters {
+  return {
+    brands: [...new Set(products.map((p) => p.brand))].sort(),
+    batteryCapacity: [...new Set(products.map((p) => p.batteryCapacity))].sort(),
+    screenType: [...new Set(products.map((p) => p.screenType))].sort(),
+    screenDiagonal: [...new Set(products.map((p) => p.screenDiagonal))].sort(),
+    protectionClass: [...new Set(products.map((p) => p.protectionClass))].sort(),
+    builtInMemory: [...new Set(products.map((p) => p.builtInMemory))].sort(),
+  };
+}
 
-const mockBrands: BrandItem[] = [
-  { label: "Samsung", count: 125 },
-  { label: "Xiaomi", count: 68 },
-  { label: "Poco", count: 44 },
-  { label: "OPPO", count: 36 },
-  { label: "Honor", count: 10 },
-  { label: "Motorola", count: 34 },
-  { label: "Nokia", count: 22 },
-  { label: "Realme", count: 35 },
-  { label: "Apple", count: 110 },
-];
+/* ---------------- mock data ---------------- */
 
-const mockSections: FilterSection[] = [
+const categories: CatalogCategory[] = [
   {
-    key: "battery",
-    title: "Battery capacity",
-    options: [
-      { label: "3000 – 3999 mAh", count: 24 },
-      { label: "4000 – 4999 mAh", count: 68 },
-      { label: "5000 – 5999 mAh", count: 102 },
-      { label: "6000+ mAh", count: 19 },
-    ],
+    id: "smartphone",
+    name: "Smartphone",
+    slug: "smartphone",
+    image: "",
+    description: "",
   },
   {
-    key: "screen",
-    title: "Screen type",
-    options: [
-      { label: "AMOLED", count: 86 },
-      { label: "OLED", count: 44 },
-      { label: "IPS LCD", count: 72 },
-    ],
-  },
-  {
-    key: "diagonal",
-    title: "Screen diagonal",
-    options: [
-      { label: "≤ 6.1 inch", count: 38 },
-      { label: "6.2 – 6.6 inch", count: 96 },
-      { label: "≥ 6.7 inch", count: 54 },
-    ],
-  },
-  {
-    key: "protection",
-    title: "Protection class",
-    options: [
-      { label: "IP53", count: 14 },
-      { label: "IP67", count: 22 },
-      { label: "IP68", count: 41 },
-    ],
-  },
-  {
-    key: "memory",
-    title: "Built-in memory",
-    options: [
-      { label: "64 GB", count: 33 },
-      { label: "128 GB", count: 88 },
-      { label: "256 GB", count: 61 },
-      { label: "512 GB", count: 12 },
-    ],
+    id: "laptop",
+    name: "Laptop",
+    slug: "laptop",
+    image: "",
+    description: "",
   },
 ];
 
-function DropdownIcon({ isOpen }: { isOpen?: boolean }) {
-  return (
-    <img
-      src={ArrowDownIcon}
-      alt="dropdown"
-      className={`h-4 w-4 transition-transform duration-200 ${
-        isOpen ? "rotate-180" : ""
-      }`}
-    />
-  );
-}
+const products: CatalogProduct[] = [
+  {
+    id: "1",
+    name: "iPhone 15",
+    slug: "iphone-15",
+    sku: "IP15",
+    description: "",
+    price: 999,
+    compareAtPrice: null,
+    stock: 10,
+    featured: false,
+    brand: "Apple",
+    batteryCapacity: "3200 mAh",
+    screenType: "OLED",
+    screenDiagonal: "6.1",
+    protectionClass: "IP68",
+    builtInMemory: "128 GB",
+    status: "active",
+    displayStatus: "available",
+    image: "",
+    images: [],
+    category: {
+      id: "smartphone",
+      name: "Smartphone",
+      slug: "smartphone",
+    },
+    createdAt: "",
+    updatedAt: "",
+  },
+  {
+    id: "2",
+    name: "Galaxy S24",
+    slug: "galaxy-s24",
+    sku: "S24",
+    description: "",
+    price: 899,
+    compareAtPrice: null,
+    stock: 10,
+    featured: false,
+    brand: "Samsung",
+    batteryCapacity: "4000 mAh",
+    screenType: "AMOLED",
+    screenDiagonal: "6.2",
+    protectionClass: "IP68",
+    builtInMemory: "256 GB",
+    status: "active",
+    displayStatus: "available",
+    image: "",
+    images: [],
+    category: {
+      id: "smartphone",
+      name: "Smartphone",
+      slug: "smartphone",
+    },
+    createdAt: "",
+    updatedAt: "",
+  },
+];
 
-function SearchBox() {
-  return (
-    <div className="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2">
-      <img src={SearchIcon} alt="search" className="h-4 w-4 opacity-60" />
-      <input
-        placeholder="Search"
-        className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
-      />
-    </div>
-  );
-}
+/* ---------------- page ---------------- */
 
-export default function FilterSidebar() {
-  const [open, setOpen] = useState<Record<string, boolean>>({
-    brand: true,
+export default function CatalogPage() {
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("");
+
+  const [selectedFilters, setSelectedFilters] = useState<Record<FilterKey, string[]>>({
+    brand: [],
+    batteryCapacity: [],
+    screenType: [],
+    screenDiagonal: [],
+    protectionClass: [],
+    builtInMemory: [],
   });
 
-  const [selected, setSelected] = useState<Record<string, string[]>>({});
+  const filters = useMemo(() => extractFilters(products), []);
 
-  const toggleSection = (key: string) => {
-    setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  function handleToggleFilter(key: FilterKey, value: string) {
+    setSelectedFilters((prev) => {
+      const exists = prev[key].includes(value);
 
-  const toggleOption = (section: string, value: string) => {
-    setSelected((prev) => {
-      const current = prev[section] || [];
       return {
         ...prev,
-        [section]: current.includes(value)
-          ? current.filter((v) => v !== value)
-          : [...current, value],
+        [key]: exists
+          ? prev[key].filter((v) => v !== value)
+          : [...prev[key], value],
       };
     });
-  };
+  }
+
+  const filteredProducts = products.filter((p) => {
+    if (activeCategory && p.category?.id !== activeCategory) return false;
+
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
+
+    if (selectedFilters.brand.length && !selectedFilters.brand.includes(p.brand)) return false;
+
+    if (
+      selectedFilters.batteryCapacity.length &&
+      !selectedFilters.batteryCapacity.includes(p.batteryCapacity)
+    )
+      return false;
+
+    if (selectedFilters.screenType.length && !selectedFilters.screenType.includes(p.screenType))
+      return false;
+
+    if (
+      selectedFilters.screenDiagonal.length &&
+      !selectedFilters.screenDiagonal.includes(p.screenDiagonal)
+    )
+      return false;
+
+    if (
+      selectedFilters.protectionClass.length &&
+      !selectedFilters.protectionClass.includes(p.protectionClass)
+    )
+      return false;
+
+    if (
+      selectedFilters.builtInMemory.length &&
+      !selectedFilters.builtInMemory.includes(p.builtInMemory)
+    )
+      return false;
+
+    return true;
+  });
 
   return (
-    <aside className="w-72 border-r bg-white px-4 py-6">
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("brand")}
-          className="flex w-full items-center justify-between text-sm font-semibold"
-        >
-          Brand
-          <DropdownIcon isOpen={open.brand} />
-        </button>
-
-        <div className="mt-3 h-px bg-gray-200" />
-
-        {open.brand && (
-          <div className="mt-4 space-y-4">
-            <SearchBox />
-
-            <div className="space-y-3">
-              {mockBrands.map((item) => (
-                <label
-                  key={item.label}
-                  className="flex cursor-pointer items-center justify-between text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4"
-                      checked={(selected.brand || []).includes(item.label)}
-                      onChange={() => toggleOption("brand", item.label)}
-                    />
-                    <span className="font-medium text-gray-900">
-                      {item.label}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-400">{item.count}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
+    <div className="flex gap-10 p-10">
+      <div className="w-[300px]">
+        <FilterSidebar
+          categories={categories}
+          activeCategory={activeCategory}
+          search={search}
+          filters={filters}
+          selectedFilters={selectedFilters}
+          onSearch={setSearch}
+          onSelectCategory={setActiveCategory}
+          onToggleFilter={handleToggleFilter}
+        />
       </div>
 
-      <div className="space-y-6">
-        {mockSections.map((section) => (
-          <div key={section.key}>
-            <button
-              onClick={() => toggleSection(section.key)}
-              className="flex w-full items-center justify-between text-sm font-semibold"
-            >
-              {section.title}
-              <DropdownIcon isOpen={open[section.key]} />
-            </button>
-
-            <div className="mt-3 h-px bg-gray-200" />
-
-            {open[section.key] && (
-              <div className="mt-4 space-y-4">
-                <SearchBox />
-
-                <div className="space-y-3">
-                  {section.options.map((opt) => (
-                    <label
-                      key={opt.label}
-                      className="flex cursor-pointer items-center justify-between text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4"
-                          checked={(selected[section.key] || []).includes(
-                            opt.label,
-                          )}
-                          onChange={() => toggleOption(section.key, opt.label)}
-                        />
-                        <span className="font-medium">{opt.label}</span>
-                      </div>
-                      <span className="text-xs text-gray-400">{opt.count}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+      <div className="flex-1 grid grid-cols-3 gap-6">
+        {filteredProducts.map((product) => (
+          <div key={product.id} className="border p-4 rounded">
+            <h3 className="font-semibold">{product.name}</h3>
+            <p>{product.brand}</p>
+            <p>{product.price}$</p>
           </div>
         ))}
       </div>
-    </aside>
+    </div>
   );
 }

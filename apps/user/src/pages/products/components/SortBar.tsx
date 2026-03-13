@@ -1,38 +1,30 @@
-import React, { useState } from "react";
-
 type SortOption = "rating" | "price_asc" | "price_desc" | "newest";
 
-const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "rating", label: "By rating" },
-  { value: "price_asc", label: "Price: Low to high" },
-  { value: "price_desc", label: "Price: High to low" },
-  { value: "newest", label: "Latest" },
-];
-
-export const SortBar: React.FC = () => {
-  const [selectedCount] = useState<number>(85);
-  const [sortBy, setSortBy] = useState<SortOption>("rating");
-
+export default function SortBar({
+  total,
+  sort,
+  onSortChange,
+}: {
+  total: number;
+  sort: SortOption;
+  onSortChange: (value: SortOption) => void;
+}) {
   return (
-    <div className="w-full rounded-sm flex items-center justify-between px-3 py-2 bg-white">
-      <div className="text-sm text-gray-700">
-        <span className="font-medium">Selected Products:</span>{" "}
-        <span className="font-bold">{selectedCount}</span>
-      </div>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-[1.05rem] text-black/80">
+        Selected Products: <span className="font-semibold text-black">{total}</span>
+      </p>
 
-      <div>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortOption)}
-          className="text-sm border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
-        >
-          {sortOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        value={sort}
+        onChange={(event) => onSortChange(event.target.value as SortOption)}
+        className="h-14 min-w-[220px] rounded-xl border border-black/10 bg-white px-4 text-[15px] text-black outline-none"
+      >
+        <option value="rating">By rating</option>
+        <option value="newest">Newest</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+      </select>
     </div>
   );
-};
+}

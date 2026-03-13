@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import type { SidebarItem } from "./nav.config";
 import type { AdminTheme } from "../AdminLayout";
 
@@ -21,7 +21,7 @@ export function NavItemRow({ item, active, collapsed, theme }: Props) {
         "group flex items-center rounded-xl px-4 py-3 text-[15px] font-medium transition-all duration-200",
         collapsed ? "justify-center" : "gap-3",
         active
-          ? "bg-emerald-500 text-white shadow-sm"
+          ? "bg-black text-white shadow-sm"
           : isDark
           ? "text-slate-400 hover:bg-slate-800 hover:text-white"
           : "text-slate-500 hover:bg-slate-100 hover:text-slate-900",

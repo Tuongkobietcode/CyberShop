@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/features/auth/auth.context";
 import { getCatalogProducts } from "@/features/catalog/catalog.service";
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
+import { useCart } from "@/features/cart/cart.context";
+import { resolveAssetUrl } from "@/utils/assets";
 
 type Product = {
+  product: CatalogProduct;
   title: string;
   price: string;
-  image: string;
-  favorite?: boolean;
 };
 
 type PromoBlock = {
@@ -23,26 +25,26 @@ const promos: PromoBlock[] = [
     title: "Popular Products",
     copy:
       "Minimal hardware and lifestyle picks arranged to feel premium, tactile, and ready to sell.",
-    image: "/images/Group 1.png",
+    image: "/assets/images/profile-group-1.png",
   },
   {
     title: "Ipad Pro",
     copy:
       "Packed canvas, lightweight form, and a visual language built for modern workflows.",
-    image: "/images/ipad.png",
+    image: "/assets/images/ipad-10-9-wifi.png",
   },
   {
     title: "Samsung Galaxy",
     copy:
       "A cinematic fold with luxurious surfaces and compact product storytelling.",
-    image: "/images/Iphone 14 pro 1 (5).png",
+    image: "/assets/images/galaxy-z-fold-5.png",
     dark: true,
   },
   {
     title: "Macbook Pro",
     copy:
       "Industrial materials and focused hierarchy to make premium hardware feel effortless.",
-    image: "/images/MacBookAir.png",
+    image: "/assets/images/macbook-air-main.png",
     dark: true,
   },
 ];
@@ -54,6 +56,10 @@ function ProductGrid({
   title: string;
   products: Product[];
 }) {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggleWishlist } = useCart();
+
   return (
     <section className="py-14">
       <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-10 2xl:px-16">
@@ -77,31 +83,50 @@ function ProductGrid({
             >
               <button
                 type="button"
-                className="absolute right-4 top-4 text-slate-300 transition hover:text-red-500"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.product.slug}`)}`);
+                    return;
+                  }
+                  toggleWishlist(product.product);
+                }}
+                className={[
+                  "absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/92 shadow-sm transition focus:outline-none",
+                  isInWishlist(product.product.id, product.product.slug)
+                    ? "text-rose-500"
+                    : "text-slate-300 hover:text-slate-400",
+                ].join(" ")}
               >
                 <Heart
-                  className="h-4 w-4"
-                  fill={product.favorite ? "currentColor" : "none"}
+                  className={[
+                    "h-4 w-4",
+                    isInWishlist(product.product.id, product.product.slug)
+                      ? "text-rose-500"
+                      : "text-slate-300",
+                  ].join(" ")}
+                  fill={isInWishlist(product.product.id, product.product.slug) ? "currentColor" : "none"}
                 />
               </button>
 
-              <div className="flex h-40 items-center justify-center sm:h-48 2xl:h-52">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="max-h-full object-contain transition duration-300 group-hover:scale-105"
-                />
-              </div>
+              <Link to={`/products/${product.product.slug}`} className="block">
+                <div className="flex h-40 items-center justify-center sm:h-48 2xl:h-52">
+                  <img
+                    src={resolveAssetUrl(product.product.image)}
+                    alt={product.title}
+                    className="max-h-full object-contain transition duration-300 group-hover:scale-105"
+                  />
+                </div>
 
-              <h3 className="mt-5 min-h-[3rem] text-center text-xs font-medium leading-5 text-slate-900 sm:text-sm">
-                {product.title}
-              </h3>
-              <p className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-950">
-                {product.price}
-              </p>
+                <h3 className="mt-5 min-h-[3rem] text-center text-xs font-medium leading-5 text-slate-900 sm:text-sm">
+                  {product.title}
+                </h3>
+                <p className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-950">
+                  {product.price}
+                </p>
+              </Link>
 
               <Link
-                to="/products"
+                to={`/products/${product.product.slug}`}
                 className="mt-5 block rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Buy Now
@@ -118,12 +143,11 @@ function formatMoney(value: number) {
   return `$${value.toLocaleString("en-US")}`;
 }
 
-function mapProducts(products: CatalogProduct[], favoriteIndex = -1): Product[] {
-  return products.map((product, index) => ({
+function mapProducts(products: CatalogProduct[]): Product[] {
+  return products.map((product) => ({
+    product,
     title: product.name,
     price: formatMoney(product.price),
-    image: product.image,
-    favorite: index === favoriteIndex,
   }));
 }
 
@@ -144,7 +168,7 @@ function PromoStrip() {
             ].join(" ")}
           >
             <img
-              src={item.image}
+              src={resolveAssetUrl(item.image)}
               alt={item.title}
               className="mx-auto h-36 object-contain transition duration-500 group-hover:scale-105 sm:h-44 2xl:h-48"
             />
@@ -187,17 +211,17 @@ function BigBanner() {
         <div className="relative mx-auto flex min-h-[320px] max-w-[1720px] items-center justify-center overflow-hidden px-4 py-12 text-center text-white sm:min-h-[360px] sm:px-6 2xl:min-h-[420px]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_45%)]" />
           <img
-            src="/images/Iphone 14 pro 1 (2).png"
+            src={resolveAssetUrl("/assets/images/iphone-14-pro-angle-2.png")}
             alt="Summer devices left"
             className="absolute left-[-2%] top-[8%] hidden w-[220px] rotate-[-18deg] object-contain opacity-95 md:block 2xl:w-[300px]"
           />
           <img
-            src="/images/applewatch.png"
+            src={resolveAssetUrl("/assets/images/apple-watch.png")}
             alt="Watch"
             className="absolute bottom-[-2%] right-[6%] hidden w-[180px] rotate-[18deg] object-contain md:block 2xl:w-[240px]"
           />
           <img
-            src="/images/Iphone14.png"
+            src={resolveAssetUrl("/assets/images/iphone-14-front.png")}
             alt="Phone"
             className="absolute right-[-4%] top-[4%] hidden w-[180px] rotate-[24deg] object-contain opacity-90 lg:block 2xl:w-[240px]"
           />
@@ -237,7 +261,7 @@ export default function ProductShowcaseSection() {
     loadProducts();
   }, []);
 
-  const newArrivals = useMemo(() => mapProducts(products.slice(0, 8), 5), [products]);
+  const newArrivals = useMemo(() => mapProducts(products.slice(0, 8)), [products]);
   const discountProducts = useMemo(
     () => mapProducts(products.filter((item) => item.compareAtPrice).slice(0, 4)),
     [products]
@@ -252,3 +276,5 @@ export default function ProductShowcaseSection() {
     </>
   );
 }
+
+

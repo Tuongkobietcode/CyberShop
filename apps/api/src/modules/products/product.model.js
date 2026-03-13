@@ -72,6 +72,37 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    brand: {
+      type: String,
+      default: "",
+      trim: true,
+      index: true,
+    },
+    batteryCapacity: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    screenType: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    screenDiagonal: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    protectionClass: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    builtInMemory: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
