@@ -240,28 +240,6 @@ export function CategoriesPage() {
                 Reset
               </button>
             </div>
-          ) : null}
-        </CardContent>
-      </Card>
-
-      <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5">
-        <CategoriesToolbar
-          active={status}
-          onChange={(nextStatus) => {
-            setStatus(nextStatus);
-            setPage(1);
-          }}
-          search={search}
-          onSearch={(value) => {
-            setSearch(value);
-            setPage(1);
-          }}
-          totalProducts={totalProducts}
-        />
-
-        {loading ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center text-sm text-slate-500">
-            Loading category inventory...
           </div>
         </section>
       </div>
