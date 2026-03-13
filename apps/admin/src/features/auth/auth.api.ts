@@ -32,6 +32,9 @@ export async function getCurrentAdmin() {
 }
 
 export async function logoutAdmin() {
-  await http.post("/auth/admin/logout");
-  clearAdminAccessToken();
+  try {
+    await http.post("/auth/admin/logout");
+  } finally {
+    clearAdminAccessToken();
+  }
 }

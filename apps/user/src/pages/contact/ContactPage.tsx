@@ -7,13 +7,13 @@ const supportOptions = [
   {
     icon: Mail,
     title: "Email support",
-    value: "support@cybershop.dev",
+    value: "duongtuong131004@gmail.com",
     copy: "Best for order questions, warranty requests, and general support.",
   },
   {
     icon: PhoneCall,
     title: "Sales line",
-    value: "+1 (800) 555-0199",
+    value: "0862128904",
     copy: "Useful when someone wants help choosing between products quickly.",
   },
   {
@@ -188,9 +188,9 @@ export default function ContactPage() {
               <div>
                 <h2 className="text-[1.8rem] font-semibold tracking-[-0.04em] text-slate-950">Studio & support desk</h2>
                 <p className="mt-4 text-sm leading-7 text-slate-600">
-                  221B Market Street<br />
-                  Portland, OR 97204<br />
-                  United States
+                  Street Ba Trieu, Le Dai Hanh<br />
+                  Hai Ba Trung<br />
+                  Ha Noi
                 </p>
                 <p className="mt-5 text-sm leading-7 text-slate-600">
                   Mon to Fri: 09:00 - 18:00<br />
