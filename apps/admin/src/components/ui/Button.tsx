@@ -18,7 +18,7 @@ export function Button({
   const sizes = size === "sm" ? "h-8 px-3 text-sm" : "h-10 px-4 text-sm";
 
   const variants: Record<Variant, string> = {
-    solid: "bg-emerald-600 text-white hover:bg-emerald-700",
+    solid: "bg-black text-white hover:bg-[#1f1f1f]",
     outline: "border border-slate-200 bg-white hover:bg-slate-50 text-slate-900",
     ghost: "bg-transparent hover:bg-slate-100 text-slate-900",
   };

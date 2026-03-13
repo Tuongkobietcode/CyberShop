@@ -5,8 +5,14 @@ const refreshTokenSchema = new mongoose.Schema(
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",
-      required: true,
       index: true,
+      default: null,
+    },
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+      index: true,
+      default: null,
     },
     token: {
       type: String,
@@ -28,6 +34,8 @@ const refreshTokenSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+refreshTokenSchema.index({ customerId: 1, expiresAt: -1 });
 
 export const RefreshToken = mongoose.model(
   "RefreshToken",

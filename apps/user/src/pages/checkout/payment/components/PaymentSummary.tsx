@@ -1,104 +1,94 @@
-import React from "react";
+import type {
+  CartItem,
+  CheckoutAddress,
+  ShippingMethod,
+} from "@/features/cart/cart.types";
+import { resolveAssetUrl } from "@/utils/assets";
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-};
+function formatMoney(value: number) {
+  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+}
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Apple iPhone 14 Pro Max 128Gb",
-    price: 1399000,
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUjIVj-V8ofg8brSJ09II0tdD11P-krTlElQ&s",
-  },
-  {
-    id: 2,
-    name: "AirPods Max Silver",
-    price: 549000,
-    image:
-      "https://cdn2.fptshop.com.vn/unsafe/828x0/filters:format(webp):quality(75)/2022_10_28_638025679601008898_iPhone%2014%20(13).jpg",
-  },
-  {
-    id: 3,
-    name: "Apple Watch Series 9 GPS 41mm",
-    price: 399000,
-    image:
-      "https://cdn2.fptshop.com.vn/unsafe/828x0/filters:format(webp):quality(75)/2022_10_28_638025679601008898_iPhone%2014%20(13).jpg",
-  },
-];
-
-const formatVND = (value: number) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-
-const PaymentSummary: React.FC = () => {
-  const subtotal = products.reduce((sum, p) => sum + p.price, 0);
-  const tax = 50000;
-  const shipping = 29000;
-  const total = subtotal + tax + shipping;
-
+export default function PaymentSummary({
+  items,
+  address,
+  shippingMethod,
+  subtotal,
+  tax,
+  shippingFee,
+  total,
+}: {
+  items: CartItem[];
+  address: CheckoutAddress | undefined;
+  shippingMethod: ShippingMethod | undefined;
+  subtotal: number;
+  tax: number;
+  shippingFee: number;
+  total: number;
+}) {
   return (
-    <div className="max-w-md rounded-xl border border-gray-50 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-semibold">Summary</h2>
+    <div className="rounded-[28px] border border-black/10 bg-white p-6">
+      <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-black">
+        Summary
+      </h2>
 
-      <div className="space-y-3">
-        {products.map((product) => (
+      <div className="mt-6 space-y-4">
+        {items.map((item) => (
           <div
-            key={product.id}
-            className="flex items-center justify-between rounded-lg bg-gray-100 p-3"
+            key={item.productId}
+            className="flex items-center gap-4 rounded-2xl bg-[#f6f6f6] p-4"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2">
               <img
-                src={product.image}
-                alt={product.name}
-                className="h-10 w-10 rounded-md object-cover"
+                src={resolveAssetUrl(item.image)}
+                alt={item.name}
+                className="max-h-full object-contain"
               />
-              <span className="text-sm font-medium">{product.name}</span>
             </div>
-            <span className="text-sm font-semibold">
-              {formatVND(product.price)}
-            </span>
+            <p className="flex-1 text-[1.05rem] font-medium text-black">
+              {item.name}
+            </p>
+            <p className="text-[1.6rem] font-semibold tracking-[-0.04em] text-black">
+              {formatMoney(item.price * item.quantity)}
+            </p>
           </div>
         ))}
       </div>
 
-      <div className="mt-5 text-sm">
-        <p className="font-medium">Address</p>
-        <p className="text-gray-600">123 Nguyễn Trãi, Ba Đình Hà Nội</p>
+      <div className="mt-8 space-y-2 text-[1.05rem] text-black/72">
+        <p>Address</p>
+        <p className="text-[1.15rem] text-black">
+          {address
+            ? `${address.addressLine1}, ${address.city}`
+            : "No address selected"}
+        </p>
       </div>
 
-      <div className="mt-3 text-sm">
-        <p className="font-medium">Shipping method</p>
-        <p className="text-gray-600">Free</p>
+      <div className="mt-6 space-y-2 text-[1.05rem] text-black/72">
+        <p>Shipment method</p>
+        <p className="text-[1.15rem] text-black">
+          {shippingMethod?.label || "Free"}
+        </p>
       </div>
 
-      <div className="mt-5 space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Subtotal</span>
-          <span>{formatVND(subtotal)}</span>
+      <div className="mt-8 space-y-5 text-[1.15rem]">
+        <div className="flex items-center justify-between font-medium text-black">
+          <span>Subtotal</span>
+          <span>{formatMoney(subtotal)}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Estimated Tax</span>
-          <span>{formatVND(tax)}</span>
+        <div className="flex items-center justify-between text-black/58">
+          <span>Estimated Tax</span>
+          <span>{formatMoney(tax)}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Estimated shipping & Handling</span>
-          <span>{formatVND(shipping)}</span>
+        <div className="flex items-center justify-between text-black/58">
+          <span>Estimated shipping & Handling</span>
+          <span>{formatMoney(shippingFee)}</span>
         </div>
-
-        <div className="flex justify-between border-t pt-3 text-base font-semibold">
+        <div className="flex items-center justify-between text-[1.35rem] font-semibold text-black">
           <span>Total</span>
-          <span>{formatVND(total)}</span>
+          <span>{formatMoney(total)}</span>
         </div>
       </div>
     </div>
   );
-};
-
-export default PaymentSummary;
+}

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+﻿import { Link, useLocation } from "react-router-dom";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { NAV_GROUPS } from "./nav.config";
 import { NavItemRow } from "./SidebarItem";
@@ -32,8 +32,8 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
             collapsed ? "justify-center" : "",
           ].join(" ")}
         >
-          <div className="text-[22px] font-extrabold margin-left-10 tracking-tight text-emerald-500">
-            Cyber
+          <div className="text-[22px] font-extrabold tracking-[-0.08em] text-black">
+            cyber
           </div>
         </Link>
 
@@ -66,7 +66,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
               {!collapsed && (
-                <p className="mb-3 px-2 text-xs font-medium text-slate-400">
+                <p className="mb-3 px-2 text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
                   {group.title}
                 </p>
               )}

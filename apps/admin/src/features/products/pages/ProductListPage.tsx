@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { MoreHorizontal, Pencil, PlusCircle, Search, Trash2 } from "lucide-react";
+import { resolveAssetUrl } from "@/utils/assets";
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 import {
   deleteAdminProduct,
@@ -11,13 +10,17 @@ import {
   type AdminProduct,
 } from "../api/products.api";
 
+const surface = "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
+
 function formatMoney(value: number) {
-  return value.toLocaleString("vi-VN");
+  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
 }
 
 export default function ProductListPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<"all" | "featured" | "active" | "out_of_stock">("all");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -36,13 +39,11 @@ export default function ProductListPage() {
 
   async function loadProducts() {
     setLoading(true);
-
     try {
       const [productResponse, categoryResponse] = await Promise.all([
         getAdminProducts({ limit: 100 }),
         getAdminCategories({ limit: 50 }),
       ]);
-
       setProducts(productResponse.data);
       setCategories(categoryResponse.data.map((item) => ({ id: item.id, name: item.name })));
     } finally {
@@ -53,6 +54,27 @@ export default function ProductListPage() {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const keyword = `${product.name} ${product.sku} ${product.category?.name || ""}`.toLowerCase();
+      const searchMatch = keyword.includes(search.toLowerCase());
+      const statusMatch =
+        status === "all"
+          ? true
+          : status === "featured"
+          ? product.featured
+          : product.status === status;
+      return searchMatch && statusMatch;
+    });
+  }, [products, search, status]);
+
+  const topCards = [
+    { label: "All Products", value: products.length },
+    { label: "Featured", value: products.filter((item) => item.featured).length },
+    { label: "Active", value: products.filter((item) => item.status === "active").length },
+    { label: "Out of Stock", value: products.filter((item) => item.status === "out_of_stock").length },
+  ];
 
   function resetForm() {
     setSelectedProductId("");
@@ -88,19 +110,13 @@ export default function ProductListPage() {
 
   async function handleDelete(productId: string) {
     await deleteAdminProduct(productId);
-    if (selectedProductId === productId) {
-      resetForm();
-    }
+    if (selectedProductId === productId) resetForm();
     await loadProducts();
   }
 
   async function handleSave() {
-    if (!selectedProductId) {
-      return;
-    }
-
+    if (!selectedProductId) return;
     setSaving(true);
-
     try {
       await updateAdminProduct(selectedProductId, {
         name: form.name,
@@ -122,201 +138,170 @@ export default function ProductListPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Products</h1>
-          <p className="mt-1 text-sm text-slate-500">Real products stored in MongoDB.</p>
+          <p className="text-sm font-medium text-black/45">Product list</p>
+          <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-black">Shared catalog inventory</h1>
         </div>
-        <Link
-          to="/admin/products/new"
-          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-        >
-          Add Product
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/admin/products/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f]">
+            <PlusCircle className="h-4 w-4" />
+            Add Product
+          </Link>
+          <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
+            More Action
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">
-              {selectedProductId ? "Edit Product" : "Select a product to edit"}
-            </h2>
-            <p className="text-sm text-slate-500">
-              Create happens on the dedicated page. Update and delete happen here.
-            </p>
-          </div>
-          {selectedProductId ? (
-            <Button variant="outline" onClick={resetForm}>
-              Cancel Edit
-            </Button>
-          ) : null}
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <Input
-            placeholder="Product name"
-            value={form.name}
-            onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-          />
-          <Input
-            placeholder="SKU"
-            value={form.sku}
-            onChange={(event) => setForm((current) => ({ ...current, sku: event.target.value }))}
-          />
-          <Input
-            type="number"
-            placeholder="Price"
-            value={form.price}
-            onChange={(event) => setForm((current) => ({ ...current, price: event.target.value }))}
-          />
-          <Input
-            type="number"
-            placeholder="Compare at price"
-            value={form.compareAtPrice}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, compareAtPrice: event.target.value }))
-            }
-          />
-          <Input
-            type="number"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={(event) => setForm((current) => ({ ...current, stock: event.target.value }))}
-          />
-          <select
-            value={form.categoryId}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, categoryId: event.target.value }))
-            }
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900"
-          >
-            <option value="">Select category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={form.status}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, status: event.target.value }))
-            }
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900"
-          >
-            <option value="active">Active</option>
-            <option value="draft">Draft</option>
-            <option value="out_of_stock">Out of stock</option>
-            <option value="archived">Archived</option>
-          </select>
-          <label className="md:col-span-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-            <input
-              type="checkbox"
-              checked={form.featured}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, featured: event.target.checked }))
-              }
-              className="h-4 w-4 rounded border-slate-300"
-            />
-            Mark as featured on user-facing lists
-          </label>
-          <Input
-            className="md:col-span-2"
-            placeholder="Image URL"
-            value={form.image}
-            onChange={(event) => setForm((current) => ({ ...current, image: event.target.value }))}
-          />
-          <textarea
-            value={form.description}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, description: event.target.value }))
-            }
-            placeholder="Description"
-            className="min-h-28 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none md:col-span-2"
-          />
-          <div className="md:col-span-2">
-            <Button onClick={handleSave} disabled={!selectedProductId || saving}>
-              {saving ? "Saving..." : "Update Product"}
-            </Button>
-          </div>
-          {form.image ? (
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <img
-                  src={form.image}
-                  alt={form.name || "Product preview"}
-                  className="h-20 w-20 rounded-2xl object-cover"
-                />
-                <div>
-                  <p className="text-sm font-medium text-slate-900">
-                    {form.name || "Product preview"}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {form.status} · {form.featured ? "featured" : "standard"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {topCards.map((card) => (
+          <section key={card.label} className={surface}>
+            <p className="text-sm font-medium text-black/45">{card.label}</p>
+            <p className="mt-5 text-[2.4rem] font-semibold tracking-[-0.06em] text-black">{card.value.toLocaleString("en-US")}</p>
+            <p className="mt-2 text-sm text-black/42">Live inventory snapshot</p>
+          </section>
+        ))}
+      </div>
 
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold text-slate-900">Product List</h2>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="py-10 text-center text-sm text-slate-500">Loading products...</div>
-          ) : (
-            <div className="space-y-3">
-              {products.map((product) => (
-                <div key={product.id} className="flex flex-col gap-3 rounded-2xl border border-slate-100 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={product.image || "https://placehold.co/80x80?text=Product"}
-                      alt={product.name}
-                      className="h-16 w-16 rounded-2xl object-cover"
-                    />
-                    <div>
-                      <p className="font-medium text-slate-900">{product.name}</p>
-                      <p className="text-sm text-slate-500">
-                        {product.category?.name || "No category"} · SKU {product.sku}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid gap-1 text-sm text-slate-600 lg:text-right">
-                    <p>Price: {formatMoney(product.price)}</p>
-                    <p>Stock: {product.stock}</p>
-                    <p>Status: {product.status}</p>
-                    <p>Storefront: {product.featured ? "featured" : product.displayStatus}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(product)}
-                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(product.id)}
-                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+      <div className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr]">
+        <section className={surface}>
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="inline-flex rounded-full bg-[#f5f5f5] p-1 text-sm">
+              {([
+                ["all", `All Product (${products.length})`],
+                ["featured", "Featured Products"],
+                ["active", "Active"],
+                ["out_of_stock", "Out of Stock"],
+              ] as const).map(([value, label]) => (
+                <button key={value} type="button" onClick={() => setStatus(value)} className={["rounded-full px-4 py-2 font-medium transition", status === value ? "bg-white text-black shadow-sm" : "text-black/45 hover:text-black"].join(" ")}>
+                  {label}
+                </button>
               ))}
+            </div>
 
-              {products.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">No products found.</div>
-              ) : null}
+            <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
+              <Search className="h-4 w-4" />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search your product" className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35" />
+            </label>
+          </div>
+
+          {loading ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center text-sm text-black/45">Loading products...</div>
+          ) : (
+            <div className="mt-6 overflow-hidden rounded-[24px] border border-black/8">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-[#f7f7f8] text-black/48">
+                  <tr>
+                    <th className="px-5 py-4 font-medium">Product</th>
+                    <th className="px-5 py-4 font-medium">Created Date</th>
+                    <th className="px-5 py-4 font-medium">Category</th>
+                    <th className="px-5 py-4 font-medium">Price</th>
+                    <th className="px-5 py-4 font-medium">Stock</th>
+                    <th className="px-5 py-4 font-medium">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="border-t border-black/6">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[#f7f7f8]">
+                            <img src={resolveAssetUrl(product.image || "/assets/images/iphone-fallback.png")} alt={product.name} className="max-h-10 object-contain" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-black">{product.name}</p>
+                            <p className="mt-1 text-sm text-black/42">SKU {product.sku}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-black/42">{new Date(product.createdAt).toLocaleDateString()}</td>
+                      <td className="px-5 py-4 text-black/65">{product.category?.name || "No category"}</td>
+                      <td className="px-5 py-4 font-medium text-black">{formatMoney(product.price)}</td>
+                      <td className="px-5 py-4">
+                        <span className={["inline-flex rounded-full px-3 py-1 text-xs font-semibold", product.status === "out_of_stock" ? "bg-rose-100 text-rose-600" : "bg-black text-white"].join(" ")}>
+                          {product.stock}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <button type="button" onClick={() => handleEdit(product)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-black transition hover:bg-black hover:text-white">
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button type="button" onClick={() => handleDelete(product.id)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 text-rose-500 transition hover:bg-rose-500 hover:text-white">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </section>
+
+        <section className={surface}>
+          <p className="text-sm font-medium text-black/45">{selectedProductId ? "Edit product" : "Select a product"}</p>
+          <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Product update</h2>
+
+          <div className="mt-6 space-y-4">
+            <Field label="Product name" value={form.name} onChange={(value) => setForm((current) => ({ ...current, name: value }))} />
+            <Field label="SKU" value={form.sku} onChange={(value) => setForm((current) => ({ ...current, sku: value }))} />
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Price" value={form.price} onChange={(value) => setForm((current) => ({ ...current, price: value }))} />
+              <Field label="Compare at price" value={form.compareAtPrice} onChange={(value) => setForm((current) => ({ ...current, compareAtPrice: value }))} />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Stock" value={form.stock} onChange={(value) => setForm((current) => ({ ...current, stock: value }))} />
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-black/58">Category</span>
+                <select value={form.categoryId} onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))} className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none">
+                  <option value="">Select category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <Field label="Image path" value={form.image} onChange={(value) => setForm((current) => ({ ...current, image: value }))} />
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-black/58">Description</span>
+              <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 py-3 text-sm outline-none" />
+            </label>
+            <label className="flex items-center gap-3 rounded-2xl border border-black/10 bg-[#f7f7f8] px-4 py-4 text-sm font-medium text-black">
+              <input type="checkbox" checked={form.featured} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} className="h-4 w-4 rounded border-black/20" />
+              Featured on user storefront
+            </label>
+            {form.image ? (
+              <div className="rounded-[24px] bg-[#f7f7f8] p-4">
+                <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl bg-white">
+                  <img src={resolveAssetUrl(form.image)} alt={form.name || "Preview"} className="max-h-[140px] object-contain" />
+                </div>
+              </div>
+            ) : null}
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={handleSave} disabled={!selectedProductId || saving} className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60">
+                {saving ? "Saving..." : "Update Product"}
+              </button>
+              <button type="button" onClick={resetForm} className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
+                Reset
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
+  );
+}
+
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-black/58">{label}</span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none" />
+    </label>
   );
 }
