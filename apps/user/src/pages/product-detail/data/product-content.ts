@@ -1,18 +1,9 @@
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
+import type { ProductReview } from "@/features/product/product-review.types";
 
 export type ProductSpecRow = {
   label: string;
   value: string;
-};
-
-export type ProductReview = {
-  id: string;
-  author: string;
-  avatar: string;
-  rating: number;
-  date: string;
-  content: string;
-  photos?: string[];
 };
 
 const productMediaMap: Record<string, string[]> = {

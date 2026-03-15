@@ -4,7 +4,11 @@ import Breadcrumb from "@/components/layout/Breadcrumb";
 import { useAuth } from "@/features/auth/auth.context";
 import { getCatalogProducts } from "@/features/catalog/catalog.service";
 import { useCart } from "@/features/cart/cart.context";
-import { getProductDetail } from "@/features/product/product.service";
+import {
+  createProductReview,
+  getProductDetail,
+  getProductReviews as getProductReviewsApi,
+} from "@/features/product/product.service";
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
 import type { ProductDetail } from "@/features/product/product.types";
 import { resolveAssetUrl } from "@/utils/assets";
@@ -13,7 +17,11 @@ import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
 import ProductSpecs from "./components/ProductSpecs";
 import ReviewSection from "./components/ReviewSection";
-import { getProductGallery, getProductReviews, getProductSpecs } from "./data/product-content";
+import {
+  getProductGallery,
+  getProductSpecs,
+} from "./data/product-content";
+import type { ProductReview } from "@/features/product/product-review.types";
 
 function getDisplayCategoryName(categoryName: string | undefined, categorySlug: string | undefined) {
   if (categorySlug === "phones") return "Smartphones";
@@ -43,10 +51,11 @@ function RelatedProducts({ products }: { products: CatalogProduct[] }) {
 export default function ProductDetailPage() {
   const { slug = "" } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { customer, isAuthenticated } = useAuth();
   const { addItem, isInWishlist, toggleWishlist } = useCart();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<CatalogProduct[]>([]);
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("#7441e1");
   const [selectedCapacity, setSelectedCapacity] = useState("128GB");
@@ -60,6 +69,8 @@ export default function ProductDetailPage() {
       setProduct(detail);
       const related = await getCatalogProducts({ category: detail.category?.id || "", limit: 8 });
       setRelatedProducts(related.data.filter((item) => item.slug !== detail.slug).slice(0, 4));
+      const apiReviews = await getProductReviewsApi(slug);
+      setReviews(apiReviews);
     }
 
     loadData();
@@ -67,7 +78,6 @@ export default function ProductDetailPage() {
 
   const gallery = useMemo(() => (product ? getProductGallery(product) : []), [product]);
   const specs = useMemo(() => (product ? getProductSpecs(product) : []), [product]);
-  const reviews = useMemo(() => (product ? getProductReviews(product) : []), [product]);
 
   if (!product) {
     return <div className="px-4 py-16 text-center text-sm text-black/50">Loading product...</div>;
@@ -128,7 +138,30 @@ export default function ProductDetailPage() {
         </section>
 
         <ProductSpecs specs={specs} />
-        <ReviewSection reviews={reviews} />
+        <ReviewSection
+          reviews={reviews}
+          isAuthenticated={isAuthenticated}
+          customerName={customer?.name}
+          onRequireSignIn={() => navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`)}
+          onSubmitReview={async ({ rating, content }) => {
+            const created = await createProductReview(product.slug, { rating, content });
+            const nextReview: ProductReview = {
+              id: created.id,
+              author: created.customer?.name || "Customer",
+              avatar: "/assets/images/profile-image-64.png",
+              rating: created.rating,
+              date: new Date(created.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              }),
+              content: created.content,
+              photos: created.photos,
+            };
+
+            setReviews((current) => [nextReview, ...current]);
+          }}
+        />
         <RelatedProducts products={relatedProducts} />
       </div>
     </div>
