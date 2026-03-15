@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getProductDetail,
   listAdminProducts,
+  listProductFilters,
   listProducts,
   updateProduct,
 } from "./product.controller.js";
@@ -18,6 +19,7 @@ export const productRouter = Router();
 export const adminProductRouter = Router();
 
 productRouter.get("/", listProducts);
+productRouter.get("/filters", listProductFilters);
 productRouter.get("/:slug", getProductDetail);
 productRouter.get("/:slug/reviews", listProductReviews);
 productRouter.post("/:slug/reviews", requireCustomerAuth, createProductReview);

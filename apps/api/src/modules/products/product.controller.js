@@ -40,6 +40,12 @@ function sanitizeProduct(product) {
     compareAtPrice: product.compareAtPrice,
     stock: product.stock,
     featured: product.featured,
+    brand: product.brand,
+    batteryCapacity: product.batteryCapacity,
+    screenType: product.screenType,
+    screenDiagonal: product.screenDiagonal,
+    protectionClass: product.protectionClass,
+    builtInMemory: product.builtInMemory,
     status: product.status,
     displayStatus: mapProductStatus(product),
     category,
@@ -50,12 +56,34 @@ function sanitizeProduct(product) {
   };
 }
 
+function parseQueryValues(value) {
+  if (Array.isArray(value)) {
+    return value.flatMap((item) =>
+      String(item || "")
+        .split(",")
+        .map((chunk) => chunk.trim())
+        .filter(Boolean)
+    );
+  }
+
+  return String(value || "")
+    .split(",")
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+}
+
 async function buildProductFilter(query, options = {}) {
   const filter = {};
   const search = String(query.search || "").trim();
   const category = String(query.category || "").trim();
   const status = String(query.status || "").trim();
   const featured = query.featured;
+  const brandValues = parseQueryValues(query.brand);
+  const batteryCapacityValues = parseQueryValues(query.batteryCapacity);
+  const screenTypeValues = parseQueryValues(query.screenType);
+  const screenDiagonalValues = parseQueryValues(query.screenDiagonal);
+  const protectionClassValues = parseQueryValues(query.protectionClass);
+  const builtInMemoryValues = parseQueryValues(query.builtInMemory);
 
   if (search) {
     filter.$or = [
@@ -76,6 +104,30 @@ async function buildProductFilter(query, options = {}) {
 
   if (featured !== undefined) {
     filter.featured = String(featured) === "true";
+  }
+
+  if (brandValues.length) {
+    filter.brand = { $in: brandValues };
+  }
+
+  if (batteryCapacityValues.length) {
+    filter.batteryCapacity = { $in: batteryCapacityValues };
+  }
+
+  if (screenTypeValues.length) {
+    filter.screenType = { $in: screenTypeValues };
+  }
+
+  if (screenDiagonalValues.length) {
+    filter.screenDiagonal = { $in: screenDiagonalValues };
+  }
+
+  if (protectionClassValues.length) {
+    filter.protectionClass = { $in: protectionClassValues };
+  }
+
+  if (builtInMemoryValues.length) {
+    filter.builtInMemory = { $in: builtInMemoryValues };
   }
 
   if (status) {
@@ -99,6 +151,12 @@ async function buildProductFilter(query, options = {}) {
   }
 
   return filter;
+}
+
+function buildOptionList(items, key) {
+  return [...new Set(items.map((item) => String(item[key] || "").trim()).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b)
+  );
 }
 
 function buildProductSort(query) {
@@ -161,6 +219,32 @@ export const getProductDetail = asyncHandler(async (req, res) => {
   });
 });
 
+export const listProductFilters = asyncHandler(async (req, res) => {
+  const filter = await buildProductFilter(
+    {
+      category: req.query.category,
+    },
+    { publicOnly: true }
+  );
+
+  const items = await Product.find(filter)
+    .select("brand batteryCapacity screenType screenDiagonal protectionClass builtInMemory")
+    .lean();
+
+  res.json({
+    success: true,
+    message: "Product filters fetched successfully",
+    data: {
+      brands: buildOptionList(items, "brand"),
+      batteryCapacity: buildOptionList(items, "batteryCapacity"),
+      screenType: buildOptionList(items, "screenType"),
+      screenDiagonal: buildOptionList(items, "screenDiagonal"),
+      protectionClass: buildOptionList(items, "protectionClass"),
+      builtInMemory: buildOptionList(items, "builtInMemory"),
+    },
+  });
+});
+
 export const listAdminProducts = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
   const filter = await buildProductFilter(req.query);
@@ -216,6 +300,12 @@ export const createProduct = asyncHandler(async (req, res) => {
     stock: Number(req.body.stock ?? 0),
     status: String(req.body.status || "draft"),
     featured: Boolean(req.body.featured),
+    brand: String(req.body.brand || "").trim(),
+    batteryCapacity: String(req.body.batteryCapacity || "").trim(),
+    screenType: String(req.body.screenType || "").trim(),
+    screenDiagonal: String(req.body.screenDiagonal || "").trim(),
+    protectionClass: String(req.body.protectionClass || "").trim(),
+    builtInMemory: String(req.body.builtInMemory || "").trim(),
     categoryId,
     images: Array.isArray(req.body.images) ? req.body.images : [],
   });
@@ -270,6 +360,17 @@ export const updateProduct = asyncHandler(async (req, res) => {
   product.status = req.body.status === undefined ? product.status : String(req.body.status);
   product.featured =
     req.body.featured === undefined ? product.featured : Boolean(req.body.featured);
+  product.brand = req.body.brand === undefined ? product.brand : String(req.body.brand || "").trim();
+  product.batteryCapacity =
+    req.body.batteryCapacity === undefined ? product.batteryCapacity : String(req.body.batteryCapacity || "").trim();
+  product.screenType =
+    req.body.screenType === undefined ? product.screenType : String(req.body.screenType || "").trim();
+  product.screenDiagonal =
+    req.body.screenDiagonal === undefined ? product.screenDiagonal : String(req.body.screenDiagonal || "").trim();
+  product.protectionClass =
+    req.body.protectionClass === undefined ? product.protectionClass : String(req.body.protectionClass || "").trim();
+  product.builtInMemory =
+    req.body.builtInMemory === undefined ? product.builtInMemory : String(req.body.builtInMemory || "").trim();
   product.categoryId =
     req.body.categoryId === undefined ? product.categoryId : String(req.body.categoryId).trim();
   product.images = Array.isArray(req.body.images) ? req.body.images : product.images;

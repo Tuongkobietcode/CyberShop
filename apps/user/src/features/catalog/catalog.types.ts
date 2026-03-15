@@ -16,6 +16,12 @@ export type CatalogProduct = {
   compareAtPrice: number | null;
   stock: number;
   featured: boolean;
+  brand: string;
+  batteryCapacity: string;
+  screenType: string;
+  screenDiagonal: string;
+  protectionClass: string;
+  builtInMemory: string;
   status: string;
   displayStatus: string;
   image: string;
@@ -31,4 +37,13 @@ export type CatalogProduct = {
   } | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type CatalogProductFilters = {
+  brands: string[];
+  batteryCapacity: string[];
+  screenType: string[];
+  screenDiagonal: string[];
+  protectionClass: string[];
+  builtInMemory: string[];
 };

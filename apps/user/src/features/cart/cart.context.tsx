@@ -49,8 +49,8 @@ const shippingMethods: ShippingMethod[] = [
 
 type CartNotification = {
   id: number;
-  type: "cart" | "wishlist";
-  action: "added" | "removed";
+  type: "cart" | "wishlist" | "order";
+  action: "added" | "removed" | "placed";
   name: string;
   quantity: number;
 };
@@ -79,6 +79,7 @@ type CartContextValue = {
   setShippingMethod: (methodId: ShippingMethodId) => void;
   setPaymentMethod: (method: PaymentMethod) => void;
   setSameAsBilling: (value: boolean) => void;
+  showOrderSuccess: (orderCode: string) => void;
   clearNotification: () => void;
 };
 
@@ -358,6 +359,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setNotification(null);
   }, []);
 
+  const showOrderSuccess = useCallback((orderCode: string) => {
+    setNotification({
+      id: Date.now(),
+      type: "order",
+      action: "placed",
+      name: `Order ${orderCode}`,
+      quantity: 1,
+    });
+  }, []);
+
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
   const wishlistCount = wishlist.length;
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
@@ -390,6 +401,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setShippingMethod,
       setPaymentMethod,
       setSameAsBilling,
+      showOrderSuccess,
       clearNotification,
     }),
     [
@@ -408,6 +420,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setPaymentMethod,
       setSameAsBilling,
       setShippingMethod,
+      showOrderSuccess,
       shippingFee,
       subtotal,
       tax,
