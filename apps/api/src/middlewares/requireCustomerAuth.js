@@ -11,7 +11,13 @@ export async function requireCustomerAuth(req, _res, next) {
     }
 
     const accessToken = authHeader.slice("Bearer ".length).trim();
-    const payload = verifyAccessToken(accessToken);
+    let payload;
+
+    try {
+      payload = verifyAccessToken(accessToken);
+    } catch {
+      throw createHttpError(401, "Invalid or expired access token");
+    }
 
     if (payload.aud !== "customer") {
       throw createHttpError(401, "Invalid customer token");

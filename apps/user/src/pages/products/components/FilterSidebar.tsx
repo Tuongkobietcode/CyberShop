@@ -1,29 +1,74 @@
-import { Search } from "lucide-react";
-import type { CatalogCategory } from "@/features/catalog/catalog.types";
+import { ChevronDown, Search } from "lucide-react";
+import { useState } from "react";
+import type {
+  CatalogCategory,
+  CatalogProductFilters,
+} from "@/features/catalog/catalog.types";
+
+type FilterKey =
+  | "brand"
+  | "batteryCapacity"
+  | "screenType"
+  | "screenDiagonal"
+  | "protectionClass"
+  | "builtInMemory";
 
 type Props = {
   categories: CatalogCategory[];
   activeCategory: string;
   search: string;
+  filters: CatalogProductFilters;
+  selectedFilters: Record<FilterKey, string[]>;
   onSearch: (value: string) => void;
   onSelectCategory: (categoryId: string) => void;
+  onToggleFilter: (key: FilterKey, value: string) => void;
 };
 
-const staticFilters = [
-  "Battery capacity",
-  "Screen type",
-  "Screen diagonal",
-  "Protection class",
-  "Built-in memory",
+const filterSections: Array<{
+  key: FilterKey;
+  label: string;
+  source: keyof CatalogProductFilters;
+}> = [
+  { key: "brand", label: "Brand", source: "brands" },
+  {
+    key: "batteryCapacity",
+    label: "Battery capacity",
+    source: "batteryCapacity",
+  },
+  { key: "screenType", label: "Screen type", source: "screenType" },
+  { key: "screenDiagonal", label: "Screen diagonal", source: "screenDiagonal" },
+  {
+    key: "protectionClass",
+    label: "Protection class",
+    source: "protectionClass",
+  },
+  { key: "builtInMemory", label: "Built-in memory", source: "builtInMemory" },
 ];
 
 export default function FilterSidebar({
   categories,
   activeCategory,
   search,
+  filters,
+  selectedFilters,
   onSearch,
   onSelectCategory,
+  onToggleFilter,
 }: Props) {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    category: true,
+    brand: true,
+    batteryCapacity: false,
+    screenType: false,
+    screenDiagonal: false,
+    protectionClass: false,
+    builtInMemory: false,
+  });
+
+  function toggleSection(key: string) {
+    setOpenSections((current) => ({ ...current, [key]: !current[key] }));
+  }
+
   return (
     <aside className="space-y-6">
       <div>

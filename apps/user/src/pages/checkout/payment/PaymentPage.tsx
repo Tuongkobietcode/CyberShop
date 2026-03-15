@@ -22,6 +22,7 @@ export default function PaymentPage() {
     setPaymentMethod,
     setSameAsBilling,
     clearCart,
+    showOrderSuccess,
   } = useCart();
   const [submitting, setSubmitting] = useState(false);
 
@@ -83,15 +84,18 @@ export default function PaymentPage() {
                 if (!selectedAddress || !shippingMethod) return;
                 setSubmitting(true);
                 try {
-                  await createOrder({
+                  const order = await createOrder({
                     items,
                     address: selectedAddress,
                     shippingMethod,
                     paymentMethod: checkout.paymentMethod,
                   });
                   await refreshProfile();
+                  showOrderSuccess(order.orderCode);
                   clearCart();
-                  navigate("/home", { replace: true });
+                  window.setTimeout(() => {
+                    navigate("/home", { replace: true });
+                  }, 1200);
                 } finally {
                   setSubmitting(false);
                 }

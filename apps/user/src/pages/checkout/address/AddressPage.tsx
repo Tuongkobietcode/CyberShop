@@ -65,7 +65,14 @@ export default function AddressPage() {
 
         <div className="flex justify-end gap-4 pt-8">
           <button type="button" onClick={() => navigate("/cart")} className="h-16 min-w-[220px] rounded-xl border border-black text-[1.15rem] font-medium text-black">Back</button>
-          <button type="button" onClick={() => navigate("/checkout/shipping")} className="h-16 min-w-[220px] rounded-xl bg-black text-[1.15rem] font-medium text-white">Next</button>
+          <button
+            type="button"
+            disabled={!selectedAddress}
+            onClick={() => navigate("/checkout/shipping")}
+            className="h-16 min-w-[220px] rounded-xl bg-black text-[1.15rem] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
     </CheckoutShell>
