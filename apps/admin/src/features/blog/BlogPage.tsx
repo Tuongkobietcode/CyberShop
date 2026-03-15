@@ -18,10 +18,6 @@ export type BlogPost = {
   sections: BlogPostSection[];
 };
 
-/* =========================
-   SAMPLE DATA
-========================= */
-
 const blogPostsData: BlogPost[] = [
   {
     slug: "device-ai-everyday-utility",
@@ -62,10 +58,6 @@ const blogPostsData: BlogPost[] = [
 const surface =
   "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
 
-/* =========================
-   PAGE
-========================= */
-
 export function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>(blogPostsData);
 
@@ -78,7 +70,7 @@ export function BlogPage() {
     category: "",
     excerpt: "",
     image: "",
-    date: "",
+
     readTime: "",
   });
 
@@ -101,7 +93,6 @@ export function BlogPage() {
       category: "",
       excerpt: "",
       image: "",
-      date: "",
       readTime: "",
     });
   }
@@ -115,7 +106,6 @@ export function BlogPage() {
       category: post.category,
       excerpt: post.excerpt,
       image: post.image,
-      date: post.date,
       readTime: post.readTime,
     });
   }
@@ -132,7 +122,20 @@ export function BlogPage() {
         prev.map((p) => (p.slug === selectedSlug ? { ...p, ...form } : p)),
       );
     } else {
-      setPosts((prev) => [...prev, { ...form, sections: [] }]);
+      const currentDate = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      setPosts((prev) => [
+        ...prev,
+        {
+          ...form,
+          date: currentDate,
+          sections: [],
+        },
+      ]);
     }
 
     resetForm();
@@ -140,12 +143,10 @@ export function BlogPage() {
 
   return (
     <div className="space-y-6">
-      {/* HEADER */}
-
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-black/45">Content</p>
-          <h1 className="text-[2.2rem] font-semibold">Blog list</h1>
+          <h1 className="text-[2.2rem] font-semibold">Blog Management</h1>
         </div>
 
         <div className="flex gap-3">
@@ -164,75 +165,79 @@ export function BlogPage() {
         </div>
       </div>
 
-      {/* SEARCH */}
-
-      {/* TABLE */}
       <div className="flex gap-6 items-start">
         <section className={`${surface} border border-black/8 flex-1`}>
-          <label className="mb-6 flex h-12 w-[30%] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4">
-            <Search size={16} />
-
-            <input
-              placeholder="Search blog"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-transparent outline-none"
-            />
-          </label>
-          <table className="min-w-full text-sm">
-            <thead className="bg-[#f7f7f8] text-black/50">
-              <tr>
-                <th className="px-5 py-4">Post</th>
-                <th className="px-5 py-4">Category</th>
-                <th className="px-5 py-4">Date</th>
-                <th className="px-5 py-4">Read</th>
-                <th className="px-5 py-4">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredPosts.map((post) => (
-                <tr key={post.slug} className="border-t border-black/6">
-                  <td className="px-5 py-4 flex gap-3">
-                    <img
-                      src={resolveAssetUrl(post.image)}
-                      className="h-12 w-12 rounded-xl object-cover"
-                    />
-
-                    <div>
-                      <p className="font-semibold">{post.title}</p>
-                      <p className="text-black/40 text-sm">{post.excerpt}</p>
-                    </div>
-                  </td>
-
-                  <td className="px-5 py-4">{post.category}</td>
-
-                  <td className="px-5 py-4">{post.date}</td>
-
-                  <td className="px-5 py-4">{post.readTime}</td>
-
-                  <td className="px-5 py-4 flex gap-2">
-                    <button
-                      onClick={() => handleSelect(post)}
-                      className="px-4 h-9 border border-black/10 rounded-full hover:bg-black hover:text-white transition"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(post.slug)}
-                      className="px-4 h-9 border border-black/10 rounded-full hover:bg-black hover:text-white transition"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-black/45">Manage blog</p>
+              <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">
+                List blog
+              </h2>
+            </div>
+            <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
+              <Search className="h-4 w-4" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search blog"
+                className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35"
+              />
+            </label>
+          </div>
+          <div className="mt-6 overflow-hidden rounded-2xl border border-black/10">
+            <table className="min-w-full text-sm">
+              <thead className="bg-[#f7f7f8] text-black/50">
+                <tr>
+                  <th className="px-5 py-4">Post</th>
+                  <th className="px-5 py-4">Category</th>
+                  <th className="px-5 py-4">Date</th>
+                  <th className="px-5 py-4">Read</th>
+                  <th className="px-5 py-4">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+              </thead>
 
-        {/* FORM */}
+              <tbody>
+                {filteredPosts.map((post) => (
+                  <tr key={post.slug} className="border-t border-black/6">
+                    <td className="px-5 py-4 flex gap-3">
+                      <img
+                        src={resolveAssetUrl(post.image)}
+                        className="h-12 w-12 rounded-xl object-cover"
+                      />
+
+                      <div>
+                        <p className="font-semibold">{post.title}</p>
+                        <p className="text-black/40 text-sm">{post.excerpt}</p>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4">{post.category}</td>
+
+                    <td className="px-5 py-4">{post.date}</td>
+
+                    <td className="px-5 py-4">{post.readTime}</td>
+
+                    <td className="px-5 py-4 flex gap-2">
+                      <button
+                        onClick={() => handleSelect(post)}
+                        className="px-4 h-9 border border-black/10 font-semibold text-black rounded-full hover:bg-black hover:text-white transition"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(post.slug)}
+                        className="px-4 h-9 border border-rose-200 text-rose-500  rounded-full hover:bg-rose-500 hover:text-white transition"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <section className={`${surface} w-[420px]`}>
           <h2 className="text-xl font-semibold">
@@ -265,23 +270,19 @@ export function BlogPage() {
             />
 
             <Field
-              label="Date"
-              value={form.date}
-              onChange={(v) => setForm({ ...form, date: v })}
-            />
-
-            <Field
               label="Read Time"
               value={form.readTime}
               onChange={(v) => setForm({ ...form, readTime: v })}
             />
 
-            <textarea
-              value={form.excerpt}
-              onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-              className="w-full rounded-xl border border-black/10 bg-[#f7f7f8] p-3 outline-none"
-              placeholder="Excerpt"
-            />
+            <label className="block space-y-2">
+              <span className="text-sm text-black/58">Excerpt</span>
+              <textarea
+                value={form.excerpt}
+                onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+                className="w-full rounded-xl border border-black/10 bg-[#f7f7f8] p-3 outline-none"
+              />
+            </label>
 
             <div className="flex gap-3">
               <button
