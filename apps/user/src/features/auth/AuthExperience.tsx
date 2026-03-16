@@ -156,6 +156,16 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
               <Field label="Email" type="email" value={email} onChange={setEmail} placeholder="you@example.com" />
               {isSignUp ? <Field label="Phone" value={phone} onChange={setPhone} placeholder="Your phone number" /> : null}
               <Field label="Password" type="password" value={password} onChange={setPassword} placeholder="Enter your password" />
+              {!isSignUp && (
+                <div className="flex justify-end">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm font-medium text-black/60 transition hover:text-black"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
               {isSignUp ? (
                 <Field
                   label="Confirm password"

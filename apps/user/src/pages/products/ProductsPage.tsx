@@ -3,19 +3,21 @@ import { useSearchParams } from "react-router-dom";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import {
   getCatalogCategories,
-  getCatalogProductFilters,
   getCatalogProducts,
 } from "@/features/catalog/catalog.service";
+
 import type {
   CatalogCategory,
   CatalogProduct,
   CatalogProductFilters,
 } from "@/features/catalog/catalog.types";
+
 import FilterSidebar from "./components/FilterSidebar";
 import ProductGrid from "./components/ProductGrid";
 import SortBar from "./components/SortBar";
 
 type SortOption = "rating" | "price_asc" | "price_desc" | "newest";
+
 type FilterKey =
   | "brand"
   | "batteryCapacity"
@@ -24,23 +26,14 @@ type FilterKey =
   | "protectionClass"
   | "builtInMemory";
 
-const filterKeys: FilterKey[] = [
-  "brand",
-  "batteryCapacity",
-  "screenType",
-  "screenDiagonal",
-  "protectionClass",
-  "builtInMemory",
-];
-
-function emptyFilters(): CatalogProductFilters {
+function mockFilters(): CatalogProductFilters {
   return {
-    brands: [],
-    batteryCapacity: [],
-    screenType: [],
-    screenDiagonal: [],
-    protectionClass: [],
-    builtInMemory: [],
+    brands: ["Apple", "Samsung", "Galaxy"],
+    batteryCapacity: ["3000 mAh", "4000 mAh", "5000 mAh"],
+    screenType: ["OLED", "AMOLED", "LCD"],
+    screenDiagonal: ['6.1"', '6.7"', '7.0"'],
+    protectionClass: ["IP67", "IP68"],
+    builtInMemory: ["128 GB", "256 GB", "512 GB", "1 TB"],
   };
 }
 
@@ -63,9 +56,11 @@ function buildSelectedFilters(searchParams: URLSearchParams): Record<FilterKey, 
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [filters, setFilters] = useState<CatalogProductFilters>(emptyFilters());
+  const [filters, setFilters] = useState<CatalogProductFilters>(mockFilters());
+
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(() => searchParams.get("search") || "");
   const [page, setPage] = useState(1);
@@ -81,34 +76,33 @@ export default function ProductsPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+
       try {
-        const productParams: Record<string, string | number | boolean | string[]> = { limit: 100 };
+        const productParams: Record<string, string | number> = {
+          limit: 100,
+        };
+
         if (activeCategory) {
           productParams.category = activeCategory;
         }
 
-        filterKeys.forEach((key) => {
-          if (selectedFilters[key].length) {
-            productParams[key] = selectedFilters[key];
-          }
-        });
-
-        const [categoryResponse, filterResponse, productResponse] = await Promise.all([
+        const [categoryResponse, productResponse] = await Promise.all([
           getCatalogCategories({ limit: 20 }),
-          getCatalogProductFilters(activeCategory ? { category: activeCategory } : undefined),
           getCatalogProducts(productParams),
         ]);
 
         setCategories(categoryResponse.data);
-        setFilters(filterResponse.data);
         setProducts(productResponse.data);
+
+        // mock filters for UI
+        setFilters(mockFilters());
       } finally {
         setLoading(false);
       }
     }
 
     loadData();
-  }, [activeCategory, selectedFilters]);
+  }, [activeCategory]);
 
   const visibleProducts = useMemo(() => {
     const filtered = products.filter((product) =>
@@ -116,8 +110,15 @@ export default function ProductsPage() {
     );
 
     const sorted = [...filtered];
-    if (sort === "price_asc") sorted.sort((a, b) => a.price - b.price);
-    if (sort === "price_desc") sorted.sort((a, b) => b.price - a.price);
+
+    if (sort === "price_asc") {
+      sorted.sort((a, b) => a.price - b.price);
+    }
+
+    if (sort === "price_desc") {
+      sorted.sort((a, b) => b.price - a.price);
+    }
+
     if (sort === "newest") {
       sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
     }
@@ -127,27 +128,39 @@ export default function ProductsPage() {
 
   const pageSize = 9;
   const totalPages = Math.max(1, Math.ceil(visibleProducts.length / pageSize));
-  const pagedProducts = visibleProducts.slice((page - 1) * pageSize, page * pageSize);
-  const activeCategoryRecord = categories.find((item) => item.id === activeCategory);
+
+  const pagedProducts = visibleProducts.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
+
+  const activeCategoryRecord = categories.find(
+    (item) => item.id === activeCategory
+  );
+
   const activeCategoryName = getUserCategoryName(activeCategoryRecord);
 
   useEffect(() => {
     setPage(1);
-  }, [activeCategory, search, sort, selectedFilters]);
+  }, [activeCategory, search, sort]);
 
   function buildParamsForCategory(categoryId: string) {
     const params = new URLSearchParams();
+
     if (categoryId) {
       params.set("category", categoryId);
     }
+
     if (search.trim()) {
       params.set("search", search.trim());
     }
+
     return params;
   }
 
   function toggleFilter(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams);
+
     const currentValues = params.getAll(key);
     params.delete(key);
 
@@ -156,12 +169,6 @@ export default function ProductsPage() {
       : [...currentValues, value];
 
     nextValues.forEach((item) => params.append(key, item));
-
-    if (search.trim()) {
-      params.set("search", search.trim());
-    } else {
-      params.delete("search");
-    }
 
     setSearchParams(params);
   }
@@ -184,14 +191,18 @@ export default function ProductsPage() {
           filters={filters}
           selectedFilters={selectedFilters}
           onSearch={setSearch}
-          onSelectCategory={(categoryId) => {
-            setSearchParams(buildParamsForCategory(categoryId));
-          }}
+          onSelectCategory={(categoryId) =>
+            setSearchParams(buildParamsForCategory(categoryId))
+          }
           onToggleFilter={toggleFilter}
         />
 
         <div className="space-y-8">
-          <SortBar total={visibleProducts.length} sort={sort} onSortChange={setSort} />
+          <SortBar
+            total={visibleProducts.length}
+            sort={sort}
+            onSortChange={setSort}
+          />
 
           {loading ? (
             <div className="rounded-2xl border border-dashed border-black/10 px-6 py-20 text-center text-sm text-black/50">
@@ -203,45 +214,34 @@ export default function ProductsPage() {
 
           <div className="flex items-center justify-center gap-3 pt-4 text-sm">
             <button
-              type="button"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              className="h-9 w-9 rounded-lg text-black/70 transition hover:bg-black/5"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="h-9 w-9 rounded-lg hover:bg-black/5"
             >
               ‹
             </button>
+
             {Array.from({ length: totalPages }).slice(0, 4).map((_, index) => {
               const pageNumber = index + 1;
+
               return (
                 <button
                   key={pageNumber}
-                  type="button"
                   onClick={() => setPage(pageNumber)}
                   className={[
                     "h-9 min-w-9 rounded-lg px-3",
-                    page === pageNumber ? "bg-black text-white" : "text-black/70 hover:bg-black/5",
+                    page === pageNumber
+                      ? "bg-black text-white"
+                      : "hover:bg-black/5",
                   ].join(" ")}
                 >
                   {pageNumber}
                 </button>
               );
             })}
-            {totalPages > 4 ? <span className="px-1 text-black/40">....</span> : null}
-            {totalPages > 4 ? (
-              <button
-                type="button"
-                onClick={() => setPage(totalPages)}
-                className={[
-                  "h-9 min-w-9 rounded-lg px-3",
-                  page === totalPages ? "bg-black text-white" : "text-black/70 hover:bg-black/5",
-                ].join(" ")}
-              >
-                {totalPages}
-              </button>
-            ) : null}
+
             <button
-              type="button"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              className="h-9 w-9 rounded-lg text-black/70 transition hover:bg-black/5"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              className="h-9 w-9 rounded-lg hover:bg-black/5"
             >
               ›
             </button>

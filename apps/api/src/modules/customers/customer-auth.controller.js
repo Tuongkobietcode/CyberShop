@@ -213,3 +213,75 @@ export const logoutCustomer = asyncHandler(async (req, res) => {
     data: null,
   });
 });
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const email = String(req.body.email || "").trim().toLowerCase();
+
+  if (!email) {
+    throw createHttpError(400, "Email is required");
+  }
+
+  const customer = await Customer.findOne({ email });
+
+  // Không tiết lộ email tồn tại hay không
+  if (!customer) {
+    return res.json({
+      success: true,
+      message: "If the email exists, a reset link has been sent",
+      data: null,
+    });
+  }
+
+  const crypto = await import("crypto");
+  const token = crypto.randomBytes(32).toString("hex");
+
+  customer.resetPasswordToken = token;
+  customer.resetPasswordExpires = new Date(Date.now() + 1000 * 60 * 30); // 30 phút
+  await customer.save();
+
+  // TODO: gửi email reset link
+  // ví dụ:
+  // https://your-site.com/reset-password?token=xxxx
+
+  res.json({
+    success: true,
+    message: "If the email exists, a reset link has been sent",
+    data: null,
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const token = String(req.body.token || "");
+  const password = String(req.body.password || "");
+
+  if (!token || !password) {
+    throw createHttpError(400, "Token and password are required");
+  }
+
+  if (password.length < 6) {
+    throw createHttpError(400, "Password must be at least 6 characters");
+  }
+
+  const customer = await Customer.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: new Date() },
+  });
+
+  if (!customer) {
+    throw createHttpError(400, "Invalid or expired reset token");
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  customer.passwordHash = passwordHash;
+  customer.resetPasswordToken = undefined;
+  customer.resetPasswordExpires = undefined;
+
+  await customer.save();
+
+  res.json({
+    success: true,
+    message: "Password reset successful",
+    data: null,
+  });
+});

@@ -17,6 +17,9 @@ import SignInPage from "@/pages/sign-in/SignInPage";
 import SignUpPage from "@/pages/sign-up/SignUpPage";
 import RequireCustomerAuth from "@/features/auth/RequireCustomerAuth";
 
+import ForgotPassword from "@/pages/forgot-password/ForgotPassword";
+import ResetPassword from "@/pages/reset-password/ResetPassword";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -29,6 +32,14 @@ export const router = createBrowserRouter([
   {
     path: "/sign-up",
     element: <SignUpPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />
   },
   {
     element: <MainLayout />,

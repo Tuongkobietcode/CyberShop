@@ -25,6 +25,15 @@ type LoginPayload = {
   password: string;
 };
 
+type ForgotPasswordPayload = {
+  email: string;
+};
+
+type ResetPasswordPayload = {
+  token: string;
+  password: string;
+};
+
 export async function registerCustomer(payload: RegisterPayload) {
   const response = await http.post<ApiResponse<AuthPayload>>("/auth/customer/register", payload);
   return response.data.data;
@@ -32,6 +41,22 @@ export async function registerCustomer(payload: RegisterPayload) {
 
 export async function loginCustomer(payload: LoginPayload) {
   const response = await http.post<ApiResponse<AuthPayload>>("/auth/customer/login", payload);
+  return response.data.data;
+}
+
+export async function requestPasswordReset(payload: ForgotPasswordPayload) {
+  const response = await http.post<ApiResponse<null>>(
+    "/auth/customer/forgot-password",
+    payload
+  );
+  return response.data.data;
+}
+
+export async function resetPassword(payload: ResetPasswordPayload) {
+  const response = await http.post<ApiResponse<null>>(
+    "/auth/customer/reset-password",
+    payload
+  );
   return response.data.data;
 }
 

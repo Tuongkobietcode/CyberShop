@@ -16,6 +16,8 @@ import {
   setStoredCustomerAuth,
 } from "./auth.storage";
 import {
+  requestPasswordReset,
+  resetPassword,
   deleteMyAddress,
   getCurrentCustomer,
   getMyOrders,
@@ -42,6 +44,8 @@ type AuthContextValue = {
   signIn: (payload: { email: string; password: string }) => Promise<void>;
   signUp: (payload: { name: string; email: string; phone: string; password: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (token: string, password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateProfile: (payload: CustomerProfilePayload) => Promise<void>;
   saveAddress: (payload: CustomerAddressPayload) => Promise<string>;
@@ -179,6 +183,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      requestPasswordReset: async (email: string) => {
+      await requestPasswordReset({ email });
+    },
+
+    resetPassword: async (token: string, password: string) => {
+      await resetPassword({ token, password });
+    },
       refreshProfile,
       updateProfile,
       saveAddress,
