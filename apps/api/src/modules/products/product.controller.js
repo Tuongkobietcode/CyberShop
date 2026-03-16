@@ -4,6 +4,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { buildMeta, getPagination } from "../../utils/pagination.js";
 import { createHttpError } from "../../utils/createHttpError.js";
 import { toSlug } from "../../utils/slug.js";
+import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
 
 function mapProductStatus(product) {
   if (product.stock === 0 || product.status === "out_of_stock") {
@@ -147,7 +148,7 @@ async function buildProductFilter(query, options = {}) {
   }
 
   if (options.publicOnly) {
-    filter.status = "active";
+    filter.status = { $in: ["active", "out_of_stock"] };
   }
 
   return filter;
@@ -205,7 +206,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 export const getProductDetail = asyncHandler(async (req, res) => {
   const product = await Product.findOne({
     slug: req.params.slug,
-    status: "active",
+    status: { $in: ["active", "out_of_stock"] },
   }).populate("categoryId", "name slug");
 
   if (!product) {
@@ -310,6 +311,9 @@ export const createProduct = asyncHandler(async (req, res) => {
     images: Array.isArray(req.body.images) ? req.body.images : [],
   });
 
+  syncProductInventoryStatus(product);
+  await product.save();
+
   await product.populate("categoryId", "name slug");
 
   res.status(201).json({
@@ -346,6 +350,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw createHttpError(409, "Product slug or SKU already exists");
   }
 
+  const previousStock = product.stock;
   product.name = nextName;
   product.slug = nextSlug;
   product.sku = nextSku;
@@ -374,9 +379,26 @@ export const updateProduct = asyncHandler(async (req, res) => {
   product.categoryId =
     req.body.categoryId === undefined ? product.categoryId : String(req.body.categoryId).trim();
   product.images = Array.isArray(req.body.images) ? req.body.images : product.images;
+  syncProductInventoryStatus(product);
 
   await product.save();
   await product.populate("categoryId", "name slug");
+
+  if (product.stock !== previousStock) {
+    await recordInventoryLog({
+      product,
+      delta: product.stock - previousStock,
+      previousStock,
+      nextStock: product.stock,
+      reason: "product_updated",
+      note: "Stock changed from product editor",
+      actorType: "admin",
+      actorId: req.admin?._id || null,
+      referenceType: "product_update",
+      referenceId: product._id,
+      referenceCode: product.sku,
+    });
+  }
 
   res.json({
     success: true,
@@ -399,6 +421,75 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: "Product archived successfully",
+    data: sanitizeProduct(product),
+  });
+});
+
+export const adjustProductInventory = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    throw createHttpError(404, "Product not found");
+  }
+
+  const type = String(req.body.type || "increase").trim();
+  const quantity = Number(req.body.quantity);
+  const reason = String(req.body.reason || "").trim();
+  const note = String(req.body.note || "").trim();
+
+  if (!["increase", "decrease", "set"].includes(type)) {
+    throw createHttpError(400, "Unsupported inventory adjustment type");
+  }
+
+  if (!Number.isFinite(quantity) || quantity < 0) {
+    throw createHttpError(400, "Inventory quantity must be a non-negative number");
+  }
+
+  if (!reason) {
+    throw createHttpError(400, "Inventory adjustment reason is required");
+  }
+
+  const previousStock = product.stock;
+  let nextStock = previousStock;
+
+  if (type === "increase") {
+    nextStock = previousStock + quantity;
+  } else if (type === "decrease") {
+    nextStock = previousStock - quantity;
+  } else {
+    nextStock = quantity;
+  }
+
+  if (nextStock < 0) {
+    throw createHttpError(400, "Inventory cannot go below zero");
+  }
+
+  product.stock = nextStock;
+  syncProductInventoryStatus(product);
+  await product.save();
+  await product.populate("categoryId", "name slug");
+
+  const delta = nextStock - previousStock;
+
+  if (delta !== 0) {
+    await recordInventoryLog({
+      product,
+      delta,
+      previousStock,
+      nextStock,
+      reason,
+      note,
+      actorType: "admin",
+      actorId: req.admin?._id || null,
+      referenceType: "adjustment",
+      referenceId: product._id,
+      referenceCode: product.sku,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Inventory adjusted successfully",
     data: sanitizeProduct(product),
   });
 });

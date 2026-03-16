@@ -7,6 +7,7 @@ export const PATHS = {
   categories: "/admin/categories",
   transactions: "/admin/transactions",
   addProduct: "/admin/products/new",
+  inventory: "/admin/products/inventory",
   adminRole: "/admin/admin-role",
 
   dev: {
@@ -17,6 +18,7 @@ export const PATHS = {
     categories: "/dev/categories",
     transactions: "/dev/transactions",
     addProduct: "/dev/add-product",
+    inventory: "/dev/inventory",
     adminRole: "/dev/admin-role",
   },
 } as const;

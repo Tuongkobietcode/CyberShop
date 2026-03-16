@@ -14,9 +14,15 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   const { isAuthenticated } = useAuth();
   const { isInWishlist, toggleWishlist } = useCart();
   const active = isInWishlist(product.id, product.slug);
+  const isOutOfStock = product.stock <= 0 || product.status === "out_of_stock";
 
   return (
     <article className="group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+      {isOutOfStock ? (
+        <span className="absolute left-5 top-5 z-10 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">
+          Out of stock
+        </span>
+      ) : null}
       <button
         type="button"
         onClick={() => {
@@ -64,6 +70,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             </span>
           ) : null}
         </div>
+        <p className="text-sm text-slate-400">{isOutOfStock ? "Currently unavailable" : `${product.stock} items available`}</p>
       </Link>
     </article>
   );

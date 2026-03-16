@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 export default function AddToCartSection({
   quantity,
+  maxQuantity,
+  isOutOfStock,
   addedSignal,
   wishlistSignal,
   isWishlisted,
@@ -12,6 +14,8 @@ export default function AddToCartSection({
   onToggleWishlist,
 }: {
   quantity: number;
+  maxQuantity: number;
+  isOutOfStock: boolean;
   addedSignal: number;
   wishlistSignal: number;
   isWishlisted: boolean;
@@ -51,12 +55,17 @@ export default function AddToCartSection({
 
   return (
     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-      <div className="inline-flex h-14 items-center rounded-xl border border-black/15 px-3">
-        <button type="button" onClick={onDecrease} className="h-10 w-10 text-xl text-black/60">
+      <div className={["inline-flex h-14 items-center rounded-xl border px-3", isOutOfStock ? "border-black/8 bg-black/[0.03]" : "border-black/15"].join(" ")}>
+        <button type="button" onClick={onDecrease} disabled={isOutOfStock} className="h-10 w-10 text-xl text-black/60 disabled:cursor-not-allowed disabled:text-black/20">
           -
         </button>
         <span className="w-12 text-center text-lg font-medium text-black">{quantity}</span>
-        <button type="button" onClick={onIncrease} className="h-10 w-10 text-xl text-black/60">
+        <button
+          type="button"
+          onClick={onIncrease}
+          disabled={isOutOfStock || quantity >= maxQuantity}
+          className="h-10 w-10 text-xl text-black/60 disabled:cursor-not-allowed disabled:text-black/20"
+        >
           +
         </button>
       </div>
@@ -77,9 +86,12 @@ export default function AddToCartSection({
       <button
         type="button"
         onClick={onAddToCart}
+        disabled={isOutOfStock}
         className={[
           "relative inline-flex h-14 items-center justify-center gap-3 overflow-hidden rounded-xl px-8 text-[15px] font-medium text-white transition duration-300",
-          isAdded
+          isOutOfStock
+            ? "cursor-not-allowed bg-black/20 text-white/85 shadow-none"
+            : isAdded
             ? "bg-emerald-600 shadow-[0_18px_42px_rgba(16,185,129,0.32)]"
             : "bg-black hover:bg-[#1d1d1d] hover:shadow-[0_16px_36px_rgba(15,23,42,0.18)]",
         ].join(" ")}
@@ -91,7 +103,7 @@ export default function AddToCartSection({
           ].join(" ")}
         />
         {isAdded ? <CheckCircle2 className="relative z-10 h-5 w-5" /> : <ShoppingCart className="relative z-10 h-5 w-5" />}
-        <span className="relative z-10">{isAdded ? "Added to Cart" : "Add to Cart"}</span>
+        <span className="relative z-10">{isOutOfStock ? "Out of Stock" : isAdded ? "Added to Cart" : "Add to Cart"}</span>
       </button>
     </div>
   );

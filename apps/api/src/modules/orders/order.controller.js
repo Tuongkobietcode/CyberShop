@@ -5,6 +5,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { buildMeta, getPagination } from "../../utils/pagination.js";
 import { createHttpError } from "../../utils/createHttpError.js";
 import { generateOrderCode } from "../../utils/orderCode.js";
+import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
 
 function sanitizeOrder(order) {
   return {
@@ -170,11 +171,23 @@ export const createOrder = asyncHandler(async (req, res) => {
   });
 
   for (const item of orderItems) {
+    const previousStock = item.product.stock;
     item.product.stock -= item.quantity;
-    if (item.product.stock === 0) {
-      item.product.status = "out_of_stock";
-    }
+    syncProductInventoryStatus(item.product);
     await item.product.save();
+    await recordInventoryLog({
+      product: item.product,
+      delta: -item.quantity,
+      previousStock,
+      nextStock: item.product.stock,
+      reason: "order_created",
+      note: `Stock reserved for order ${order.orderCode}`,
+      actorType: order.customerId ? "customer" : "system",
+      actorId: order.customerId,
+      referenceType: "order",
+      referenceId: order._id,
+      referenceCode: order.orderCode,
+    });
   }
 
   customer.orderCount += 1;
@@ -248,6 +261,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   const nextOrderStatus = String(req.body.orderStatus || "").trim();
   const nextPaymentStatus = String(req.body.paymentStatus || "").trim();
+  const previousOrderStatus = order.orderStatus;
 
   if (nextOrderStatus) {
     order.orderStatus = nextOrderStatus;
@@ -255,6 +269,34 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   if (nextPaymentStatus) {
     order.paymentStatus = nextPaymentStatus;
+  }
+
+  if (previousOrderStatus !== "cancelled" && order.orderStatus === "cancelled") {
+    for (const item of order.items) {
+      const product = await Product.findById(item.productId);
+
+      if (!product) {
+        continue;
+      }
+
+      const previousStock = product.stock;
+      product.stock += item.quantity;
+      syncProductInventoryStatus(product);
+      await product.save();
+      await recordInventoryLog({
+        product,
+        delta: item.quantity,
+        previousStock,
+        nextStock: product.stock,
+        reason: "order_cancelled",
+        note: `Stock restored from cancelled order ${order.orderCode}`,
+        actorType: "admin",
+        actorId: req.admin?._id || null,
+        referenceType: "order",
+        referenceId: order._id,
+        referenceCode: order.orderCode,
+      });
+    }
   }
 
   await order.save();

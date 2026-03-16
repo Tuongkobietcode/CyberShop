@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  adjustProductInventory,
   createProduct,
   deleteProduct,
   getProductDetail,
@@ -20,5 +21,6 @@ productRouter.get("/:slug", getProductDetail);
 adminProductRouter.use(requireAdminAuth);
 adminProductRouter.get("/", listAdminProducts);
 adminProductRouter.post("/", createProduct);
+adminProductRouter.patch("/:id/inventory", adjustProductInventory);
 adminProductRouter.patch("/:id", updateProduct);
 adminProductRouter.delete("/:id", deleteProduct);

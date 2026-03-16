@@ -49,8 +49,8 @@ const shippingMethods: ShippingMethod[] = [
 
 type CartNotification = {
   id: number;
-  type: "cart" | "wishlist" | "order";
-  action: "added" | "removed" | "placed";
+  type: "cart" | "wishlist" | "order" | "stock";
+  action: "added" | "removed" | "placed" | "limited";
   name: string;
   quantity: number;
 };
@@ -207,16 +207,59 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (product: CatalogProduct, quantity = 1) => {
       if (!isAuthenticated) return;
 
+      if (product.stock <= 0) {
+        setNotification({
+          id: Date.now(),
+          type: "stock",
+          action: "limited",
+          name: `${product.name} is out of stock`,
+          quantity: 0,
+        });
+        return;
+      }
+
       setItems((current) => {
         const existing = current.find((item) => item.productId === product.id);
 
         if (existing) {
+          const nextQuantity = Math.min(existing.quantity + quantity, product.stock);
+          const addedQuantity = nextQuantity - existing.quantity;
+
+          if (addedQuantity <= 0) {
+            setNotification({
+              id: Date.now(),
+              type: "stock",
+              action: "limited",
+              name: `${product.name} reached available stock`,
+              quantity: product.stock,
+            });
+            return current;
+          }
+
+          setNotification({
+            id: Date.now(),
+            type: "cart",
+            action: "added",
+            name: product.name,
+            quantity: addedQuantity,
+          });
+
           return current.map((item) =>
             item.productId === product.id
-              ? { ...item, quantity: Math.min(item.quantity + quantity, Math.max(product.stock, 1)) }
+              ? { ...item, quantity: nextQuantity }
               : item
           );
         }
+
+        const initialQuantity = Math.min(quantity, product.stock);
+
+        setNotification({
+          id: Date.now(),
+          type: "cart",
+          action: "added",
+          name: product.name,
+          quantity: initialQuantity,
+        });
 
         return [
           ...current,
@@ -228,17 +271,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
             image: product.image,
             price: product.price,
             compareAtPrice: product.compareAtPrice,
-            quantity: Math.min(quantity, Math.max(product.stock, 1)),
+            quantity: initialQuantity,
             categoryName: product.category?.name || "Catalog",
           },
         ];
-      });
-      setNotification({
-        id: Date.now(),
-        type: "cart",
-        action: "added",
-        name: product.name,
-        quantity,
       });
     },
     [isAuthenticated]

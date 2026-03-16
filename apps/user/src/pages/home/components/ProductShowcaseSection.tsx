@@ -81,6 +81,11 @@ function ProductGrid({
               key={product.title}
               className="group relative overflow-hidden rounded-[20px] bg-white px-4 py-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(15,23,42,0.08)] sm:px-5 sm:py-6"
             >
+              {product.product.stock <= 0 || product.product.status === "out_of_stock" ? (
+                <span className="absolute left-4 top-4 z-10 rounded-full bg-rose-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-600">
+                  Out of stock
+                </span>
+              ) : null}
               <button
                 type="button"
                 onClick={() => {
@@ -123,13 +128,23 @@ function ProductGrid({
                 <p className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-950">
                   {product.price}
                 </p>
+                <p className="mt-2 text-center text-sm text-slate-400">
+                  {product.product.stock <= 0 || product.product.status === "out_of_stock"
+                    ? "Currently unavailable"
+                    : `${product.product.stock} available`}
+                </p>
               </Link>
 
               <Link
                 to={`/products/${product.product.slug}`}
-                className="mt-5 block rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
+                className={[
+                  "mt-5 block rounded-xl px-4 py-3 text-center text-sm font-semibold transition",
+                  product.product.stock <= 0 || product.product.status === "out_of_stock"
+                    ? "bg-black/15 text-black/45"
+                    : "bg-black text-white hover:bg-slate-800",
+                ].join(" ")}
               >
-                Buy Now
+                {product.product.stock <= 0 || product.product.status === "out_of_stock" ? "View Details" : "Buy Now"}
               </Link>
             </article>
           ))}

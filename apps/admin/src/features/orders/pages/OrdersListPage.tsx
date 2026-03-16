@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { CheckCheck, ChevronLeft, ChevronRight, MoreHorizontal, Search, Truck } from "lucide-react";
+import { Ban, CheckCheck, ChevronLeft, ChevronRight, MoreHorizontal, Search, Truck } from "lucide-react";
 import { getAdminOrders, updateAdminOrderStatus, type AdminOrder } from "../api/orders.api";
 import { resolveAssetUrl } from "@/utils/assets";
 
@@ -78,6 +78,16 @@ export default function OrdersListPage() {
     setUpdatingId(orderId);
     try {
       await updateAdminOrderStatus(orderId, { orderStatus: "shipping" });
+      await loadOrders();
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
+  async function handleCancel(orderId: string) {
+    setUpdatingId(orderId);
+    try {
+      await updateAdminOrderStatus(orderId, { orderStatus: "cancelled" });
       await loadOrders();
     } finally {
       setUpdatingId("");
@@ -173,6 +183,8 @@ export default function OrdersListPage() {
                 ) : (
                   pagedOrders.map((order) => {
                     const leadItem = order.items[0];
+                    const isCancelled = order.orderStatus === "cancelled";
+                    const isDelivered = order.orderStatus === "delivered";
                     return (
                       <tr key={order.id} className="border-t border-black/6 align-top">
                         <td className="px-5 py-4">
@@ -208,7 +220,7 @@ export default function OrdersListPage() {
                             <button
                               type="button"
                               onClick={() => handleConfirm(order.id)}
-                              disabled={updatingId === order.id}
+                              disabled={updatingId === order.id || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
                             >
                               <CheckCheck className="mr-2 h-4 w-4" />
@@ -217,11 +229,20 @@ export default function OrdersListPage() {
                             <button
                               type="button"
                               onClick={() => handleShip(order.id)}
-                              disabled={updatingId === order.id}
+                              disabled={updatingId === order.id || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60"
                             >
                               <Truck className="mr-2 h-4 w-4" />
                               Ship
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCancel(order.id)}
+                              disabled={updatingId === order.id || isCancelled || isDelivered}
+                              className="inline-flex h-10 items-center justify-center rounded-full border border-rose-200 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-600 hover:text-white disabled:opacity-60"
+                            >
+                              <Ban className="mr-2 h-4 w-4" />
+                              Cancel
                             </button>
                           </div>
                         </td>
