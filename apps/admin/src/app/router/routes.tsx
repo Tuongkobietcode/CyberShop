@@ -12,7 +12,11 @@ import { RequireAdminAuth } from "@/features/auth/RequireAdminAuth";
 import TransactionsPage from "@/features/transactions/pages/TransactionsPage";
 import AdminRolePage from "@/features/admin/pages/AdminRolePage";
 import ModulePlaceholderPage from "@/components/feedback/ModulePlaceholderPage";
+<<<<<<< Updated upstream
 import { BlogPage } from "@/features/blog/BlogPage";
+=======
+import BrandsPage from "@/features/brand/pages/BrandPage";
+>>>>>>> Stashed changes
 
 function Placeholder({
   title,
@@ -67,15 +71,7 @@ export default function AppRoutes() {
               />
             }
           />
-          <Route
-            path="brands"
-            element={
-              <Placeholder
-                title="Brands"
-                description="Brand management is currently folded into product and category data. A separate brands module can be added when the data model needs it."
-              />
-            }
-          />
+          <Route path="brands" element={<BrandsPage />} />
           <Route path="admin-role" element={<AdminRolePage />} />
           <Route
             path="control-authority"

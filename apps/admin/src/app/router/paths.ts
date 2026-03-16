@@ -6,6 +6,7 @@ export const PATHS = {
   coupons: "/admin/coupons",
   categories: "/admin/categories",
   transactions: "/admin/transactions",
+  brands: "/admin/brands",
   addProduct: "/admin/products/new",
   adminRole: "/admin/admin-role",
 
