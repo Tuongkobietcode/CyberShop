@@ -38,10 +38,34 @@ const productMediaMap: Record<string, string[]> = {
   ],
 };
 
-export function getProductGallery(product: CatalogProduct) {
+const productColorImageMap: Record<string, Record<string, string>> = {
+  "airpods-max-silver-starlight-aluminum": {
+    black: "/assets/images/Logo.png",
+    purple: "/assets/images/Logo.png",
+    red: "/assets/images/Logo.png",
+    yellow: "/assets/images/Logo.png",
+    silver: "/assets/images/Logo.png",
+  },
+};
+
+export function getProductGallery(
+  product: CatalogProduct,
+  selectedColor?: string,
+) {
   const mapped = productMediaMap[product.slug] || [];
-  const media = [product.image, ...mapped, ...product.images.map((item) => item.url)].filter(Boolean);
-  return [...new Set(media)];
+
+  const colorKey = selectedColor?.toLowerCase();
+
+  const colorImage =
+    productColorImageMap[product.slug]?.[
+      colorKey as keyof typeof productColorImageMap
+    ];
+
+  const mainImage = colorImage || product.image;
+
+  const media = [mainImage, ...mapped.filter((img) => img !== mainImage)];
+
+  return media;
 }
 
 export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
@@ -49,12 +73,15 @@ export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
 
   if (product.category?.slug === "phones") {
     return [
-      { label: "Screen diagonal", value: "6.7\"" },
+      { label: "Screen diagonal", value: '6.7"' },
       { label: "The screen resolution", value: "2796x1290" },
       { label: "The screen refresh rate", value: "120 Hz" },
       { label: "The pixel density", value: "460 ppi" },
       { label: "Screen type", value: "OLED" },
-      { label: "Additionally", value: `Dynamic Island, Always-On display, ${memory}` },
+      {
+        label: "Additionally",
+        value: `Dynamic Island, Always-On display, ${memory}`,
+      },
       { label: "CPU", value: "A16 Bionic" },
       { label: "Number of cores", value: "6" },
     ];
@@ -87,9 +114,15 @@ export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
   return [
     { label: "Category", value: product.category?.name || "Catalog" },
     { label: "SKU", value: product.sku },
-    { label: "Availability", value: product.stock > 0 ? "In stock" : "Out of stock" },
+    {
+      label: "Availability",
+      value: product.stock > 0 ? "In stock" : "Out of stock",
+    },
     { label: "Display status", value: product.displayStatus },
-    { label: "Created", value: new Date(product.createdAt).toLocaleDateString() },
+    {
+      label: "Created",
+      value: new Date(product.createdAt).toLocaleDateString(),
+    },
   ];
 }
 
@@ -122,7 +155,10 @@ export function getProductReviews(product: CatalogProduct): ProductReview[] {
         date: "24 January, 2023",
         content:
           "The design is clean and premium. The display is the main highlight, especially for productivity and media.",
-        photos: ["/assets/images/macbook-air-main.png", "/assets/images/macbook-air-side.png"],
+        photos: [
+          "/assets/images/macbook-air-main.png",
+          "/assets/images/macbook-air-side.png",
+        ],
       },
     ];
   }
@@ -154,9 +190,10 @@ export function getProductReviews(product: CatalogProduct): ProductReview[] {
       date: "24 January, 2023",
       content:
         "The overall experience is strong. The finish and screen quality stand out, and the package feels well put together.",
-      photos: ["/assets/images/iphone-14-front.png", "/assets/images/iphone-14-pro-angle-3.png"],
+      photos: [
+        "/assets/images/iphone-14-front.png",
+        "/assets/images/iphone-14-pro-angle-3.png",
+      ],
     },
   ];
 }
-
-
