@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+﻿import { Search } from "lucide-react";
 import type { AdminTheme } from "../AdminLayout";
 
 type Props = {
@@ -11,13 +11,13 @@ export function GlobalSearch({ theme }: Props) {
   return (
     <div
       className={[
-        "flex h-12 items-center rounded-full border px-4 transition-colors duration-300",
+        "flex h-14 items-center rounded-full border px-5 shadow-[0_12px_30px_-22px_rgba(15,23,42,0.35)] transition-colors duration-300",
         isDark
           ? "border-slate-700 bg-slate-900"
-          : "border-slate-200 bg-slate-50",
+          : "border-slate-200 bg-[#f8f8f8]",
       ].join(" ")}
     >
-      <Search size={20} className="text-slate-400" />
+      <Search size={18} className={isDark ? "text-slate-500" : "text-slate-400"} />
       <input
         placeholder="Search data, users, or reports"
         className={[

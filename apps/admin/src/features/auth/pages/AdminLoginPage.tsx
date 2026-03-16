@@ -31,10 +31,10 @@ export function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#dcfce7,#f8fafc_45%,#e2e8f0)] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#f8fafc,#f8fafc_45%,#e2e8f0)] px-4">
       <div className="w-full max-w-md rounded-[28px] border border-white/70 bg-white/90 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-900">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
@@ -51,11 +51,7 @@ export function AdminLoginPage() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">Password</label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           {error ? (
