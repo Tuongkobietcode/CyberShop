@@ -18,6 +18,7 @@ import {
 } from "../modules/orders/order.route.js";
 import { dashboardRouter } from "../modules/dashboard/dashboard.route.js";
 import { contactRouter } from "../modules/contact/contact.route.js";
+import { inventoryRouter } from "../modules/inventory/inventory.route.js";
 
 export const apiRouter = Router();
 const adminRouter = Router();
@@ -36,5 +37,6 @@ adminRouter.use("/products", adminProductRouter);
 adminRouter.use("/customers", customerRouter);
 adminRouter.use("/orders", adminOrderRouter);
 adminRouter.use("/dashboard", dashboardRouter);
+adminRouter.use("/inventory", inventoryRouter);
 
 apiRouter.use("/admin", adminRouter);

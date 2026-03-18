@@ -7,6 +7,7 @@ import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import OrdersListPage from "@/features/orders/pages/OrdersListPage";
 import ProductListPage from "@/features/products/pages/ProductListPage";
 import ProductCreatePage from "@/features/products/pages/ProductCreatePage";
+import InventoryPage from "@/features/inventory/pages/InventoryPage";
 import { AdminLoginPage } from "@/features/auth/pages/AdminLoginPage";
 import { RequireAdminAuth } from "@/features/auth/RequireAdminAuth";
 import TransactionsPage from "@/features/transactions/pages/TransactionsPage";
@@ -50,6 +51,7 @@ export default function AppRoutes() {
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="products" element={<ProductListPage />} />
           <Route path="products/new" element={<ProductCreatePage />} />
+          <Route path="products/inventory" element={<InventoryPage />} />
           <Route
             path="products/media"
             element={

@@ -61,6 +61,8 @@ export default function MainLayout() {
             ? "border border-rose-200/80"
             : notification?.type === "order"
               ? "border border-sky-200/80"
+              : notification?.type === "stock"
+                ? "border border-amber-200/80"
             : "border border-emerald-200/70",
           notification ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0",
         ].join(" ")}
@@ -73,16 +75,20 @@ export default function MainLayout() {
                 ? "bg-rose-100 text-rose-600"
                 : notification?.type === "order"
                   ? "bg-sky-100 text-sky-600"
+                  : notification?.type === "stock"
+                    ? "bg-amber-100 text-amber-600"
                 : "bg-emerald-100 text-emerald-600",
             ].join(" ")}
           >
-            {notification?.type === "wishlist" ? (
-              <Heart className="h-5 w-5" fill="currentColor" />
-            ) : notification?.type === "order" ? (
-              <CheckCircle2 className="h-5 w-5" />
-            ) : (
-              <CheckCircle2 className="h-5 w-5" />
-            )}
+              {notification?.type === "wishlist" ? (
+                <Heart className="h-5 w-5" fill="currentColor" />
+              ) : notification?.type === "order" ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : notification?.type === "stock" ? (
+                <ShoppingBag className="h-5 w-5" />
+              ) : (
+                <CheckCircle2 className="h-5 w-5" />
+              )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-slate-900">
@@ -92,6 +98,8 @@ export default function MainLayout() {
                   : "Removed from wishlist"
                 : notification?.type === "order"
                   ? "Order placed successfully"
+                  : notification?.type === "stock"
+                    ? "Inventory limit reached"
                 : "Added to cart"}
             </p>
             <p className="mt-1 text-sm leading-5 text-slate-600">
@@ -100,6 +108,8 @@ export default function MainLayout() {
                   ? notification.name
                   : notification.type === "order"
                     ? `${notification.name} is confirmed. Redirecting to home...`
+                    : notification.type === "stock"
+                      ? notification.name
                   : `${notification.quantity} x ${notification.name}`
                 : ""}
             </p>
@@ -109,6 +119,8 @@ export default function MainLayout() {
               <Heart className="h-4 w-4" fill="currentColor" />
             ) : notification?.type === "order" ? (
               <CheckCircle2 className="h-4 w-4" />
+            ) : notification?.type === "stock" ? (
+              <ShoppingBag className="h-4 w-4" />
             ) : (
               <ShoppingBag className="h-4 w-4" />
             )}

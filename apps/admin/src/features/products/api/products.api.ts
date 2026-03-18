@@ -61,6 +61,22 @@ export async function updateAdminProduct(productId: string, payload: Record<stri
   return response.data.data;
 }
 
+export async function adjustAdminProductInventory(
+  productId: string,
+  payload: {
+    type: "increase" | "decrease" | "set";
+    quantity: number;
+    reason: string;
+    note?: string;
+  }
+) {
+  const response = await http.patch<ApiResponse<AdminProduct>>(
+    `/admin/products/${productId}/inventory`,
+    payload
+  );
+  return response.data.data;
+}
+
 export async function deleteAdminProduct(productId: string) {
   const response = await http.delete<ApiResponse<AdminProduct>>(
     `/admin/products/${productId}`

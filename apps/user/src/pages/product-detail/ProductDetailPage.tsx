@@ -65,6 +65,11 @@ export default function ProductDetailPage() {
     loadData();
   }, [slug]);
 
+  useEffect(() => {
+    if (!product) return;
+    setQuantity((current) => Math.min(Math.max(1, current), Math.max(product.stock, 1)));
+  }, [product]);
+
   const gallery = useMemo(() => (product ? getProductGallery(product) : []), [product]);
   const specs = useMemo(() => (product ? getProductSpecs(product) : []), [product]);
   const reviews = useMemo(() => (product ? getProductReviews(product) : []), [product]);
@@ -76,6 +81,8 @@ export default function ProductDetailPage() {
   const brand = product.name.split(" ")[0];
   const categoryLabel = getDisplayCategoryName(product.category?.name, product.category?.slug);
   const wishlisted = isInWishlist(product.id, product.slug);
+  const isOutOfStock = product.stock <= 0 || product.status === "out_of_stock";
+  const maxQuantity = Math.max(product.stock, 1);
 
   return (
     <div className="bg-[#fafafa] pb-20">
@@ -100,16 +107,32 @@ export default function ProductDetailPage() {
               selectedCapacity={selectedCapacity}
               onSelectCapacity={setSelectedCapacity}
             />
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <span
+                className={[
+                  "inline-flex rounded-full px-3 py-2 text-sm font-medium",
+                  isOutOfStock ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-700",
+                ].join(" ")}
+              >
+                {isOutOfStock ? "Out of stock" : `${product.stock} in stock`}
+              </span>
+              {!isOutOfStock ? <span className="text-sm text-black/45">Inventory updates after each confirmed purchase.</span> : null}
+            </div>
             <AddToCartSection
               quantity={quantity}
+              maxQuantity={maxQuantity}
+              isOutOfStock={isOutOfStock}
               addedSignal={addedSignal}
               wishlistSignal={wishlistSignal}
               isWishlisted={wishlisted}
               onDecrease={() => setQuantity((current) => Math.max(1, current - 1))}
-              onIncrease={() => setQuantity((current) => current + 1)}
+              onIncrease={() => setQuantity((current) => Math.min(maxQuantity, current + 1))}
               onAddToCart={() => {
                 if (!isAuthenticated) {
                   navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`);
+                  return;
+                }
+                if (isOutOfStock) {
                   return;
                 }
                 addItem(product, quantity);

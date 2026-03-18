@@ -4,6 +4,7 @@ import { MoreHorizontal, Pencil, PlusCircle, Search, Trash2 } from "lucide-react
 import { resolveAssetUrl } from "@/utils/assets";
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 import {
+  adjustAdminProductInventory,
   deleteAdminProduct,
   getAdminProducts,
   updateAdminProduct,
@@ -35,6 +36,12 @@ export default function ProductListPage() {
     image: "",
     featured: false,
     status: "active",
+  });
+  const [adjustment, setAdjustment] = useState({
+    type: "increase" as "increase" | "decrease" | "set",
+    quantity: "0",
+    reason: "manual_restock",
+    note: "",
   });
 
   async function loadProducts() {
@@ -90,6 +97,12 @@ export default function ProductListPage() {
       featured: false,
       status: "active",
     });
+    setAdjustment({
+      type: "increase",
+      quantity: "0",
+      reason: "manual_restock",
+      note: "",
+    });
   }
 
   function handleEdit(product: AdminProduct) {
@@ -131,6 +144,23 @@ export default function ProductListPage() {
         featured: form.featured,
       });
       resetForm();
+      await loadProducts();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleInventoryAdjust() {
+    if (!selectedProductId) return;
+    setSaving(true);
+    try {
+      await adjustAdminProductInventory(selectedProductId, {
+        type: adjustment.type,
+        quantity: Number(adjustment.quantity),
+        reason: adjustment.reason,
+        note: adjustment.note,
+      });
+      setAdjustment((current) => ({ ...current, quantity: "0", note: "" }));
       await loadProducts();
     } finally {
       setSaving(false);
@@ -290,6 +320,53 @@ export default function ProductListPage() {
                 Reset
               </button>
             </div>
+
+            {selectedProductId ? (
+              <div className="rounded-[24px] border border-black/8 bg-[#fbfbfb] p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-black/45">Inventory control</p>
+                    <h3 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-black">Stock adjustment</h3>
+                  </div>
+                  <span className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
+                    Current {form.stock}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium text-black/58">Adjustment type</span>
+                      <select value={adjustment.type} onChange={(event) => setAdjustment((current) => ({ ...current, type: event.target.value as "increase" | "decrease" | "set" }))} className="h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-sm outline-none">
+                        <option value="increase">Increase</option>
+                        <option value="decrease">Decrease</option>
+                        <option value="set">Set exact stock</option>
+                      </select>
+                    </label>
+                    <Field label="Quantity" value={adjustment.quantity} onChange={(value) => setAdjustment((current) => ({ ...current, quantity: value }))} />
+                  </div>
+
+                  <label className="block space-y-2">
+                    <span className="text-sm font-medium text-black/58">Reason</span>
+                    <select value={adjustment.reason} onChange={(event) => setAdjustment((current) => ({ ...current, reason: event.target.value }))} className="h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-sm outline-none">
+                      <option value="manual_restock">Manual restock</option>
+                      <option value="damage_writeoff">Damage write-off</option>
+                      <option value="stock_correction">Stock correction</option>
+                      <option value="store_transfer">Store transfer</option>
+                    </select>
+                  </label>
+
+                  <label className="block space-y-2">
+                    <span className="text-sm font-medium text-black/58">Note</span>
+                    <textarea value={adjustment.note} onChange={(event) => setAdjustment((current) => ({ ...current, note: event.target.value }))} className="min-h-24 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none" placeholder="Explain why stock changed." />
+                  </label>
+
+                  <button type="button" onClick={handleInventoryAdjust} disabled={saving || Number(adjustment.quantity) < 0} className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-black/10 bg-white px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60">
+                    {saving ? "Applying..." : "Apply Stock Adjustment"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
       </div>
