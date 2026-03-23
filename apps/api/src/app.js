@@ -25,6 +25,20 @@ const allowedOrigins = new Set(
   ].filter(Boolean)
 );
 
+const allowedVercelProjectPrefixes = [
+  process.env.CLIENT_USER_URL,
+  process.env.CLIENT_ADMIN_URL,
+]
+  .map((value) => {
+    try {
+      const url = new URL(value);
+      return url.hostname.endsWith(".vercel.app") ? url.hostname.replace(/\.vercel\.app$/, "") : "";
+    } catch {
+      return "";
+    }
+  })
+  .filter(Boolean);
+
 function isAllowedLocalOrigin(origin) {
   try {
     const url = new URL(origin);
@@ -34,10 +48,33 @@ function isAllowedLocalOrigin(origin) {
   }
 }
 
+function isAllowedVercelPreviewOrigin(origin) {
+  try {
+    const url = new URL(origin);
+
+    if (url.protocol !== "https:" || !url.hostname.endsWith(".vercel.app")) {
+      return false;
+    }
+
+    return allowedVercelProjectPrefixes.some(
+      (prefix) =>
+        url.hostname === `${prefix}.vercel.app` ||
+        url.hostname.startsWith(`${prefix}-`)
+    );
+  } catch {
+    return false;
+  }
+}
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.has(origin) || isAllowedLocalOrigin(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.has(origin) ||
+        isAllowedLocalOrigin(origin) ||
+        isAllowedVercelPreviewOrigin(origin)
+      ) {
         callback(null, true);
         return;
       }
