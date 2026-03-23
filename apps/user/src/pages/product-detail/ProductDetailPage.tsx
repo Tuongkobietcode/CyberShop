@@ -58,7 +58,10 @@ export default function ProductDetailPage() {
       if (!slug) return;
       const detail = await getProductDetail(slug);
       setProduct(detail);
-      const related = await getCatalogProducts({ category: detail.category?.id || "", limit: 8 });
+      const related = await getCatalogProducts({
+        category: detail.category?.slug || detail.category?.id || "",
+        limit: 8,
+      });
       setRelatedProducts(related.data.filter((item) => item.slug !== detail.slug).slice(0, 4));
     }
 
@@ -90,7 +93,12 @@ export default function ProductDetailPage() {
         items={[
           { label: "Home", to: "/home" },
           { label: "Catalog", to: "/products" },
-          { label: categoryLabel, to: product.category ? `/products?category=${product.category.id}` : "/products" },
+          {
+            label: categoryLabel,
+            to: product.category
+              ? `/products?category=${encodeURIComponent(product.category.slug || product.category.id)}`
+              : "/products",
+          },
           { label: brand },
           { label: product.name },
         ]}

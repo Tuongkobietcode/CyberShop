@@ -20,26 +20,45 @@ const categoryIconMap: Record<string, LucideIcon> = {
   gaming: Gamepad2,
 };
 
+const fallbackCategories: Array<{ id: string; label: string; slug: string; icon: LucideIcon }> = [
+  { id: "phones", label: "Phones", slug: "phones", icon: Smartphone },
+  { id: "smart-watches", label: "Smart Watches", slug: "smart-watches", icon: Watch },
+  { id: "cameras", label: "Cameras", slug: "cameras", icon: Camera },
+  { id: "headphones", label: "Headphones", slug: "headphones", icon: Headphones },
+  { id: "computers", label: "Computers", slug: "computers", icon: Laptop2 },
+  { id: "gaming", label: "Gaming", slug: "gaming", icon: Gamepad2 },
+];
+
 export default function BrowseCategorySection() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<
     Array<{ id: string; label: string; slug: string; icon: LucideIcon }>
-  >([]);
+  >(fallbackCategories);
 
   useEffect(() => {
     async function loadCategories() {
-      const response = await getCatalogCategories({ limit: 6 });
-      setCategories(
-        response.data.map((item) => ({
-          id: item.id,
-          label: item.name,
-          slug: item.slug,
-          icon: categoryIconMap[item.slug] || Smartphone,
-        }))
-      );
+      try {
+        const response = await getCatalogCategories({ limit: 6 });
+
+        if (!response.data.length) {
+          setCategories(fallbackCategories);
+          return;
+        }
+
+        setCategories(
+          response.data.map((item) => ({
+            id: item.id,
+            label: item.name,
+            slug: item.slug,
+            icon: categoryIconMap[item.slug] || Smartphone,
+          }))
+        );
+      } catch {
+        setCategories(fallbackCategories);
+      }
     }
 
-    loadCategories();
+    void loadCategories();
   }, []);
 
   return (
@@ -74,7 +93,7 @@ export default function BrowseCategorySection() {
               <button
                 key={item.label}
                 type="button"
-                onClick={() => navigate(`/products?category=${item.id}`)}
+                onClick={() => navigate(`/products?category=${encodeURIComponent(item.slug)}`)}
                 className="group rounded-[24px] border border-white/60 bg-white/80 px-4 py-6 text-center shadow-sm backdrop-blur transition duration-300 hover:-translate-y-1 hover:bg-[#18121f] hover:text-white hover:shadow-[0_24px_60px_rgba(24,18,31,0.18)] sm:px-5 sm:py-7 2xl:py-8"
                 style={{ animationDelay: `${index * 80}ms` }}
               >

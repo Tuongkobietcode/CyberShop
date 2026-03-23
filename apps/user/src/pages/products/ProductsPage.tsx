@@ -128,7 +128,9 @@ export default function ProductsPage() {
   const pageSize = 9;
   const totalPages = Math.max(1, Math.ceil(visibleProducts.length / pageSize));
   const pagedProducts = visibleProducts.slice((page - 1) * pageSize, page * pageSize);
-  const activeCategoryRecord = categories.find((item) => item.id === activeCategory);
+  const activeCategoryRecord = categories.find(
+    (item) => item.id === activeCategory || item.slug === activeCategory
+  );
   const activeCategoryName = getUserCategoryName(activeCategoryRecord);
 
   useEffect(() => {
