@@ -36,6 +36,10 @@ export function resolveAssetUrl(src?: string | null) {
   }
 
   if (src.startsWith("/assets/")) {
+    return src;
+  }
+
+  if (src.startsWith("/uploads/")) {
     const origin = getApiOrigin();
     return origin ? `${origin}${src}` : src;
   }
