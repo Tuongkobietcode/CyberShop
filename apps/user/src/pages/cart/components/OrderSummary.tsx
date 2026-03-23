@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 
 function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 export default function OrderSummary({

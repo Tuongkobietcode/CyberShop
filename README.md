@@ -102,3 +102,12 @@ npm --workspace apps/user run dev
 - Images are served by the backend at `/assets/images/...`
 - Frontend apps depend on the API server for image loading and live data
 - Some admin modules are intentionally left as empty-state placeholders: coupons, brands, media, reviews, control authority
+
+## VNPay Sandbox Preparation
+- Fill `VNPAY_TMN_CODE` and `VNPAY_HASH_SECRET` in `apps/api/.env`
+- Set `API_PUBLIC_URL` to a public HTTPS URL that reaches your API server
+- If you do not set explicit callback URLs, the API will derive:
+  - Return URL: `${API_PUBLIC_URL}/api/payments/vnpay/return`
+  - IPN URL: `${API_PUBLIC_URL}/api/payments/vnpay/ipn`
+- If you do not set `VNPAY_FRONTEND_RETURN_URL`, the API will redirect back to `${CLIENT_USER_URL}/checkout/payment/result`
+- For local development, use an HTTPS tunnel such as Cloudflare Tunnel or ngrok because VNPay IPN requires a public callback URL

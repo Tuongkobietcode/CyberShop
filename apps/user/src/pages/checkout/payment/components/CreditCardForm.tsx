@@ -1,40 +1,47 @@
 export default function CreditCardForm({
+  method,
   sameAsBilling,
   onToggleSameAsBilling,
 }: {
+  method: "vnpay" | "cod";
   sameAsBilling: boolean;
   onToggleSameAsBilling: (value: boolean) => void;
 }) {
+  if (method === "vnpay") {
+    return (
+      <div className="space-y-5">
+        <div className="rounded-[28px] border border-black/10 bg-white p-6">
+          <p className="text-sm uppercase tracking-[0.2em] text-black/38">VNPay Sandbox</p>
+          <h3 className="mt-3 text-[1.8rem] font-semibold tracking-[-0.04em] text-black">Redirect payment flow</h3>
+          <div className="mt-5 space-y-3 text-[1.02rem] leading-7 text-black/62">
+            <p>You will be redirected to the hosted VNPay payment page after pressing the payment button.</p>
+            <p>Use the VNPay sandbox account and card data on the hosted page to simulate a successful or failed payment.</p>
+            <p>The order will only be marked paid after the backend receives a valid IPN callback from VNPay.</p>
+          </div>
+        </div>
+
+        <label className="flex items-center gap-3 text-[1.05rem] text-black">
+          <input type="checkbox" checked={sameAsBilling} onChange={(event) => onToggleSameAsBilling(event.target.checked)} className="h-5 w-5 rounded border-black/20" />
+          Shipping address is also the billing address
+        </label>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
-      <div className="max-w-[360px] rounded-[24px] bg-black p-8 text-white shadow-[0_24px_60px_rgba(0,0,0,0.18)]">
-        <div className="flex items-center justify-between text-[#ffd24c]">
-          <div className="h-10 w-14 rounded-md bg-[#f8d457]" />
-          <div className="text-2xl">)))</div>
+      <div className="rounded-[28px] border border-black/10 bg-[#f7f7f8] p-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-black/38">Cash on delivery</p>
+        <h3 className="mt-3 text-[1.8rem] font-semibold tracking-[-0.04em] text-black">Pay when your order arrives</h3>
+        <div className="mt-5 space-y-3 text-[1.02rem] leading-7 text-black/62">
+          <p>The order is created immediately in the store system and will stay in pending payment until it is collected at delivery.</p>
+          <p>No redirect is required for this method.</p>
         </div>
-        <p className="mt-16 text-[2rem] tracking-[0.18em]">4085 9536 8475 9530</p>
-        <div className="mt-10 flex items-end justify-between">
-          <div>
-            <p className="text-sm text-white/60">Cardholder</p>
-            <p className="mt-2 text-lg">Cyber User</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-8 w-8 rounded-full bg-[#ff5f00]" />
-            <span className="-ml-4 h-8 w-8 rounded-full bg-[#ffb547]" />
-          </div>
-        </div>
-      </div>
-
-      <input className="h-16 w-full rounded-2xl border border-black/10 bg-white px-5 text-base outline-none" placeholder="Cardholder Name" />
-      <input className="h-16 w-full rounded-2xl border border-black/10 bg-white px-5 text-base outline-none" placeholder="Card Number" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <input className="h-16 rounded-2xl border border-black/10 bg-white px-5 text-base outline-none" placeholder="Exp.Date" />
-        <input className="h-16 rounded-2xl border border-black/10 bg-white px-5 text-base outline-none" placeholder="CVV" />
       </div>
 
       <label className="flex items-center gap-3 text-[1.05rem] text-black">
         <input type="checkbox" checked={sameAsBilling} onChange={(event) => onToggleSameAsBilling(event.target.checked)} className="h-5 w-5 rounded border-black/20" />
-        Same as billing address
+        Shipping address is also the billing address
       </label>
     </div>
   );

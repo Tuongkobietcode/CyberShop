@@ -166,8 +166,8 @@ Error response:
 
 `POST /orders`
 
-- Purpose: create a customer order from checkout.
-- Auth: public.
+- Purpose: create a cash-on-delivery customer order from checkout.
+- Auth: customer bearer token required.
 - Request body:
 
 ```json
@@ -185,6 +185,7 @@ Error response:
     "country": "Vietnam"
   },
   "paymentMethod": "cod",
+  "shippingMethodId": "free",
   "items": [
     {
       "productId": "mongo_object_id",
@@ -194,6 +195,52 @@ Error response:
   "note": ""
 }
 ```
+
+`POST /payments/vnpay/create`
+
+- Purpose: create a pending order, reserve stock, and return a hosted VNPay payment URL.
+- Auth: customer bearer token required.
+- Request body:
+
+```json
+{
+  "customer": {
+    "name": "Nguyen Van A",
+    "email": "a@example.com",
+    "phone": "0900000000"
+  },
+  "shippingAddress": {
+    "fullName": "Nguyen Van A",
+    "phone": "0900000000",
+    "addressLine1": "123 Street",
+    "city": "Ho Chi Minh City",
+    "country": "Vietnam"
+  },
+  "shippingMethodId": "express",
+  "items": [
+    {
+      "productId": "mongo_object_id",
+      "quantity": 1
+    }
+  ],
+  "note": ""
+}
+```
+
+`GET /payments/vnpay/ipn`
+
+- Purpose: receive the VNPay server-to-server callback, verify checksum and amount, then finalize the order state.
+- Auth: public.
+
+`GET /payments/vnpay/return`
+
+- Purpose: verify the VNPay checksum and redirect the browser back to the storefront result page.
+- Auth: public.
+
+`GET /payments/vnpay/status/:txnRef`
+
+- Purpose: let the signed-in customer poll the latest VNPay order status after the browser redirect completes.
+- Auth: customer bearer token required.
 
 `GET /admin/orders`
 

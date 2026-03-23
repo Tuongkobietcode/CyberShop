@@ -96,6 +96,81 @@ const shippingAddressSchema = new mongoose.Schema(
   }
 );
 
+const paymentMetaSchema = new mongoose.Schema(
+  {
+    provider: {
+      type: String,
+      enum: ["", "manual", "vnpay"],
+      default: "",
+    },
+    txnRef: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    paymentUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    expiresAt: {
+      type: Date,
+      default: null,
+    },
+    requestedBankCode: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    transactionNo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    bankCode: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    bankTranNo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    cardType: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    payDate: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    responseCode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    transactionStatus: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    lastUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+  },
+  {
+    _id: false,
+  }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     orderCode: {
@@ -138,15 +213,30 @@ const orderSchema = new mongoose.Schema(
       type: shippingAddressSchema,
       required: true,
     },
+    shippingMethodId: {
+      type: String,
+      enum: ["free", "express", "schedule"],
+      default: "free",
+      required: true,
+    },
+    shippingMethodLabel: {
+      type: String,
+      default: "Free",
+      trim: true,
+    },
     paymentMethod: {
       type: String,
-      enum: ["cod", "bank_transfer", "card"],
+      enum: ["cod", "bank_transfer", "card", "vnpay"],
       required: true,
     },
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
+    },
+    paymentMeta: {
+      type: paymentMetaSchema,
+      default: null,
     },
     orderStatus: {
       type: String,
@@ -159,6 +249,11 @@ const orderSchema = new mongoose.Schema(
       min: 0,
     },
     shippingFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    taxAmount: {
       type: Number,
       default: 0,
       min: 0,
@@ -178,6 +273,22 @@ const orderSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    inventoryReservedAt: {
+      type: Date,
+      default: null,
+    },
+    inventoryReleasedAt: {
+      type: Date,
+      default: null,
+    },
+    customerStatsCommittedAt: {
+      type: Date,
+      default: null,
+    },
+    paymentConfirmedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -187,5 +298,6 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 orderSchema.index({ paymentStatus: 1, createdAt: -1 });
+orderSchema.index({ "paymentMeta.txnRef": 1 }, { sparse: true });
 
 export const Order = mongoose.model("Order", orderSchema);

@@ -8,6 +8,7 @@ import {
 type RetriableRequestConfig = {
   _retry?: boolean;
   headers?: Record<string, string>;
+  url?: string;
 };
 
 const baseURL = import.meta.env.VITE_API_URL;

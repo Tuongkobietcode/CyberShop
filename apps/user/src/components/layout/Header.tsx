@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Heart, Search, ShoppingCart, User } from "lucide-react";
 import { useAuth } from "@/features/auth/auth.context";

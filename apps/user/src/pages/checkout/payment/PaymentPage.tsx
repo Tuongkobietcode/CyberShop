@@ -6,7 +6,7 @@ import { useAuth } from "@/features/auth/auth.context";
 import PaymentSummary from "./components/PaymentSummary";
 import PaymentMethodTabs from "./components/PaymentMethodTabs";
 import CreditCardForm from "./components/CreditCardForm";
-import { createOrder } from "@/features/order/order.service";
+import { createCodOrder, createVnpayPayment } from "@/features/order/order.service";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
@@ -31,6 +31,7 @@ export default function PaymentPage() {
     [checkout.addresses, checkout.selectedAddressId]
   );
   const shippingMethod = shippingMethods.find((item) => item.id === checkout.shippingMethodId);
+  const isVnpay = checkout.paymentMethod === "vnpay";
 
   if (items.length === 0) {
     return <Navigate to="/cart" replace />;
@@ -55,7 +56,7 @@ export default function PaymentPage() {
             <PaymentMethodTabs value={checkout.paymentMethod} onChange={setPaymentMethod} />
           </div>
           <div className="mt-8">
-            <CreditCardForm sameAsBilling={checkout.sameAsBilling} onToggleSameAsBilling={setSameAsBilling} />
+            <CreditCardForm method={checkout.paymentMethod} sameAsBilling={checkout.sameAsBilling} onToggleSameAsBilling={setSameAsBilling} />
           </div>
 
           <div className="mt-10 flex gap-4">
@@ -67,7 +68,18 @@ export default function PaymentPage() {
                 if (!selectedAddress || !shippingMethod) return;
                 setSubmitting(true);
                 try {
-                  const order = await createOrder({
+                  if (isVnpay) {
+                    const payment = await createVnpayPayment({
+                      items,
+                      address: selectedAddress,
+                      shippingMethod,
+                      paymentMethod: checkout.paymentMethod,
+                    });
+                    window.location.assign(payment.paymentUrl);
+                    return;
+                  }
+
+                  const order = await createCodOrder({
                     items,
                     address: selectedAddress,
                     shippingMethod,
@@ -76,16 +88,14 @@ export default function PaymentPage() {
                   await refreshProfile();
                   showOrderSuccess(order.orderCode);
                   clearCart();
-                  window.setTimeout(() => {
-                    navigate("/home", { replace: true });
-                  }, 1200);
+                  navigate(`/checkout/payment/result?mode=cod&orderCode=${encodeURIComponent(order.orderCode)}`, { replace: true });
                 } finally {
                   setSubmitting(false);
                 }
               }}
               className="h-16 min-w-[220px] rounded-xl bg-black text-[1.15rem] font-medium text-white disabled:opacity-60"
             >
-              {submitting ? "Paying..." : "Pay"}
+              {submitting ? (isVnpay ? "Redirecting..." : "Creating order...") : isVnpay ? "Pay with VNPay" : "Place COD order"}
             </button>
           </div>
         </div>

@@ -46,7 +46,7 @@ export type ShippingMethod = {
   etaLabel: string;
 };
 
-export type PaymentMethod = "card" | "paypal" | "paypal_credit";
+export type PaymentMethod = "vnpay" | "cod";
 
 export type CheckoutState = {
   addresses: CheckoutAddress[];

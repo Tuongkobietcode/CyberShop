@@ -14,8 +14,34 @@ type ApiResponse<T> = {
   data: T;
 };
 
-export async function createOrder(payload: CreateOrderPayload) {
-  const response = await http.post<ApiResponse<{ id: string; orderCode: string }>>("/orders", {
+type CheckoutOrder = {
+  id: string;
+  orderCode: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  totalAmount: number;
+};
+
+type VnpayCreateResponse = {
+  order: CheckoutOrder;
+  paymentUrl: string;
+  txnRef: string;
+  expiresAt: string;
+};
+
+type VnpayStatusResponse = {
+  isFinal: boolean;
+  order: CheckoutOrder & {
+    paymentMeta: {
+      txnRef: string;
+      responseCode: string;
+      transactionStatus: string;
+    } | null;
+  };
+};
+
+function buildCheckoutBody(payload: CreateOrderPayload) {
+  return {
     customer: {
       name: payload.address.fullName,
       email: payload.address.email,
@@ -32,13 +58,34 @@ export async function createOrder(payload: CreateOrderPayload) {
       country: payload.address.country,
       postalCode: payload.address.postalCode,
     },
-    paymentMethod: payload.paymentMethod === "card" ? "card" : payload.paymentMethod === "paypal_credit" ? "bank_transfer" : "card",
+    shippingMethodId: payload.shippingMethod.id,
     items: payload.items.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
     })),
     note: `Shipping method: ${payload.shippingMethod.label}`,
+  };
+}
+
+export async function createCodOrder(payload: CreateOrderPayload) {
+  const response = await http.post<ApiResponse<CheckoutOrder>>("/orders", {
+    ...buildCheckoutBody(payload),
+    paymentMethod: "cod",
   });
 
+  return response.data.data;
+}
+
+export async function createVnpayPayment(payload: CreateOrderPayload) {
+  const response = await http.post<ApiResponse<VnpayCreateResponse>>("/payments/vnpay/create", {
+    ...buildCheckoutBody(payload),
+    paymentMethod: "vnpay",
+  });
+
+  return response.data.data;
+}
+
+export async function getVnpayPaymentStatus(txnRef: string) {
+  const response = await http.get<ApiResponse<VnpayStatusResponse>>(`/payments/vnpay/status/${encodeURIComponent(txnRef)}`);
   return response.data.data;
 }

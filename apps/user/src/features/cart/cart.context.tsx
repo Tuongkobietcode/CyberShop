@@ -22,26 +22,27 @@ import type {
 const CART_STORAGE_KEY = "cybershop_user_cart";
 const CHECKOUT_STORAGE_KEY = "cybershop_user_checkout";
 const WISHLIST_STORAGE_KEY = "cybershop_user_wishlist";
+const DEFAULT_PAYMENT_METHOD: PaymentMethod = "vnpay";
 
 const shippingMethods: ShippingMethod[] = [
   {
     id: "free",
     label: "Free",
-    description: "Regulary shipment",
+    description: "Standard delivery · 0 VND",
     price: 0,
     etaLabel: "17 Oct, 2023",
   },
   {
     id: "express",
-    label: "$8.50",
-    description: "Get your delivery as soon as possible",
+    label: "Express",
+    description: "Fast delivery · 8,500 VND",
     price: 8500,
     etaLabel: "1 Oct, 2023",
   },
   {
     id: "schedule",
     label: "Schedule",
-    description: "Pick a date when you want to get your delivery",
+    description: "Choose a delivery date · 29,000 VND",
     price: 29000,
     etaLabel: "Select Date",
   },
@@ -103,9 +104,13 @@ function buildCheckoutState(addresses: CheckoutAddress[]): CheckoutState {
     addresses,
     selectedAddressId: addresses.find((item) => item.isDefault)?.id || addresses[0]?.id || "",
     shippingMethodId: "free",
-    paymentMethod: "card",
+    paymentMethod: DEFAULT_PAYMENT_METHOD,
     sameAsBilling: true,
   };
+}
+
+function isPaymentMethod(value: unknown): value is PaymentMethod {
+  return value === "vnpay" || value === "cod";
 }
 
 function normalizeAddresses(
@@ -161,7 +166,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     >(checkoutKey, {
       selectedAddressId: "",
       shippingMethodId: "free",
-      paymentMethod: "card",
+      paymentMethod: DEFAULT_PAYMENT_METHOD,
       sameAsBilling: true,
     });
     const fallbackSelectedAddressId =
@@ -175,7 +180,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ? savedCheckout.selectedAddressId
         : fallbackSelectedAddressId,
       shippingMethodId: savedCheckout.shippingMethodId,
-      paymentMethod: savedCheckout.paymentMethod,
+      paymentMethod: isPaymentMethod(savedCheckout.paymentMethod)
+        ? savedCheckout.paymentMethod
+        : DEFAULT_PAYMENT_METHOD,
       sameAsBilling: savedCheckout.sameAsBilling,
     });
   }, [cartKey, checkoutKey, customer, isAuthenticated, wishlistKey]);

@@ -19,6 +19,7 @@ import {
 import { dashboardRouter } from "../modules/dashboard/dashboard.route.js";
 import { contactRouter } from "../modules/contact/contact.route.js";
 import { inventoryRouter } from "../modules/inventory/inventory.route.js";
+import { vnpayRouter } from "../modules/payments/vnpay.route.js";
 
 export const apiRouter = Router();
 const adminRouter = Router();
@@ -28,6 +29,7 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/categories", categoryRouter);
 apiRouter.use("/products", productRouter);
 apiRouter.use("/orders", orderRouter);
+apiRouter.use("/payments/vnpay", vnpayRouter);
 apiRouter.use("/contact", contactRouter);
 apiRouter.use("/auth/customer", customerAuthRouter);
 apiRouter.use("/me", customerMeRouter);

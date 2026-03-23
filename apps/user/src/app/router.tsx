@@ -12,6 +12,7 @@ import WishlistPage from "@/pages/wishlist/WishlistPage";
 import AddressPage from "@/pages/checkout/address/AddressPage";
 import ShippingPage from "@/pages/checkout/shipping/ShippingPage";
 import PaymentPage from "@/pages/checkout/payment/PaymentPage";
+import PaymentResultPage from "@/pages/checkout/payment-result/PaymentResultPage";
 import ProfilePage from "@/pages/profile/ProfilePage";
 import SignInPage from "@/pages/sign-in/SignInPage";
 import SignUpPage from "@/pages/sign-up/SignUpPage";
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
           { path: "/checkout/address", element: <AddressPage /> },
           { path: "/checkout/shipping", element: <ShippingPage /> },
           { path: "/checkout/payment", element: <PaymentPage /> },
+          { path: "/checkout/payment/result", element: <PaymentResultPage /> },
           { path: "/profile", element: <ProfilePage /> },
         ],
       },

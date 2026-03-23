@@ -1,9 +1,8 @@
 import type { PaymentMethod } from "@/features/cart/cart.types";
 
 const tabs: { id: PaymentMethod; label: string }[] = [
-  { id: "card", label: "Credit Card" },
-  { id: "paypal", label: "PayPal" },
-  { id: "paypal_credit", label: "PayPal Credit" },
+  { id: "vnpay", label: "VNPay" },
+  { id: "cod", label: "Cash on delivery" },
 ];
 
 export default function PaymentMethodTabs({

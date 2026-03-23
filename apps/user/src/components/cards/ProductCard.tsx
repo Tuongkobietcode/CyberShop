@@ -48,27 +48,28 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         to={`/products/${product.slug}`}
         className="block"
       >
-      <div className="aspect-[4/3] bg-[linear-gradient(180deg,_#f8fafc,_#e2e8f0)] p-6">
-        <img
-          src={resolveAssetUrl(product.image || "/assets/images/iphone-fallback.png")}
-          alt={product.name}
-          className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
-        />
-      </div>
-      <div className="space-y-3 p-5">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-            {product.category?.name || "Catalog"}
-          </p>
-          <h3 className="mt-2 text-lg font-semibold text-slate-900">{product.name}</h3>
+        <div className="aspect-[4/3] bg-[linear-gradient(180deg,_#f8fafc,_#e2e8f0)] p-6">
+          <img
+            src={resolveAssetUrl(product.image || "/assets/images/iphone-fallback.png")}
+            alt={product.name}
+            className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
+          />
         </div>
-        <div className="flex items-end gap-3">
-          <span className="text-xl font-semibold text-slate-900">{formatMoney(product.price)}</span>
-          {product.compareAtPrice ? (
-            <span className="text-sm text-slate-400 line-through">
-              {formatMoney(product.compareAtPrice)}
-            </span>
-          ) : null}
+        <div className="space-y-3 p-5">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              {product.category?.name || "Catalog"}
+            </p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-900">{product.name}</h3>
+          </div>
+          <div className="flex items-end gap-3">
+            <span className="text-xl font-semibold text-slate-900">{formatMoney(product.price)}</span>
+            {product.compareAtPrice ? (
+              <span className="text-sm text-slate-400 line-through">
+                {formatMoney(product.compareAtPrice)}
+              </span>
+            ) : null}
+          </div>
         </div>
         <p className="text-sm text-slate-400">{isOutOfStock ? "Currently unavailable" : `${product.stock} items available`}</p>
       </Link>

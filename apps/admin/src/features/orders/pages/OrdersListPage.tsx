@@ -67,7 +67,7 @@ export default function OrdersListPage() {
   async function handleConfirm(orderId: string) {
     setUpdatingId(orderId);
     try {
-      await updateAdminOrderStatus(orderId, { orderStatus: "confirmed", paymentStatus: "paid" });
+      await updateAdminOrderStatus(orderId, { orderStatus: "confirmed" });
       await loadOrders();
     } finally {
       setUpdatingId("");

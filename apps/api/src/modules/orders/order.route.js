@@ -6,11 +6,12 @@ import {
   updateOrderStatus,
 } from "./order.controller.js";
 import { requireAdminAuth } from "../../middlewares/requireAdminAuth.js";
+import { requireCustomerAuth } from "../../middlewares/requireCustomerAuth.js";
 
 export const orderRouter = Router();
 export const adminOrderRouter = Router();
 
-orderRouter.post("/", createOrder);
+orderRouter.post("/", requireCustomerAuth, createOrder);
 
 adminOrderRouter.use(requireAdminAuth);
 adminOrderRouter.get("/", listAdminOrders);

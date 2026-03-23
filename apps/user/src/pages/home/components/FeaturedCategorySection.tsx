@@ -18,7 +18,7 @@ const promos: PromoCard[] = [
       "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
     image: "/assets/images/playstation-5.png",
     imageClassName:
-      "left-[-18%] bottom-[-2%] w-[58%] max-w-[300px] sm:left-[-10%] sm:w-[42%] 2xl:max-w-[360px]",
+      "left-[-18%] bottom-[-2%] w-[60%] max-w-[500px] sm:left-[-10%] sm:w-[60%] 2xl:max-w-[600px]",
     theme: "light",
   },
   {

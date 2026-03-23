@@ -1,198 +1,36 @@
-import { Customer } from "../customers/customer.model.js";
-import { Product } from "../products/product.model.js";
 import { Order } from "./order.model.js";
+import { Product } from "../products/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { buildMeta, getPagination } from "../../utils/pagination.js";
 import { createHttpError } from "../../utils/createHttpError.js";
-import { generateOrderCode } from "../../utils/orderCode.js";
 import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
-
-function sanitizeOrder(order) {
-  return {
-    id: order.id,
-    orderCode: order.orderCode,
-    customerId: order.customerId,
-    customerName: order.customerName,
-    customerEmail: order.customerEmail,
-    customerPhone: order.customerPhone,
-    items: order.items,
-    shippingAddress: order.shippingAddress,
-    paymentMethod: order.paymentMethod,
-    paymentStatus: order.paymentStatus,
-    orderStatus: order.orderStatus,
-    subtotal: order.subtotal,
-    shippingFee: order.shippingFee,
-    discountAmount: order.discountAmount,
-    totalAmount: order.totalAmount,
-    note: order.note,
-    createdAt: order.createdAt,
-    updatedAt: order.updatedAt,
-  };
-}
-
-async function resolveCustomer(customerPayload, shippingAddress) {
-  const phone = String(customerPayload.phone || shippingAddress.phone || "").trim();
-  const email = String(customerPayload.email || "").trim().toLowerCase();
-  const name = String(customerPayload.name || shippingAddress.fullName || "").trim();
-
-  if (!name || !phone) {
-    throw createHttpError(400, "Customer name and phone are required");
-  }
-
-  let customer = await Customer.findOne({
-    $or: [{ phone }, ...(email ? [{ email }] : [])],
-  });
-
-  if (!customer) {
-    customer = await Customer.create({
-      name,
-      email,
-      phone,
-      addresses: [
-        {
-          ...shippingAddress,
-          isDefault: true,
-        },
-      ],
-    });
-  } else {
-    customer.name = name;
-    customer.email = email || customer.email;
-    customer.phone = phone;
-
-    const existingAddressIndex = customer.addresses.findIndex(
-      (address) =>
-        address.addressLine1 === shippingAddress.addressLine1 &&
-        address.city === shippingAddress.city &&
-        address.phone === shippingAddress.phone
-    );
-
-    if (existingAddressIndex === -1) {
-      customer.addresses.unshift({
-        ...shippingAddress,
-        isDefault: customer.addresses.length === 0,
-      });
-    }
-
-    await customer.save();
-  }
-
-  return customer;
-}
-
-async function buildOrderItems(items) {
-  if (!Array.isArray(items) || items.length === 0) {
-    throw createHttpError(400, "Order items are required");
-  }
-
-  const orderItems = [];
-
-  for (const item of items) {
-    const product = await Product.findById(item.productId);
-
-    if (!product || product.status !== "active") {
-      throw createHttpError(400, "One or more products are unavailable");
-    }
-
-    const quantity = Number(item.quantity);
-
-    if (!quantity || quantity < 1) {
-      throw createHttpError(400, "Item quantity must be at least 1");
-    }
-
-    if (product.stock < quantity) {
-      throw createHttpError(400, `Insufficient stock for ${product.name}`);
-    }
-
-    orderItems.push({
-      product,
-      quantity,
-      lineTotal: product.price * quantity,
-    });
-  }
-
-  return orderItems;
-}
+import {
+  createCheckoutOrder,
+  finalizeCodOrder,
+  sanitizeOrder,
+} from "./order.service.js";
 
 export const createOrder = asyncHandler(async (req, res) => {
-  const customerPayload = req.body.customer || {};
-  const shippingAddress = req.body.shippingAddress || {};
   const paymentMethod = String(req.body.paymentMethod || "").trim();
-  const note = String(req.body.note || "").trim();
-
-  if (!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1 || !shippingAddress.city) {
-    throw createHttpError(400, "Shipping address is incomplete");
+  if (paymentMethod !== "cod") {
+    throw createHttpError(400, "Use the VNPay payment endpoint for online payments");
   }
 
-  if (!["cod", "bank_transfer", "card"].includes(paymentMethod)) {
-    throw createHttpError(400, "Unsupported payment method");
-  }
-
-  const customer = await resolveCustomer(customerPayload, shippingAddress);
-  const orderItems = await buildOrderItems(req.body.items);
-
-  const subtotal = orderItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  const shippingFee = subtotal >= 1000000 ? 0 : 30000;
-  const discountAmount = 0;
-  const totalAmount = subtotal + shippingFee - discountAmount;
-
-  const order = await Order.create({
-    orderCode: generateOrderCode(),
-    customerId: customer._id,
-    customerName: customer.name,
-    customerEmail: customer.email,
-    customerPhone: customer.phone,
-    items: orderItems.map(({ product, quantity, lineTotal }) => ({
-      productId: product._id,
-      name: product.name,
-      sku: product.sku,
-      image: product.images[0]?.url || "",
-      quantity,
-      unitPrice: product.price,
-      lineTotal,
-    })),
-    shippingAddress: {
-      fullName: String(shippingAddress.fullName).trim(),
-      phone: String(shippingAddress.phone).trim(),
-      addressLine1: String(shippingAddress.addressLine1).trim(),
-      addressLine2: String(shippingAddress.addressLine2 || "").trim(),
-      ward: String(shippingAddress.ward || "").trim(),
-      district: String(shippingAddress.district || "").trim(),
-      city: String(shippingAddress.city).trim(),
-      country: String(shippingAddress.country || "Vietnam").trim(),
-      postalCode: String(shippingAddress.postalCode || "").trim(),
-    },
+  const { order, customer } = await createCheckoutOrder({
+    customerPayload: req.body.customer || {},
+    shippingAddress: req.body.shippingAddress || {},
     paymentMethod,
-    subtotal,
-    shippingFee,
-    discountAmount,
-    totalAmount,
-    note,
+    items: req.body.items,
+    shippingMethodId: req.body.shippingMethodId,
+    note: req.body.note,
+    authenticatedCustomer: req.customer || null,
+    paymentMeta: {
+      provider: "manual",
+      lastUpdatedAt: new Date(),
+    },
   });
 
-  for (const item of orderItems) {
-    const previousStock = item.product.stock;
-    item.product.stock -= item.quantity;
-    syncProductInventoryStatus(item.product);
-    await item.product.save();
-    await recordInventoryLog({
-      product: item.product,
-      delta: -item.quantity,
-      previousStock,
-      nextStock: item.product.stock,
-      reason: "order_created",
-      note: `Stock reserved for order ${order.orderCode}`,
-      actorType: order.customerId ? "customer" : "system",
-      actorId: order.customerId,
-      referenceType: "order",
-      referenceId: order._id,
-      referenceCode: order.orderCode,
-    });
-  }
-
-  customer.orderCount += 1;
-  customer.totalSpend += totalAmount;
-  await customer.save();
+  await finalizeCodOrder(order, customer);
 
   res.status(201).json({
     success: true,
@@ -262,6 +100,10 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const nextOrderStatus = String(req.body.orderStatus || "").trim();
   const nextPaymentStatus = String(req.body.paymentStatus || "").trim();
   const previousOrderStatus = order.orderStatus;
+
+  if (order.paymentMethod === "vnpay" && nextPaymentStatus === "paid" && order.paymentStatus !== "paid") {
+    throw createHttpError(400, "VNPay orders can only be marked paid by a valid IPN callback");
+  }
 
   if (nextOrderStatus) {
     order.orderStatus = nextOrderStatus;

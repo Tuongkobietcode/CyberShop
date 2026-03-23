@@ -2,10 +2,43 @@ import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import { useCart } from "@/features/cart/cart.context";
+import type { CatalogProduct } from "@/features/catalog/catalog.types";
+import type { WishlistItem } from "@/features/cart/cart.types";
 import { resolveAssetUrl } from "@/utils/assets";
 
 function formatMoney(value: number) {
   return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+}
+
+function toCatalogProduct(item: WishlistItem): CatalogProduct {
+  const now = new Date().toISOString();
+
+  return {
+    id: item.productId,
+    slug: item.slug,
+    sku: item.sku,
+    name: item.name,
+    description: item.name,
+    price: item.price,
+    compareAtPrice: null,
+    stock: 1,
+    featured: false,
+    brand: "",
+    batteryCapacity: "",
+    screenType: "",
+    screenDiagonal: "",
+    protectionClass: "",
+    builtInMemory: "",
+    status: "active",
+    displayStatus: "normal",
+    image: item.image,
+    images: [{ url: item.image, alt: item.name, sortOrder: 0 }],
+    category: item.categoryName
+      ? { id: "", name: item.categoryName, slug: "" }
+      : null,
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 export default function WishlistPage() {
@@ -59,28 +92,7 @@ export default function WishlistPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
-                      toggleWishlist({
-                        id: item.productId,
-                        slug: item.slug,
-                        sku: item.sku,
-                        name: item.name,
-                        description: item.name,
-                        price: item.price,
-                        compareAtPrice: null,
-                        stock: 1,
-                        featured: false,
-                        status: "active",
-                        displayStatus: "normal",
-                        image: item.image,
-                        images: [{ url: item.image, alt: item.name, sortOrder: 0 }],
-                        category: item.categoryName
-                          ? { id: "", name: item.categoryName, slug: "" }
-                          : null,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                      })
-                    }
+                    onClick={() => toggleWishlist(toCatalogProduct(item))}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full text-black/35 transition hover:bg-black/5 hover:text-black"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -99,28 +111,7 @@ export default function WishlistPage() {
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
-                    onClick={() =>
-                      addItem({
-                        id: item.productId,
-                        slug: item.slug,
-                        sku: item.sku,
-                        name: item.name,
-                        description: item.name,
-                        price: item.price,
-                        compareAtPrice: null,
-                        stock: 1,
-                        featured: false,
-                        status: "active",
-                        displayStatus: "normal",
-                        image: item.image,
-                        images: [{ url: item.image, alt: item.name, sortOrder: 0 }],
-                        category: item.categoryName
-                          ? { id: "", name: item.categoryName, slug: "" }
-                          : null,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                      })
-                    }
+                    onClick={() => addItem(toCatalogProduct(item))}
                     className="inline-flex h-13 flex-1 items-center justify-center gap-3 rounded-xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1d1d1d]"
                   >
                     <ShoppingCart className="h-4 w-4" />
