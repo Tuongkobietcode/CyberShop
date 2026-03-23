@@ -59,7 +59,7 @@ export function getRefreshCookieOptions() {
 
   return {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: isProduction ? "none" : "lax",
     secure: isProduction,
     maxAge: REFRESH_TOKEN_TTL_MS,
   };
