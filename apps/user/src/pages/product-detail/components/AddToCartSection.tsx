@@ -54,17 +54,17 @@ export default function AddToCartSection({
   }, [wishlistSignal]);
 
   return (
-    <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-      <div className={["inline-flex h-14 items-center rounded-xl border px-3", isOutOfStock ? "border-black/8 bg-black/[0.03]" : "border-black/15"].join(" ")}>
-        <button type="button" onClick={onDecrease} disabled={isOutOfStock} className="h-10 w-10 text-xl text-black/60 disabled:cursor-not-allowed disabled:text-black/20">
+    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+      <div className={["inline-flex h-14 items-center rounded-2xl border px-3", isOutOfStock ? "border-white/6 bg-white/[0.02]" : "border-white/12 bg-white/[0.03]"].join(" ")}>
+        <button type="button" onClick={onDecrease} disabled={isOutOfStock} className="h-10 w-10 text-xl text-white/60 disabled:cursor-not-allowed disabled:text-white/20">
           -
         </button>
-        <span className="w-12 text-center text-lg font-medium text-black">{quantity}</span>
+        <span className="w-12 text-center text-lg font-medium text-white">{quantity}</span>
         <button
           type="button"
           onClick={onIncrease}
           disabled={isOutOfStock || quantity >= maxQuantity}
-          className="h-10 w-10 text-xl text-black/60 disabled:cursor-not-allowed disabled:text-black/20"
+          className="h-10 w-10 text-xl text-white/60 disabled:cursor-not-allowed disabled:text-white/20"
         >
           +
         </button>
@@ -73,27 +73,27 @@ export default function AddToCartSection({
         type="button"
         onClick={onToggleWishlist}
         className={[
-          "inline-flex h-14 items-center justify-center gap-3 rounded-xl border px-8 text-[15px] font-medium transition duration-300",
+          "inline-flex h-14 items-center justify-center gap-3 rounded-2xl border px-8 text-[15px] font-medium transition duration-300",
           isWishlisted
-            ? "border-rose-500 bg-rose-500 text-white shadow-[0_18px_42px_rgba(244,63,94,0.24)]"
-            : "border-black text-black hover:bg-black hover:text-white",
+            ? "border-rose-300/30 bg-rose-400/12 text-rose-200 shadow-[0_18px_42px_rgba(244,63,94,0.18)]"
+            : "border-white/12 bg-white/[0.03] text-white hover:bg-white/[0.06]",
           isWishlistAnimated ? "scale-[1.02]" : "",
         ].join(" ")}
       >
         <Heart className="h-5 w-5" fill={isWishlisted ? "currentColor" : "none"} />
-        {isWishlisted ? "In Wishlist" : "Add to Wishlist"}
+        {isWishlisted ? "Saved" : "Wishlist"}
       </button>
       <button
         type="button"
         onClick={onAddToCart}
         disabled={isOutOfStock}
         className={[
-          "relative inline-flex h-14 items-center justify-center gap-3 overflow-hidden rounded-xl px-8 text-[15px] font-medium text-white transition duration-300",
+          "relative inline-flex h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl px-8 text-[15px] font-medium text-slate-950 transition duration-300",
           isOutOfStock
-            ? "cursor-not-allowed bg-black/20 text-white/85 shadow-none"
+            ? "cursor-not-allowed bg-white/10 text-white/45 shadow-none"
             : isAdded
-            ? "bg-emerald-600 shadow-[0_18px_42px_rgba(16,185,129,0.32)]"
-            : "bg-black hover:bg-[#1d1d1d] hover:shadow-[0_16px_36px_rgba(15,23,42,0.18)]",
+              ? "bg-emerald-300 shadow-[0_18px_42px_rgba(74,222,128,0.18)]"
+              : "bg-[linear-gradient(180deg,#dce9ff_0%,#b6d2ff_100%)] shadow-[0_18px_48px_rgba(143,185,255,0.24)]",
         ].join(" ")}
       >
         <span
@@ -103,7 +103,9 @@ export default function AddToCartSection({
           ].join(" ")}
         />
         {isAdded ? <CheckCircle2 className="relative z-10 h-5 w-5" /> : <ShoppingCart className="relative z-10 h-5 w-5" />}
-        <span className="relative z-10">{isOutOfStock ? "Out of Stock" : isAdded ? "Added to Cart" : "Add to Cart"}</span>
+        <span className="relative z-10">
+          {isOutOfStock ? "Out of stock" : isAdded ? "Added to cart" : "Add to cart"}
+        </span>
       </button>
     </div>
   );

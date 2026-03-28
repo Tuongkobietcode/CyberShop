@@ -239,7 +239,7 @@ export default function ProductListPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[#f7f7f8]">
-                            <img src={resolveAssetUrl(product.image || "/assets/images/iphone-fallback.png")} alt={product.name} className="max-h-10 object-contain" />
+                            <img src={resolveAssetUrl(product.image || "/assets/images/iphone-17.png")} alt={product.name} className="max-h-10 object-contain" />
                           </div>
                           <div>
                             <p className="font-semibold text-black">{product.name}</p>

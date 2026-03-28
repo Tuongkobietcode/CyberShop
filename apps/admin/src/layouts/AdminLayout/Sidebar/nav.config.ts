@@ -6,7 +6,6 @@ import {
   TicketPercent,
   Shapes,
   Wallet,
-  BadgeCheck,
   PlusCircle,
   Image,
   PackageSearch,
@@ -37,7 +36,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Coupon Code", to: "/admin/coupons", icon: TicketPercent },
       { label: "Categories", to: "/admin/categories", icon: Shapes },
       { label: "Transaction", to: "/admin/transactions", icon: Wallet },
-      { label: "Brand", to: "/admin/brands", icon: BadgeCheck },
     ],
   },
   {

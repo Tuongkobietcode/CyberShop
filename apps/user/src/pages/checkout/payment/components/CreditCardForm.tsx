@@ -1,3 +1,5 @@
+import { ArrowRight, Landmark, ShieldCheck } from "lucide-react";
+
 export default function CreditCardForm({
   method,
   sameAsBilling,
@@ -10,18 +12,30 @@ export default function CreditCardForm({
   if (method === "vnpay") {
     return (
       <div className="space-y-5">
-        <div className="rounded-[28px] border border-black/10 bg-white p-6">
-          <p className="text-sm uppercase tracking-[0.2em] text-black/38">VNPay Sandbox</p>
-          <h3 className="mt-3 text-[1.8rem] font-semibold tracking-[-0.04em] text-black">Redirect payment flow</h3>
-          <div className="mt-5 space-y-3 text-[1.02rem] leading-7 text-black/62">
-            <p>You will be redirected to the hosted VNPay payment page after pressing the payment button.</p>
-            <p>Use the VNPay sandbox account and card data on the hosted page to simulate a successful or failed payment.</p>
-            <p>The order will only be marked paid after the backend receives a valid IPN callback from VNPay.</p>
+        <div className="rounded-[28px] border border-[rgba(143,185,255,0.26)] bg-[linear-gradient(180deg,rgba(143,185,255,0.14),rgba(255,255,255,0.03))] p-6 shadow-[0_26px_80px_rgba(0,0,0,0.22)]">
+          <div className="flex items-center gap-3 text-[var(--accent)]">
+            <ShieldCheck className="h-5 w-5" />
+            <p className="text-xs uppercase tracking-[0.22em]">VNPay Sandbox</p>
+          </div>
+          <h3 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-[var(--text-primary)]">Redirect payment flow</h3>
+          <div className="mt-5 space-y-3 text-sm leading-7 text-[var(--text-secondary)]">
+            <p>You will leave the storefront and complete the transaction on the hosted VNPay page.</p>
+            <p>Use the sandbox bank and card credentials on the next screen to simulate a success or failure case.</p>
+            <p>The order only becomes paid after the backend receives a valid server-to-server IPN confirmation.</p>
+          </div>
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--line-soft)] bg-white/[0.04] px-4 py-2 text-sm text-[var(--text-primary)]">
+            Continue to the hosted gateway
+            <ArrowRight className="h-4 w-4" />
           </div>
         </div>
 
-        <label className="flex items-center gap-3 text-[1.05rem] text-black">
-          <input type="checkbox" checked={sameAsBilling} onChange={(event) => onToggleSameAsBilling(event.target.checked)} className="h-5 w-5 rounded border-black/20" />
+        <label className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+          <input
+            type="checkbox"
+            checked={sameAsBilling}
+            onChange={(event) => onToggleSameAsBilling(event.target.checked)}
+            className="h-4 w-4 accent-[var(--accent)]"
+          />
           Shipping address is also the billing address
         </label>
       </div>
@@ -30,17 +44,25 @@ export default function CreditCardForm({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-[28px] border border-black/10 bg-[#f7f7f8] p-6">
-        <p className="text-sm uppercase tracking-[0.2em] text-black/38">Cash on delivery</p>
-        <h3 className="mt-3 text-[1.8rem] font-semibold tracking-[-0.04em] text-black">Pay when your order arrives</h3>
-        <div className="mt-5 space-y-3 text-[1.02rem] leading-7 text-black/62">
-          <p>The order is created immediately in the store system and will stay in pending payment until it is collected at delivery.</p>
-          <p>No redirect is required for this method.</p>
+      <div className="rounded-[28px] border border-[var(--line-soft)] bg-white/[0.03] p-6">
+        <div className="flex items-center gap-3 text-[var(--accent)]">
+          <Landmark className="h-5 w-5" />
+          <p className="text-xs uppercase tracking-[0.22em]">Cash on delivery</p>
+        </div>
+        <h3 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-[var(--text-primary)]">Pay when the order arrives</h3>
+        <div className="mt-5 space-y-3 text-sm leading-7 text-[var(--text-secondary)]">
+          <p>The order is created immediately and remains pending payment until the package is handed over.</p>
+          <p>This method avoids any redirect and keeps the flow inside the storefront.</p>
         </div>
       </div>
 
-      <label className="flex items-center gap-3 text-[1.05rem] text-black">
-        <input type="checkbox" checked={sameAsBilling} onChange={(event) => onToggleSameAsBilling(event.target.checked)} className="h-5 w-5 rounded border-black/20" />
+      <label className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+        <input
+          type="checkbox"
+          checked={sameAsBilling}
+          onChange={(event) => onToggleSameAsBilling(event.target.checked)}
+          className="h-4 w-4 accent-[var(--accent)]"
+        />
         Shipping address is also the billing address
       </label>
     </div>

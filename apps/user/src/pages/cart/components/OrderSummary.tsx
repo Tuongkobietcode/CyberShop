@@ -1,12 +1,6 @@
 import { Link } from "react-router-dom";
-
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+import { ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { formatCurrencyVnd } from "@/utils/format";
 
 export default function OrderSummary({
   subtotal,
@@ -20,44 +14,69 @@ export default function OrderSummary({
   total: number;
 }) {
   return (
-    <div className="rounded-[28px] border border-black/10 bg-white p-8">
-      <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-black">Order Summary</h2>
+    <div className="cy-panel sticky top-28 overflow-hidden p-7">
+      <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(143,185,255,0.65),transparent)]" />
 
-      <div className="mt-10 space-y-6">
+      <div>
+        <span className="cy-kicker">Order Summary</span>
+        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-[var(--text-primary)]">Checkout snapshot</h2>
+        <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+          Promo and loyalty inputs are kept visually lightweight here. The core signal is trust, transparency, and a clear path into checkout.
+        </p>
+      </div>
+
+      <div className="mt-8 space-y-4">
         <div>
-          <p className="mb-3 text-[1.05rem] text-black/65">Discount code / Promo code</p>
-          <input className="h-16 w-full rounded-2xl border border-black/10 px-4 text-base outline-none" placeholder="Code" />
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Promo code</p>
+          <input className="cy-input" placeholder="Enter code" />
         </div>
         <div>
-          <p className="mb-3 text-[1.05rem] text-black/65">Your bonus card number</p>
-          <div className="flex rounded-2xl border border-black/10 p-2">
-            <input className="h-14 flex-1 px-4 text-base outline-none" placeholder="Enter Card Number" />
-            <button type="button" className="h-14 rounded-xl border border-black px-6 text-sm font-medium text-black">Apply</button>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Loyalty card</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input className="cy-input flex-1" placeholder="Your member number" />
+            <button type="button" className="cy-btn-secondary h-14 px-5 text-sm">
+              Apply
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="mt-10 space-y-6 text-[1.15rem]">
-        <div className="flex items-center justify-between font-medium text-black">
+      <div className="mt-10 space-y-4 border-y border-[var(--line-soft)] py-6 text-sm text-[var(--text-secondary)]">
+        <div className="flex items-center justify-between">
           <span>Subtotal</span>
-          <span>{formatMoney(subtotal)}</span>
+          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(subtotal)}</span>
         </div>
-        <div className="flex items-center justify-between text-black/58">
-          <span>Estimated Tax</span>
-          <span>{formatMoney(tax)}</span>
+        <div className="flex items-center justify-between">
+          <span>Estimated tax</span>
+          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(tax)}</span>
         </div>
-        <div className="flex items-center justify-between text-black/58">
-          <span>Estimated shipping & Handling</span>
-          <span>{formatMoney(shippingFee)}</span>
+        <div className="flex items-center justify-between">
+          <span>Shipping & handling</span>
+          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(shippingFee)}</span>
         </div>
-        <div className="flex items-center justify-between text-[1.35rem] font-semibold text-black">
+        <div className="flex items-center justify-between pt-4 text-base font-semibold text-[var(--text-primary)]">
           <span>Total</span>
-          <span>{formatMoney(total)}</span>
+          <span className="font-mono text-2xl tracking-[-0.05em]">{formatCurrencyVnd(total)}</span>
         </div>
       </div>
 
-      <Link to="/checkout/address" className="mt-10 inline-flex h-16 w-full items-center justify-center rounded-xl bg-black text-lg font-medium text-white transition hover:bg-[#1d1d1d]">
-        Checkout
+      <div className="mt-6 grid gap-3 text-sm text-[var(--text-secondary)]">
+        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
+          <ShieldCheck className="h-4 w-4 text-[var(--accent)]" />
+          Secure checkout and protected payment handoff
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
+          <Truck className="h-4 w-4 text-[var(--accent)]" />
+          Shipping ETA will be confirmed before payment
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
+          <Sparkles className="h-4 w-4 text-[var(--accent)]" />
+          Inventory is reserved only when the next steps begin
+        </div>
+      </div>
+
+      <Link to="/checkout/address" className="cy-btn-primary mt-8 inline-flex h-14 w-full items-center justify-center">
+        Proceed to checkout
       </Link>
     </div>
   );

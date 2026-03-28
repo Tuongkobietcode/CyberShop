@@ -8,28 +8,28 @@ import { Product } from "../modules/products/product.model.js";
 dotenv.config();
 
 const productBaselines = {
-  "PHN-IP14PM-128": 11,
-  "CAM-BMPCC-6K": 4,
-  "WAT-AW9-41": 14,
-  "AUD-APMAX-SL": 7,
-  "WAT-SGW6-CLS": 9,
-  "PHN-ZFOLD5-UNL": 5,
-  "AUD-BUDSFE-GR": 16,
-  "TAB-IPAD-109": 12,
+  "IPH-17PM": 8,
+  "MAC-MBA15": 10,
+  "WAT-S11": 12,
+  "AIRPODSMAX": 7,
+  "AIRPODSPRO3": 10,
+  "IPD-PRO13": 7,
+  "AVP-BASE": 4,
+  "MAC-MBP14": 8,
 };
 
 const orderDefinitions = [
   {
     orderCode: "ORD-DEMO-1001",
     customerPhone: "0901000001",
-    paymentMethod: "card",
+    paymentMethod: "vnpay",
     paymentStatus: "paid",
     orderStatus: "delivered",
-    note: "Premium customer order",
+    note: "Flagship bundle order",
     createdAt: new Date("2026-03-01T09:15:00.000Z"),
     items: [
-      { sku: "PHN-IP14PM-128", quantity: 1 },
-      { sku: "AUD-APMAX-SL", quantity: 1 },
+      { sku: "IPH-17PM", quantity: 1 },
+      { sku: "AIRPODSMAX", quantity: 1 },
     ],
   },
   {
@@ -40,30 +40,30 @@ const orderDefinitions = [
     orderStatus: "confirmed",
     note: "Waiting for COD collection",
     createdAt: new Date("2026-03-03T11:40:00.000Z"),
-    items: [{ sku: "WAT-AW9-41", quantity: 1 }],
+    items: [{ sku: "WAT-S11", quantity: 1 }],
   },
   {
     orderCode: "ORD-DEMO-1003",
     customerPhone: "0901000003",
-    paymentMethod: "bank_transfer",
+    paymentMethod: "vnpay",
     paymentStatus: "paid",
     orderStatus: "shipping",
-    note: "Transfer received",
+    note: "Paid online and waiting for delivery dispatch",
     createdAt: new Date("2026-03-05T07:20:00.000Z"),
     items: [
-      { sku: "CAM-BMPCC-6K", quantity: 1 },
-      { sku: "AUD-BUDSFE-GR", quantity: 2 },
+      { sku: "AVP-BASE", quantity: 1 },
+      { sku: "AIRPODSPRO3", quantity: 1 },
     ],
   },
   {
     orderCode: "ORD-DEMO-1004",
     customerPhone: "0901000001",
-    paymentMethod: "card",
+    paymentMethod: "vnpay",
     paymentStatus: "paid",
     orderStatus: "delivered",
     note: "",
     createdAt: new Date("2026-03-06T14:05:00.000Z"),
-    items: [{ sku: "TAB-IPAD-109", quantity: 1 }],
+    items: [{ sku: "IPD-PRO13", quantity: 1 }],
   },
   {
     orderCode: "ORD-DEMO-1005",
@@ -73,7 +73,17 @@ const orderDefinitions = [
     orderStatus: "cancelled",
     note: "Customer unreachable",
     createdAt: new Date("2026-03-07T10:30:00.000Z"),
-    items: [{ sku: "WAT-SGW6-CLS", quantity: 1 }],
+    items: [{ sku: "MAC-MBA15", quantity: 1 }],
+  },
+  {
+    orderCode: "ORD-DEMO-1006",
+    customerPhone: "0901000002",
+    paymentMethod: "vnpay",
+    paymentStatus: "paid",
+    orderStatus: "delivered",
+    note: "MacBook Pro order completed",
+    createdAt: new Date("2026-03-08T16:10:00.000Z"),
+    items: [{ sku: "MAC-MBP14", quantity: 1 }],
   },
 ];
 

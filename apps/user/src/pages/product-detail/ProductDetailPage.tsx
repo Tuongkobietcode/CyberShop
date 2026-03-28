@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Breadcrumb from "@/components/layout/Breadcrumb";
+import { ProductCard } from "@/components/cards/ProductCard";
 import { useAuth } from "@/features/auth/auth.context";
 import { getCatalogProducts } from "@/features/catalog/catalog.service";
 import { useCart } from "@/features/cart/cart.context";
 import { getProductDetail } from "@/features/product/product.service";
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
 import type { ProductDetail } from "@/features/product/product.types";
-import { resolveAssetUrl } from "@/utils/assets";
 import AddToCartSection from "./components/AddToCartSection";
 import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
@@ -15,25 +15,27 @@ import ProductSpecs from "./components/ProductSpecs";
 import ReviewSection from "./components/ReviewSection";
 import { getProductGallery, getProductReviews, getProductSpecs } from "./data/product-content";
 
-function getDisplayCategoryName(categoryName: string | undefined, categorySlug: string | undefined) {
-  if (categorySlug === "phones") return "Smartphones";
+function getDisplayCategoryName(categoryName: string | undefined) {
   return categoryName || "Catalog";
 }
 
 function RelatedProducts({ products }: { products: CatalogProduct[] }) {
   return (
     <section className="space-y-8">
-      <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-black">Related Products</h2>
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="cy-kicker">Related products</p>
+          <h2 className="mt-3 text-[2rem] font-semibold tracking-[-0.04em] text-white">
+            More hardware in the same visual lane.
+          </h2>
+        </div>
+        <Link to="/products" className="text-sm font-semibold text-white/54 transition hover:text-white">
+          View catalog
+        </Link>
+      </div>
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {products.map((product) => (
-          <article key={product.id} className="rounded-2xl bg-[#f6f6f6] p-6 text-center">
-            <div className="mx-auto flex h-[180px] items-center justify-center">
-              <img src={resolveAssetUrl(product.image)} alt={product.name} className="max-h-full object-contain" />
-            </div>
-            <h3 className="mx-auto mt-5 max-w-[220px] text-sm font-medium leading-6 text-black">{product.name}</h3>
-            <p className="mt-4 text-[1.9rem] font-semibold tracking-[-0.04em] text-black">${Math.round(product.price / 16000).toLocaleString("en-US")}</p>
-            <Link to={`/products/${product.slug}`} className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-black text-sm font-medium text-white">Buy Now</Link>
-          </article>
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>
@@ -48,7 +50,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<CatalogProduct[]>([]);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState("#7441e1");
+  const [selectedColor, setSelectedColor] = useState("#10141A");
   const [selectedCapacity, setSelectedCapacity] = useState("128GB");
   const [addedSignal, setAddedSignal] = useState(0);
   const [wishlistSignal, setWishlistSignal] = useState(0);
@@ -65,7 +67,7 @@ export default function ProductDetailPage() {
       setRelatedProducts(related.data.filter((item) => item.slug !== detail.slug).slice(0, 4));
     }
 
-    loadData();
+    void loadData();
   }, [slug]);
 
   useEffect(() => {
@@ -78,17 +80,16 @@ export default function ProductDetailPage() {
   const reviews = useMemo(() => (product ? getProductReviews(product) : []), [product]);
 
   if (!product) {
-    return <div className="px-4 py-16 text-center text-sm text-black/50">Loading product...</div>;
+    return <div className="px-4 py-16 text-center text-sm text-white/50">Loading product...</div>;
   }
 
-  const brand = product.name.split(" ")[0];
-  const categoryLabel = getDisplayCategoryName(product.category?.name, product.category?.slug);
+  const categoryLabel = getDisplayCategoryName(product.category?.name);
   const wishlisted = isInWishlist(product.id, product.slug);
   const isOutOfStock = product.stock <= 0 || product.status === "out_of_stock";
   const maxQuantity = Math.max(product.stock, 1);
 
   return (
-    <div className="bg-[#fafafa] pb-20">
+    <div className="bg-transparent pb-20">
       <Breadcrumb
         items={[
           { label: "Home", to: "/home" },
@@ -99,12 +100,11 @@ export default function ProductDetailPage() {
               ? `/products?category=${encodeURIComponent(product.category.slug || product.category.id)}`
               : "/products",
           },
-          { label: brand },
           { label: product.name },
         ]}
       />
 
-      <div className="mx-auto max-w-[1200px] space-y-18 px-4 pt-10 sm:px-6 lg:px-8">
+      <div className="cy-shell space-y-16 pt-10">
         <section className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <ProductGallery images={gallery} name={product.name} />
           <div>
@@ -119,12 +119,12 @@ export default function ProductDetailPage() {
               <span
                 className={[
                   "inline-flex rounded-full px-3 py-2 text-sm font-medium",
-                  isOutOfStock ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-700",
+                  isOutOfStock ? "bg-rose-400/12 text-rose-200" : "bg-emerald-400/12 text-emerald-200",
                 ].join(" ")}
               >
                 {isOutOfStock ? "Out of stock" : `${product.stock} in stock`}
               </span>
-              {!isOutOfStock ? <span className="text-sm text-black/45">Inventory updates after each confirmed purchase.</span> : null}
+              {!isOutOfStock ? <span className="text-sm text-white/45">Inventory updates after each confirmed purchase.</span> : null}
             </div>
             <AddToCartSection
               quantity={quantity}

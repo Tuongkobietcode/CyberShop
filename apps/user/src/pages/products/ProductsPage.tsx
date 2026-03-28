@@ -17,7 +17,6 @@ import SortBar from "./components/SortBar";
 
 type SortOption = "rating" | "price_asc" | "price_desc" | "newest";
 type FilterKey =
-  | "brand"
   | "batteryCapacity"
   | "screenType"
   | "screenDiagonal"
@@ -25,7 +24,6 @@ type FilterKey =
   | "builtInMemory";
 
 const filterKeys: FilterKey[] = [
-  "brand",
   "batteryCapacity",
   "screenType",
   "screenDiagonal",
@@ -35,7 +33,6 @@ const filterKeys: FilterKey[] = [
 
 function emptyFilters(): CatalogProductFilters {
   return {
-    brands: [],
     batteryCapacity: [],
     screenType: [],
     screenDiagonal: [],
@@ -46,13 +43,11 @@ function emptyFilters(): CatalogProductFilters {
 
 function getUserCategoryName(category?: CatalogCategory) {
   if (!category) return "Catalog";
-  if (category.slug === "phones") return "Smartphones";
   return category.name;
 }
 
 function buildSelectedFilters(searchParams: URLSearchParams): Record<FilterKey, string[]> {
   return {
-    brand: searchParams.getAll("brand"),
     batteryCapacity: searchParams.getAll("batteryCapacity"),
     screenType: searchParams.getAll("screenType"),
     screenDiagonal: searchParams.getAll("screenDiagonal"),
@@ -107,7 +102,7 @@ export default function ProductsPage() {
       }
     }
 
-    loadData();
+    void loadData();
   }, [activeCategory, selectedFilters]);
 
   const visibleProducts = useMemo(() => {
@@ -168,17 +163,26 @@ export default function ProductsPage() {
     setSearchParams(params);
   }
 
+  function clearCatalogFilters() {
+    setSearch("");
+    setSearchParams(new URLSearchParams());
+  }
+
   return (
-    <div className="bg-[#fafafa] pb-20">
+    <div className="bg-transparent pb-20">
       <Breadcrumb
-        items={[
-          { label: "Home", to: "/home" },
-          { label: "Catalog", to: "/products" },
-          { label: activeCategoryName },
-        ]}
+        items={
+          activeCategory
+            ? [
+                { label: "Home", to: "/home" },
+                { label: "Catalog", to: "/products" },
+                { label: activeCategoryName },
+              ]
+            : [{ label: "Home", to: "/home" }, { label: "Catalog" }]
+        }
       />
 
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:px-8">
+      <div className="cy-shell grid gap-10 pt-10 lg:grid-cols-[320px_minmax(0,1fr)]">
         <FilterSidebar
           categories={categories}
           activeCategory={activeCategory}
@@ -196,18 +200,46 @@ export default function ProductsPage() {
           <SortBar total={visibleProducts.length} sort={sort} onSortChange={setSort} />
 
           {loading ? (
-            <div className="rounded-2xl border border-dashed border-black/10 px-6 py-20 text-center text-sm text-black/50">
+            <div className="rounded-[28px] border border-dashed border-white/12 bg-white/[0.02] px-6 py-20 text-center text-sm text-white/44">
               Loading products...
+            </div>
+          ) : !visibleProducts.length ? (
+            <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(15,19,25,0.9),rgba(9,12,17,0.86))] px-6 py-16 text-center shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/34">
+                Catalog state
+              </p>
+              <h3 className="mt-4 text-[1.9rem] font-semibold tracking-[-0.05em] text-white">
+                No products match the current view.
+              </h3>
+              <p className="mx-auto mt-4 max-w-[42ch] text-sm leading-7 text-white/52 sm:text-base">
+                This usually means the active category, search query, or selected
+                filters narrowed the catalog down to zero results.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <button type="button" onClick={clearCatalogFilters} className="cy-btn-primary">
+                  Reset catalog
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setPage(1);
+                  }}
+                  className="cy-btn-secondary"
+                >
+                  Clear search only
+                </button>
+              </div>
             </div>
           ) : (
             <ProductGrid products={pagedProducts} />
           )}
 
-          <div className="flex items-center justify-center gap-3 pt-4 text-sm">
+          <div className="flex items-center justify-center gap-3 pt-4 text-sm text-white/54">
             <button
               type="button"
               onClick={() => setPage((current) => Math.max(1, current - 1))}
-              className="h-9 w-9 rounded-lg text-black/70 transition hover:bg-black/5"
+              className="h-10 w-10 rounded-xl border border-white/8 bg-white/[0.03] transition hover:border-white/16 hover:bg-white/[0.06]"
             >
               ‹
             </button>
@@ -219,22 +251,26 @@ export default function ProductsPage() {
                   type="button"
                   onClick={() => setPage(pageNumber)}
                   className={[
-                    "h-9 min-w-9 rounded-lg px-3",
-                    page === pageNumber ? "bg-black text-white" : "text-black/70 hover:bg-black/5",
+                    "h-10 min-w-10 rounded-xl px-3",
+                    page === pageNumber
+                      ? "bg-[var(--accent)] text-slate-950"
+                      : "border border-white/8 bg-white/[0.03] text-white/54 hover:border-white/16 hover:bg-white/[0.06]",
                   ].join(" ")}
                 >
                   {pageNumber}
                 </button>
               );
             })}
-            {totalPages > 4 ? <span className="px-1 text-black/40">....</span> : null}
+            {totalPages > 4 ? <span className="px-1 text-white/28">....</span> : null}
             {totalPages > 4 ? (
               <button
                 type="button"
                 onClick={() => setPage(totalPages)}
                 className={[
-                  "h-9 min-w-9 rounded-lg px-3",
-                  page === totalPages ? "bg-black text-white" : "text-black/70 hover:bg-black/5",
+                  "h-10 min-w-10 rounded-xl px-3",
+                  page === totalPages
+                    ? "bg-[var(--accent)] text-slate-950"
+                    : "border border-white/8 bg-white/[0.03] text-white/54 hover:border-white/16 hover:bg-white/[0.06]",
                 ].join(" ")}
               >
                 {totalPages}
@@ -243,7 +279,7 @@ export default function ProductsPage() {
             <button
               type="button"
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              className="h-9 w-9 rounded-lg text-black/70 transition hover:bg-black/5"
+              className="h-10 w-10 rounded-xl border border-white/8 bg-white/[0.03] transition hover:border-white/16 hover:bg-white/[0.06]"
             >
               ›
             </button>

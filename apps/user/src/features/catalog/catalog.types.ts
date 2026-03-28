@@ -16,7 +16,6 @@ export type CatalogProduct = {
   compareAtPrice: number | null;
   stock: number;
   featured: boolean;
-  brand: string;
   batteryCapacity: string;
   screenType: string;
   screenDiagonal: string;
@@ -40,7 +39,6 @@ export type CatalogProduct = {
 };
 
 export type CatalogProductFilters = {
-  brands: string[];
   batteryCapacity: string[];
   screenType: string[];
   screenDiagonal: string[];

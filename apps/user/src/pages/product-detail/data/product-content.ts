@@ -16,27 +16,39 @@ export type ProductReview = {
 };
 
 const productMediaMap: Record<string, string[]> = {
-  "apple-iphone-14-pro-max-128gb-deep-purple": [
-    "/assets/images/iphone-14-pro-angle-2.png",
-    "/assets/images/iphone-14-front.png",
-    "/assets/images/iphone-14-pro-gold.png",
-    "/assets/images/iphone-14-pro-angle-1.png",
+  "iphone-17-pro-max": [
+    "/assets/images/iphone-17-promax.png",
   ],
-  "airpods-max-silver-starlight-aluminum": [
-    "/assets/images/airpods-max-silver.png",
-    "/assets/images/wireless-headphones.png",
-    "/assets/images/profile-image-64.png",
+  "macbook-pro-14-inch": [
+    "/assets/images/macbook-pro-14-inch.png",
   ],
-  "apple-watch-series-9-gps-41mm": [
-    "/assets/images/apple-watch.png",
-    "/assets/images/profile-image-64.png",
-    "/assets/images/profile-group-1.png",
-  ],
-  "macbook-air-15-inch": [
-    "/assets/images/macbook-air-main.png",
-    "/assets/images/macbook-air-side.png",
+  "apple-vision-pro": [
+    "/assets/images/apple-vision-pro.png",
   ],
 };
+
+function getPhoneChip(name: string) {
+  if (/iPhone 17 Pro/i.test(name)) return "A19 Pro";
+  if (/iPhone 17/i.test(name)) return "A19";
+  if (/iPhone 16/i.test(name)) return "A18";
+  return "Apple Silicon";
+}
+
+function getPhoneRefreshRate(name: string) {
+  return /Pro/i.test(name) ? "120 Hz" : "60 Hz";
+}
+
+function getPhoneResolution(screenDiagonal: string, name: string) {
+  if (/6\.9|6\.7/i.test(screenDiagonal)) {
+    return /Pro/i.test(name) ? "2868x1320" : "2796x1290";
+  }
+
+  if (/6\.3/i.test(screenDiagonal)) {
+    return /Pro/i.test(name) ? "2622x1206" : "2556x1179";
+  }
+
+  return "2532x1170";
+}
 
 export function getProductGallery(product: CatalogProduct) {
   const mapped = productMediaMap[product.slug] || [];
@@ -45,42 +57,82 @@ export function getProductGallery(product: CatalogProduct) {
 }
 
 export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
-  const memory = /128GB|256GB|512GB|1TB/i.exec(product.name)?.[0] || "128GB";
-
-  if (product.category?.slug === "phones") {
+  if (product.category?.slug === "iphone") {
     return [
-      { label: "Screen diagonal", value: "6.7\"" },
-      { label: "The screen resolution", value: "2796x1290" },
-      { label: "The screen refresh rate", value: "120 Hz" },
-      { label: "The pixel density", value: "460 ppi" },
-      { label: "Screen type", value: "OLED" },
-      { label: "Additionally", value: `Dynamic Island, Always-On display, ${memory}` },
-      { label: "CPU", value: "A16 Bionic" },
-      { label: "Number of cores", value: "6" },
+      { label: "Screen diagonal", value: product.screenDiagonal || "6.1-inch" },
+      { label: "Resolution", value: getPhoneResolution(product.screenDiagonal, product.name) },
+      { label: "Refresh rate", value: getPhoneRefreshRate(product.name) },
+      { label: "Display type", value: product.screenType || "Super Retina XDR" },
+      { label: "Chip", value: getPhoneChip(product.name) },
+      { label: "Storage", value: product.builtInMemory || "128GB" },
+      { label: "Protection", value: product.protectionClass || "IP68" },
+      { label: "Battery", value: product.batteryCapacity || "All-day battery life" },
     ];
   }
 
-  if (product.category?.slug === "headphones") {
+  if (product.category?.slug === "airpods") {
+    if (/Max/i.test(product.name)) {
+      return [
+        { label: "Type", value: "Wireless over-ear" },
+        { label: "Connection", value: "Bluetooth 5.3" },
+        { label: "Noise control", value: "Active Noise Cancellation" },
+        { label: "Battery", value: product.batteryCapacity || "Up to 20 hours" },
+        { label: "Charging", value: "USB-C" },
+        { label: "Build", value: "Aluminum ear cups" },
+      ];
+    }
+
     return [
-      { label: "Type", value: "Wireless over-ear" },
-      { label: "Connection", value: "Bluetooth 5.0" },
-      { label: "Noise cancelling", value: "Active" },
-      { label: "Battery", value: "Up to 20 hours" },
-      { label: "Charging", value: "Lightning" },
-      { label: "Weight", value: "384.8 g" },
+      { label: "Type", value: /Pro|Active Noise Cancellation/i.test(product.name) ? "Wireless in-ear with ANC" : "Wireless open-ear" },
+      { label: "Connection", value: "Bluetooth 5.3" },
+      { label: "Battery", value: product.batteryCapacity || "Up to 30 hours" },
+      { label: "Protection", value: product.protectionClass || "IP54" },
+      { label: "Case", value: "USB-C charging case" },
+      { label: "Listening mode", value: /Pro|Active Noise Cancellation/i.test(product.name) ? "ANC + Transparency" : "Adaptive EQ" },
     ];
   }
 
-  if (product.slug === "macbook-air-15-inch") {
+  if (product.category?.slug === "apple-watch") {
     return [
-      { label: "Screen diagonal", value: '15.3"' },
-      { label: "The screen resolution", value: "2880x1864" },
-      { label: "Brightness", value: "500 nits" },
-      { label: "Display type", value: "Liquid Retina" },
-      { label: "Chip", value: "Apple M3" },
-      { label: "Memory", value: "8GB unified memory" },
-      { label: "Storage", value: "256GB SSD" },
-      { label: "Battery life", value: "Up to 18 hours" },
+      { label: "Case size", value: product.screenDiagonal || "42mm" },
+      { label: "Display", value: product.screenType || "Retina LTPO OLED" },
+      { label: "Storage", value: product.builtInMemory || "64GB" },
+      { label: "Battery", value: product.batteryCapacity || "Up to 18 hours" },
+      { label: "Protection", value: product.protectionClass || "50m water resistant" },
+      { label: "Use case", value: /Ultra/i.test(product.name) ? "Outdoor and training" : "Health and everyday connectivity" },
+    ];
+  }
+
+  if (product.category?.slug === "mac") {
+    return [
+      { label: "Display", value: product.screenType || "Retina-class display" },
+      { label: "Screen size", value: product.screenDiagonal || "Desktop / notebook" },
+      { label: "Storage", value: product.builtInMemory || "256GB" },
+      { label: "Battery", value: product.batteryCapacity || "Desktop powered" },
+      { label: "Positioning", value: /Pro|Studio/i.test(product.name) ? "Professional workflow" : "Everyday workstation" },
+      { label: "Form factor", value: /Book/i.test(product.name) ? "Notebook" : "Desktop" },
+    ];
+  }
+
+  if (product.category?.slug === "ipad") {
+    return [
+      { label: "Display", value: product.screenType || "Liquid Retina" },
+      { label: "Screen size", value: product.screenDiagonal || "11-inch" },
+      { label: "Storage", value: product.builtInMemory || "128GB" },
+      { label: "Battery", value: product.batteryCapacity || "Up to 10 hours" },
+      { label: "Use case", value: /Pro/i.test(product.name) ? "Drawing, editing, studio work" : "Notes, study, and media" },
+      { label: "Accessory support", value: "Apple Pencil and keyboard accessories" },
+    ];
+  }
+
+  if (product.category?.slug === "apple-vision-pro") {
+    return [
+      { label: "Display", value: product.screenType || "Micro-OLED" },
+      { label: "Configuration", value: product.screenDiagonal || "Dual displays" },
+      { label: "Storage", value: product.builtInMemory || "256GB" },
+      { label: "Battery", value: product.batteryCapacity || "Up to 2 hours" },
+      { label: "Platform", value: "Spatial computing" },
+      { label: "Use case", value: "Immersive apps, cinema, and virtual workspaces" },
     ];
   }
 
@@ -88,75 +140,42 @@ export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
     { label: "Category", value: product.category?.name || "Catalog" },
     { label: "SKU", value: product.sku },
     { label: "Availability", value: product.stock > 0 ? "In stock" : "Out of stock" },
-    { label: "Display status", value: product.displayStatus },
     { label: "Created", value: new Date(product.createdAt).toLocaleDateString() },
   ];
 }
 
 export function getProductReviews(product: CatalogProduct): ProductReview[] {
-  if (product.slug === "macbook-air-15-inch") {
-    return [
-      {
-        id: `${product.id}-review-1`,
-        author: "Grace Carey",
-        avatar: "/assets/images/profile-image-41.png",
-        rating: 5,
-        date: "24 January, 2023",
-        content:
-          "The larger screen makes multitasking more comfortable, and the machine stays light enough to carry every day.",
-      },
-      {
-        id: `${product.id}-review-2`,
-        author: "Ronald Richards",
-        avatar: "/assets/images/profile-group-1.png",
-        rating: 4,
-        date: "24 January, 2023",
-        content:
-          "Battery life is strong and the keyboard feels reliable for long writing sessions. Great fit for work and travel.",
-      },
-      {
-        id: `${product.id}-review-3`,
-        author: "Darcy King",
-        avatar: "/assets/images/profile-image-64.png",
-        rating: 4,
-        date: "24 January, 2023",
-        content:
-          "The design is clean and premium. The display is the main highlight, especially for productivity and media.",
-        photos: ["/assets/images/macbook-air-main.png", "/assets/images/macbook-air-side.png"],
-      },
-    ];
-  }
+  const gallery = getProductGallery(product);
+  const reviewPhotos = gallery.slice(0, 2);
 
   return [
     {
       id: `${product.id}-review-1`,
-      author: "Grace Carey",
+      author: "Minh Anh",
       avatar: "/assets/images/profile-image-41.png",
       rating: 5,
-      date: "24 January, 2023",
+      date: "24 March, 2026",
       content:
-        "I was a bit nervous to be buying a secondhand phone, but I could not be happier with my purchase. The device looked and felt premium right away.",
+        "The product detail page reads much more clearly now. The device feels like the focus instead of the interface chrome.",
     },
     {
       id: `${product.id}-review-2`,
-      author: "Ronald Richards",
+      author: "Bao Chau",
       avatar: "/assets/images/profile-group-1.png",
       rating: 4,
-      date: "24 January, 2023",
+      date: "24 March, 2026",
       content:
-        "This device has the storage and speed I needed. The build feels solid and the experience has been smooth across daily tasks.",
+        "Specs, finishes, and pricing are much easier to compare. It feels closer to a premium Apple-style retail presentation.",
     },
     {
       id: `${product.id}-review-3`,
-      author: "Darcy King",
+      author: "Quoc Viet",
       avatar: "/assets/images/profile-image-64.png",
       rating: 4,
-      date: "24 January, 2023",
+      date: "24 March, 2026",
       content:
-        "The overall experience is strong. The finish and screen quality stand out, and the package feels well put together.",
-      photos: ["/assets/images/iphone-14-front.png", "/assets/images/iphone-14-pro-angle-3.png"],
+        "The darker surfaces let the hardware materials stand out. The overall experience feels calmer and more intentional.",
+      photos: reviewPhotos,
     },
   ];
 }
-
-

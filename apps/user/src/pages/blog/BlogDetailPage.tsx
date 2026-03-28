@@ -15,7 +15,7 @@ export default function BlogDetailPage() {
   const relatedPosts = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3);
 
   return (
-    <div className="bg-[#fafafa] pb-20">
+    <div className="pb-24">
       <Breadcrumb
         items={[
           { label: "Home", to: "/home" },
@@ -24,54 +24,51 @@ export default function BlogDetailPage() {
         ]}
       />
 
-      <div className="mx-auto max-w-[1200px] space-y-12 px-4 pt-10 sm:px-6 lg:px-8">
-        <article className="overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-sm">
+      <div className="cy-shell space-y-12 pt-10">
+        <article className="overflow-hidden rounded-[36px] border border-[var(--line-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
           <div className="grid gap-8 p-8 lg:grid-cols-[0.95fr_1.05fr] lg:p-10">
             <div className="flex flex-col justify-center">
               <Link
                 to="/blog"
-                className="inline-flex w-fit items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+                className="inline-flex w-fit items-center gap-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Blog
+                Back to blog
               </Link>
-              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">{post.category}</p>
-              <h1 className="mt-4 text-[2.7rem] font-light leading-none tracking-[-0.06em] text-slate-950 sm:text-[3.8rem]">
-                <span className="font-semibold">{post.title}</span>
+              <p className="mt-6 text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">{post.category}</p>
+              <h1 className="mt-4 text-[2.8rem] font-semibold leading-[0.94] tracking-[-0.07em] text-[var(--text-primary)] sm:text-[4.2rem]">
+                {post.title}
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">{post.excerpt}</p>
-              <div className="mt-7 inline-flex items-center gap-3 text-sm text-slate-500">
-                <CalendarDays className="h-4 w-4" />
+              <p className="mt-5 max-w-xl text-base leading-7 text-[var(--text-secondary)]">{post.excerpt}</p>
+              <div className="mt-7 inline-flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+                <CalendarDays className="h-4 w-4 text-[var(--accent)]" />
                 {post.date} · {post.readTime}
               </div>
             </div>
-            <div className="relative overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,#f8fafc,#eef2f7)] p-8">
-              <img
-                src={resolveAssetUrl(post.image)}
-                alt={post.title}
-                className="mx-auto h-[320px] object-contain"
-              />
+            <div className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,#0f141c,#0b0f15)] p-8">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.12),transparent_30%)]" />
+              <img src={resolveAssetUrl(post.image)} alt={post.title} className="relative z-10 mx-auto h-[320px] object-contain" />
             </div>
           </div>
         </article>
 
         <section className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <aside className="rounded-[30px] bg-slate-950 p-8 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/45">Editorial note</p>
-            <p className="mt-5 text-sm leading-7 text-white/70">
+          <aside className="rounded-[30px] border border-[var(--line-soft)] bg-[linear-gradient(180deg,#0d1118,#080b10)] p-8 text-[var(--text-primary)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">Editorial note</p>
+            <p className="mt-5 text-sm leading-7 text-[var(--text-secondary)]">
               These posts are not news reports. They are short editorial reads about how device
               trends affect product selection, storefront experience, and customer expectations.
             </p>
           </aside>
 
-          <article className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
+          <article className="cy-panel p-8">
             <div className="space-y-10">
               {post.sections.map((section) => (
                 <section key={section.heading}>
-                  <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-slate-950">{section.heading}</h2>
+                  <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{section.heading}</h2>
                   <div className="mt-4 space-y-4">
                     {section.body.map((paragraph) => (
-                      <p key={paragraph} className="text-base leading-8 text-slate-600">
+                      <p key={paragraph} className="text-base leading-8 text-[var(--text-secondary)]">
                         {paragraph}
                       </p>
                     ))}
@@ -83,22 +80,25 @@ export default function BlogDetailPage() {
         </section>
 
         <section className="space-y-6">
-          <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-slate-950">More from the journal</h2>
+          <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">More from the journal</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {relatedPosts.map((item) => (
-              <article key={item.slug} className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-                <div className="bg-[linear-gradient(180deg,#f8fafc,#eef2f7)] p-6">
+              <article
+                key={item.slug}
+                className="overflow-hidden rounded-[28px] border border-[var(--line-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] shadow-[0_18px_60px_rgba(0,0,0,0.16)]"
+              >
+                <div className="bg-[linear-gradient(180deg,#0f141c,#0b0f15)] p-6">
                   <img src={resolveAssetUrl(item.image)} alt={item.title} className="mx-auto h-[180px] object-contain" />
                 </div>
                 <div className="space-y-4 p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">{item.category}</p>
-                  <h3 className="text-xl font-semibold leading-tight tracking-[-0.04em] text-slate-950">{item.title}</h3>
-                  <p className="text-sm leading-7 text-slate-600">{item.excerpt}</p>
+                  <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">{item.category}</p>
+                  <h3 className="text-xl font-semibold leading-tight tracking-[-0.04em] text-[var(--text-primary)]">{item.title}</h3>
+                  <p className="text-sm leading-7 text-[var(--text-secondary)]">{item.excerpt}</p>
                   <Link
                     to={`/blog/${item.slug}`}
-                    className="inline-flex items-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white"
+                    className="inline-flex items-center gap-3 rounded-full border border-[var(--line-soft)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)] transition hover:border-[rgba(255,255,255,0.24)] hover:bg-white/[0.06]"
                   >
-                    Read Article
+                    Read article
                   </Link>
                 </div>
               </article>

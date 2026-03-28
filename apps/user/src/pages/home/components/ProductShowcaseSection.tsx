@@ -1,295 +1,401 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Heart } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/features/auth/auth.context";
-import { getCatalogProducts } from "@/features/catalog/catalog.service";
-import type { CatalogProduct } from "@/features/catalog/catalog.types";
-import { useCart } from "@/features/cart/cart.context";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
 import { resolveAssetUrl } from "@/utils/assets";
 
-type Product = {
-  product: CatalogProduct;
-  title: string;
-  price: string;
-};
-
-type PromoBlock = {
-  title: string;
-  copy: string;
-  image: string;
-  dark?: boolean;
-};
-
-const promos: PromoBlock[] = [
+const clarityQuotes = [
   {
-    title: "Popular Products",
-    copy:
-      "Minimal hardware and lifestyle picks arranged to feel premium, tactile, and ready to sell.",
-    image: "/assets/images/profile-group-1.png",
+    quote:
+      "The storefront finally feels curated. Products read like hero objects instead of template cards.",
+    name: "Minh Anh",
+    role: "Customer / Mobile buyer",
   },
   {
-    title: "Ipad Pro",
-    copy:
-      "Packed canvas, lightweight form, and a visual language built for modern workflows.",
-    image: "/assets/images/ipad-10-9-wifi.png",
+    quote:
+      "Checkout feels calmer and more premium now. The whole flow looks expensive without becoming loud.",
+    name: "Bao Chau",
+    role: "Customer / Audio category",
   },
   {
-    title: "Samsung Galaxy",
-    copy:
-      "A cinematic fold with luxurious surfaces and compact product storytelling.",
-    image: "/assets/images/galaxy-z-fold-5.png",
-    dark: true,
+    quote:
+      "The hierarchy is cleaner. You can scan phones, wearables, and laptops without losing visual focus.",
+    name: "Quoc Viet",
+    role: "Customer / Flagship shopper",
   },
   {
-    title: "Macbook Pro",
-    copy:
-      "Industrial materials and focused hierarchy to make premium hardware feel effortless.",
-    image: "/assets/images/macbook-air-main.png",
-    dark: true,
+    quote:
+      "The dark surfaces make the product imagery do the work. That is exactly what premium hardware needs.",
+    name: "Admin review",
+    role: "Internal storefront check",
   },
 ];
 
-function ProductGrid({
+const backOutEase = [0.34, 1.56, 0.64, 1] as const;
+
+const archiveRowLeftVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const archiveRowRightVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.2,
+      staggerDirection: -1,
+    },
+  },
+};
+
+const archiveCardFromLeftVariants = {
+  hidden: {
+    opacity: 0,
+    x: -100,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      ease: backOutEase,
+    },
+  },
+};
+
+const archiveCardFromRightVariants = {
+  hidden: {
+    opacity: 0,
+    x: 100,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      ease: backOutEase,
+    },
+  },
+};
+
+const archiveCards = [
+  {
+    title: "iPhone 17 Pro",
+    copy: "All-out Pro performance with the strongest camera and finish in the lineup.",
+    image: "/assets/images/iphone-17-pro.png",
+    to: "/products?category=iphone",
+    imageClassName:
+      "mx-auto h-[296px] w-full max-w-[302px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[324px] sm:max-w-[332px]",
+  },
+  {
+    title: "iPhone 17",
+    copy: "The everyday flagship surface, tuned for lighter use and a cleaner silhouette.",
+    image: "/assets/images/iphone-17.png",
+    to: "/products?category=iphone",
+    imageClassName:
+      "mx-auto h-[290px] w-full max-w-[294px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[318px] sm:max-w-[324px]",
+  },
+  {
+    title: "iPhone 17e",
+    copy: "Value-packed iPhone hardware staged with the same visual priority as the top tier.",
+    image: "/assets/images/iphone-17e.png",
+    to: "/products?category=iphone",
+    imageClassName:
+      "mx-auto h-[284px] w-full max-w-[288px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[310px] sm:max-w-[318px]",
+  },
+  {
+    title: "iPhone 16",
+    copy: "A calmer mainstream iPhone pick for people who want the latest shape without the Pro weight.",
+    image: "/assets/images/iphone-16.png",
+    to: "/products?category=iphone",
+    imageClassName:
+      "mx-auto h-[284px] w-full max-w-[288px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[310px] sm:max-w-[318px]",
+  },
+  {
+    title: "AirPods Max",
+    copy: "Over-ear audio hardware with the strongest studio presence in the archive.",
+    image: "/assets/images/airpods-max.png",
+    to: "/products?category=airpods",
+    imageClassName:
+      "mx-auto h-[210px] w-full max-w-[250px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[225px] sm:max-w-[270px]",
+  },
+  {
+    title: "AirPods Pro 3",
+    copy: "Compact in-ear audio that still reads like a hero object on a dark field.",
+    image: "/assets/images/airpods-pro-3.png",
+    to: "/products?category=airpods",
+    imageClassName:
+      "mx-auto h-[200px] w-full max-w-[220px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[215px] sm:max-w-[235px]",
+  },
+  {
+    title: "AirPods 4",
+    copy: "The everyday audio option, staged with less clutter and more product focus.",
+    image: "/assets/images/airpods-4.png",
+    to: "/products?category=airpods",
+    imageClassName:
+      "mx-auto h-[190px] w-full max-w-[210px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[205px] sm:max-w-[225px]",
+  },
+  {
+    title: "Apple Watch Ultra 3",
+    copy: "The bold watch choice, treated like a rugged precision instrument rather than an accessory.",
+    image: "/assets/images/apple-watch-ultra-3.png",
+    to: "/products?category=apple-watch",
+    imageClassName:
+      "mx-auto h-[220px] w-full max-w-[252px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[234px] sm:max-w-[266px]",
+  },
+  {
+    title: "Apple Watch Series 11",
+    copy: "A more refined watch surface for everyday wear, tracking, and smaller gestures.",
+    image: "/assets/images/apple-watch-series-11.png",
+    to: "/products?category=apple-watch",
+    imageClassName:
+      "mx-auto h-[216px] w-full max-w-[248px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[230px] sm:max-w-[260px]",
+  },
+  {
+    title: "Apple Watch SE",
+    copy: "The lighter watch option, framed as a clean entry point into the category.",
+    image: "/assets/images/apple-watch-se.png",
+    to: "/products?category=apple-watch",
+    imageClassName:
+      "mx-auto h-[212px] w-full max-w-[240px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[226px] sm:max-w-[252px]",
+  },
+  {
+    title: "MacBook Pro 14",
+    copy: "Portable pro power, presented like a compact work surface instead of a laptop listing.",
+    image: "/assets/images/macbook-pro-14-inch.png",
+    to: "/products?category=mac",
+    imageClassName:
+      "mx-auto h-[198px] w-full max-w-[318px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[214px] sm:max-w-[346px]",
+  },
+  {
+    title: "MacBook Pro 16",
+    copy: "The larger pro machine, staged for heavier sessions and deeper desk setups.",
+    image: "/assets/images/macbook-pro-16-inch.png",
+    to: "/products?category=mac",
+    imageClassName:
+      "mx-auto h-[200px] w-full max-w-[330px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[216px] sm:max-w-[360px]",
+  },
+  {
+    title: "MacBook Air 13",
+    copy: "The everyday Mac notebook, kept light, fast, and visually clean.",
+    image: "/assets/images/macbook-air-13-inch.png",
+    to: "/products?category=mac",
+    imageClassName:
+      "mx-auto h-[194px] w-full max-w-[316px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[210px] sm:max-w-[344px]",
+  },
+  {
+    title: "MacBook Air 15",
+    copy: "A larger Air surface for people who want room without moving into the Pro family.",
+    image: "/assets/images/macbook-air-15-inch.png",
+    to: "/products?category=mac",
+    imageClassName:
+      "mx-auto h-[196px] w-full max-w-[326px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[212px] sm:max-w-[356px]",
+  },
+  {
+    title: "iPad Pro 13",
+    copy: "The most expansive iPad canvas, framed for studio notes and creative work.",
+    image: "/assets/images/ipad-pro-13-inch.png",
+    to: "/products?category=ipad",
+    imageClassName:
+      "mx-auto h-[278px] w-full max-w-[372px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[304px] sm:max-w-[408px]",
+  },
+  {
+    title: "iPad mini",
+    copy: "Small-format tablet hardware that still deserves a premium presentation.",
+    image: "/assets/images/ipad-mini.png",
+    to: "/products?category=ipad",
+    imageClassName:
+      "mx-auto h-[268px] w-full max-w-[336px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[292px] sm:max-w-[362px]",
+  },
+];
+
+function ArchiveCard({
   title,
-  products,
+  copy,
+  image,
+  to,
+  imageClassName,
 }: {
   title: string;
-  products: Product[];
+  copy: string;
+  image: string;
+  to: string;
+  imageClassName: string;
 }) {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { isInWishlist, toggleWishlist } = useCart();
-
   return (
-    <section className="py-14">
-      <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-10 2xl:px-16">
-        <div className="mb-8 flex flex-wrap items-center gap-4 sm:gap-6">
-          <h2 className="border-b border-black pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-900 sm:text-sm">
+    <Link
+      to={to}
+      className="group relative flex h-[438px] flex-col overflow-hidden rounded-[28px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(16,20,28,0.96),rgba(9,12,18,0.94))] p-5 shadow-[0_20px_58px_rgba(2,6,16,0.32),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-500 hover:-translate-y-[3px] hover:border-white/[0.14] hover:shadow-[0_28px_72px_rgba(2,6,16,0.42),inset_0_1px_0_rgba(255,255,255,0.06)] sm:h-[468px] sm:p-6"
+    >
+      <div className="relative flex h-full flex-1 flex-col">
+        <div className="flex min-h-[102px] flex-col px-1 sm:min-h-[112px]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8fb9ff]">
+            New
+          </p>
+          <h3 className="mt-4 max-w-[11.5ch] text-[1.34rem] font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-[1.52rem]">
             {title}
-          </h2>
-          <button type="button" className="text-sm text-slate-400 transition hover:text-slate-800">
-            Bestseller
-          </button>
-          <button type="button" className="text-sm text-slate-400 transition hover:text-slate-800">
-            Featured Products
-          </button>
+          </h3>
+          <p className="mt-3 max-w-[29ch] text-[14px] leading-6 text-white/64 line-clamp-3">
+            {copy}
+          </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:gap-5">
-          {products.map((product) => (
-            <article
-              key={product.title}
-              className="group relative overflow-hidden rounded-[20px] bg-white px-4 py-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(15,23,42,0.08)] sm:px-5 sm:py-6"
-            >
-              {product.product.stock <= 0 || product.product.status === "out_of_stock" ? (
-                <span className="absolute left-4 top-4 z-10 rounded-full bg-rose-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-600">
-                  Out of stock
-                </span>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isAuthenticated) {
-                    navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.product.slug}`)}`);
-                    return;
-                  }
-                  toggleWishlist(product.product);
-                }}
-                className={[
-                  "absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/92 shadow-sm transition focus:outline-none",
-                  isInWishlist(product.product.id, product.product.slug)
-                    ? "text-rose-500"
-                    : "text-slate-300 hover:text-slate-400",
-                ].join(" ")}
-              >
-                <Heart
-                  className={[
-                    "h-4 w-4",
-                    isInWishlist(product.product.id, product.product.slug)
-                      ? "text-rose-500"
-                      : "text-slate-300",
-                  ].join(" ")}
-                  fill={isInWishlist(product.product.id, product.product.slug) ? "currentColor" : "none"}
-                />
-              </button>
-
-              <Link to={`/products/${product.product.slug}`} className="block">
-                <div className="flex h-40 items-center justify-center sm:h-48 2xl:h-52">
-                  <img
-                    src={resolveAssetUrl(product.product.image)}
-                    alt={product.title}
-                    className="max-h-full object-contain transition duration-300 group-hover:scale-105"
-                  />
-                </div>
-
-                <h3 className="mt-5 min-h-[3rem] text-center text-xs font-medium leading-5 text-slate-900 sm:text-sm">
-                  {product.title}
-                </h3>
-                <p className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-950">
-                  {product.price}
-                </p>
-                <p className="mt-2 text-center text-sm text-slate-400">
-                  {product.product.stock <= 0 || product.product.status === "out_of_stock"
-                    ? "Currently unavailable"
-                    : `${product.product.stock} available`}
-                </p>
-              </Link>
-
-              <Link
-                to={`/products/${product.product.slug}`}
-                className={[
-                  "mt-5 block rounded-xl px-4 py-3 text-center text-sm font-semibold transition",
-                  product.product.stock <= 0 || product.product.status === "out_of_stock"
-                    ? "bg-black/15 text-black/45"
-                    : "bg-black text-white hover:bg-slate-800",
-                ].join(" ")}
-              >
-                {product.product.stock <= 0 || product.product.status === "out_of_stock" ? "View Details" : "Buy Now"}
-              </Link>
-            </article>
-          ))}
+        <div className="mt-auto flex h-[286px] items-end justify-center overflow-hidden px-2 pt-0 sm:h-[320px] sm:pt-0">
+          <img
+            src={resolveAssetUrl(image)}
+            alt={title}
+            className={`${imageClassName} !w-auto drop-shadow-[0_20px_34px_rgba(0,0,0,0.22)]`}
+          />
         </div>
       </div>
-    </section>
+    </Link>
   );
 }
 
-function formatMoney(value: number) {
-  return `$${value.toLocaleString("en-US")}`;
-}
-
-function mapProducts(products: CatalogProduct[]): Product[] {
-  return products.map((product) => ({
-    product,
-    title: product.name,
-    price: formatMoney(product.price),
-  }));
-}
-
-function PromoStrip() {
+function TestimonialCard({
+  quote,
+  name,
+  role,
+}: {
+  quote: string;
+  name: string;
+  role: string;
+}) {
   return (
-    <section className="py-12">
-      <div className="mx-auto grid max-w-[1720px] gap-0 px-4 sm:px-6 lg:grid-cols-2 lg:px-10 xl:grid-cols-4 2xl:px-16">
-        {promos.map((item, index) => (
-          <article
-            key={item.title}
-            className={[
-              "group relative overflow-hidden p-6 transition duration-500 hover:-translate-y-1 sm:p-7 2xl:p-8",
-              item.dark
-                ? "bg-[#2c2c2c] text-white"
-                : index === 1
-                  ? "bg-[#f2f2f2]"
-                  : "bg-white",
-            ].join(" ")}
-          >
-            <img
-              src={resolveAssetUrl(item.image)}
-              alt={item.title}
-              className="mx-auto h-36 object-contain transition duration-500 group-hover:scale-105 sm:h-44 2xl:h-48"
-            />
-            <h3 className="mt-4 text-[1.8rem] font-light leading-none tracking-[-0.04em] sm:text-[2rem] 2xl:text-[2.3rem]">
-              {item.title.split(" ")[0]}{" "}
-              <span className="font-semibold">
-                {item.title.split(" ").slice(1).join(" ")}
-              </span>
-            </h3>
-            <p
-              className={[
-                "mt-4 text-sm leading-6",
-                item.dark ? "text-white/70" : "text-slate-500",
-              ].join(" ")}
-            >
-              {item.copy}
-            </p>
-            <Link
-              to="/products"
-              className={[
-                "mt-7 inline-flex items-center gap-3 rounded-full border px-6 py-3 text-sm font-semibold transition",
-                item.dark
-                  ? "border-white/20 text-white hover:border-white/40 hover:bg-white/10"
-                  : "border-slate-300 text-slate-900 hover:border-slate-900 hover:bg-slate-900 hover:text-white",
-              ].join(" ")}
-            >
-              Shop Now
-            </Link>
-          </article>
+    <article className="rounded-[28px] p-5">
+      <div className="flex gap-1 text-[11px] tracking-[0.18em] text-white/36">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <span key={index}>*</span>
         ))}
       </div>
-    </section>
-  );
-}
-
-function BigBanner() {
-  return (
-    <section className="pb-16 pt-4">
-      <div className="mx-auto overflow-hidden bg-[#19161d] px-4 sm:px-6 lg:px-10 2xl:px-16">
-        <div className="relative mx-auto flex min-h-[320px] max-w-[1720px] items-center justify-center overflow-hidden px-4 py-12 text-center text-white sm:min-h-[360px] sm:px-6 2xl:min-h-[420px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_45%)]" />
-          <img
-            src={resolveAssetUrl("/assets/images/iphone-14-pro-angle-2.png")}
-            alt="Summer devices left"
-            className="absolute left-[-2%] top-[8%] hidden w-[220px] rotate-[-18deg] object-contain opacity-95 md:block 2xl:w-[300px]"
-          />
-          <img
-            src={resolveAssetUrl("/assets/images/apple-watch.png")}
-            alt="Watch"
-            className="absolute bottom-[-2%] right-[6%] hidden w-[180px] rotate-[18deg] object-contain md:block 2xl:w-[240px]"
-          />
-          <img
-            src={resolveAssetUrl("/assets/images/iphone-14-front.png")}
-            alt="Phone"
-            className="absolute right-[-4%] top-[4%] hidden w-[180px] rotate-[24deg] object-contain opacity-90 lg:block 2xl:w-[240px]"
-          />
-
-          <div className="relative z-10 max-w-2xl">
-            <p className="text-[2.8rem] font-light tracking-[-0.05em] sm:text-6xl 2xl:text-7xl">
-              Big Summer{" "}
-              <span className="font-semibold text-white">Sale</span>
-            </p>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/65 sm:text-base sm:leading-7 2xl:max-w-2xl">
-              Commodo fames vitae vitae leo mauris in. Eu consequat.
-              Faster layouts, cleaner styling, and premium summer energy.
-            </p>
-            <Link
-              to="/products"
-              className="mt-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-7 py-3 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
-            >
-              Shop Now
-              <span className="h-px w-8 bg-white/70" />
-            </Link>
-          </div>
-        </div>
+      <p className="mt-4 text-sm leading-7 text-white/76">{quote}</p>
+      <div className="mt-6">
+        <p className="text-sm font-medium text-white">{name}</p>
+        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-white/34">
+          {role}
+        </p>
       </div>
-    </section>
+    </article>
   );
 }
 
 export default function ProductShowcaseSection() {
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-
-  useEffect(() => {
-    async function loadProducts() {
-      const response = await getCatalogProducts({ limit: 8 });
-      setProducts(response.data);
-    }
-
-    loadProducts();
-  }, []);
-
-  const newArrivals = useMemo(() => mapProducts(products.slice(0, 8)), [products]);
-  const discountProducts = useMemo(
-    () => mapProducts(products.filter((item) => item.compareAtPrice).slice(0, 4)),
-    [products]
-  );
+  const rows = [
+    archiveCards.slice(0, 4),
+    archiveCards.slice(4, 8),
+    archiveCards.slice(8, 12),
+  ].filter((row) => row.length > 0);
 
   return (
     <>
-      <ProductGrid title="New Arrival" products={newArrivals} />
-      <PromoStrip />
-      <ProductGrid title="Discounts Up To -50%" products={discountProducts} />
-      <BigBanner />
+      <section className="py-14 sm:py-20">
+        <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
+          <motion.div
+            className="mb-10 max-w-[720px]"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: backOutEase }}
+          >
+            <p className="cy-kicker">The archive</p>
+            <h2 className="mt-3 max-w-[16ch] text-[2.15rem] font-semibold leading-[0.96] tracking-[-0.06em] text-white sm:text-[2.7rem]">
+              Explore the catalog
+              <br />
+              as a set of product worlds, not just a list of items.
+            </h2>
+          </motion.div>
+
+          <div className="space-y-5">
+            {rows.map((row, rowIndex) => {
+              const rowFromLeft = rowIndex % 2 === 0;
+              return (
+                <motion.div
+                  key={`archive-row-${rowIndex}`}
+                  variants={rowFromLeft ? archiveRowLeftVariants : archiveRowRightVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  className="grid gap-5 md:grid-cols-2 xl:grid-cols-4"
+                >
+                  {row.map((card) => (
+                    <motion.div
+                      key={card.title}
+                      variants={rowFromLeft ? archiveCardFromLeftVariants : archiveCardFromRightVariants}
+                    >
+                      <ArchiveCard {...card} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-24">
+        <div className="cy-shell">
+          <div className="px-2 py-6 sm:px-4 lg:px-8 lg:py-10">
+            <div className="text-center">
+              <p className="text-[2.2rem] italic tracking-[-0.05em] text-white/92 sm:text-[3rem]">
+                Clarity.
+              </p>
+            </div>
+
+            <div className="mx-auto mt-12 grid max-w-[1100px] gap-5 md:grid-cols-2 xl:grid-cols-[0.9fr_1.05fr_0.9fr]">
+              <div className="md:translate-y-6">
+                <TestimonialCard {...clarityQuotes[0]} />
+              </div>
+              <div className="space-y-5">
+                <TestimonialCard {...clarityQuotes[1]} />
+                <TestimonialCard {...clarityQuotes[2]} />
+              </div>
+              <div className="md:translate-y-10">
+                <TestimonialCard {...clarityQuotes[3]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-12 pt-4 sm:pb-16">
+        <div className="cy-shell">
+          <div className="relative overflow-hidden rounded-[42px] border border-white/8 bg-[linear-gradient(180deg,rgba(9,12,17,0.98),rgba(7,9,13,0.95))] px-6 py-14 text-center shadow-[0_32px_110px_rgba(0,0,0,0.32)] sm:px-8 lg:px-12 lg:py-20">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_bottom,rgba(143,185,255,0.12),transparent_30%)]" />
+            <img
+              src={resolveAssetUrl("/assets/images/apple-vision-pro.png")}
+              alt="Apple Vision Pro background composition"
+              className="pointer-events-none absolute bottom-[-16%] left-[-3%] hidden w-[260px] rotate-[-12deg] object-contain opacity-[0.18] blur-[0.4px] md:block lg:w-[320px]"
+            />
+            <img
+              src={resolveAssetUrl("/assets/images/airpods-max.png")}
+              alt="AirPods Max background composition"
+              className="pointer-events-none absolute bottom-[-10%] right-[-2%] hidden w-[260px] rotate-[12deg] object-contain opacity-[0.18] blur-[0.4px] md:block lg:w-[320px]"
+            />
+
+            <div className="relative mx-auto max-w-[760px]">
+              <p className="cy-kicker">Join the drop list</p>
+              <h2 className="mx-auto mt-4 max-w-[11ch] text-[2.5rem] font-semibold leading-[0.96] tracking-[-0.07em] text-white sm:text-[3.8rem]">
+                Never a generic storefront.
+              </h2>
+              <p className="mx-auto mt-5 max-w-[40ch] text-[15px] leading-7 text-white/58 sm:text-base">
+                Browse launch alerts, restock notes, and the cleaner side of
+                premium electronics retail without the usual visual noise.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Link to="/sign-up" className="cy-btn-primary">
+                  Join the archive
+                </Link>
+                <Link to="/products" className="cy-btn-secondary">
+                  Browse catalog
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
-
-

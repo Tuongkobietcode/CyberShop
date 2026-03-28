@@ -23,21 +23,30 @@ export default function AddressPage() {
   }
 
   return (
-    <CheckoutShell currentStep={1} title="Select Address">
+    <CheckoutShell currentStep={1} title="Delivery address">
       <div className="space-y-6">
-        {checkout.addresses.map((address) => (
-          <AddressItem
-            key={address.id}
-            address={address}
-            checked={selectedAddress?.id === address.id}
-            onSelect={() => selectAddress(address.id)}
-            onEdit={() => {
-              setEditing(address);
-              setShowForm(true);
-            }}
-            onDelete={() => deleteAddress(address.id)}
-          />
-        ))}
+        <div className="max-w-3xl">
+          <p className="text-sm uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Recipient selection</p>
+          <p className="mt-4 text-base leading-8 text-[var(--text-secondary)]">
+            Choose a saved address or add a new one before the shipping options appear. The selected address defines ETA and tax context.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {checkout.addresses.map((address) => (
+            <AddressItem
+              key={address.id}
+              address={address}
+              checked={selectedAddress?.id === address.id}
+              onSelect={() => selectAddress(address.id)}
+              onEdit={() => {
+                setEditing(address);
+                setShowForm(true);
+              }}
+              onDelete={() => deleteAddress(address.id)}
+            />
+          ))}
+        </div>
 
         {showForm ? (
           <AddressForm
@@ -56,22 +65,25 @@ export default function AddressPage() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="flex w-full flex-col items-center justify-center gap-3 border-t border-dashed border-black/14 py-6 text-[1.4rem] text-black"
+            className="cy-panel flex w-full flex-col items-center justify-center gap-3 border-dashed px-6 py-10 text-[var(--text-primary)] transition hover:border-[rgba(143,185,255,0.32)]"
           >
-            <CirclePlus className="h-9 w-9" />
-            Add New Address
+            <CirclePlus className="h-8 w-8 text-[var(--accent)]" />
+            <span className="text-lg font-semibold tracking-[-0.04em]">Add new address</span>
+            <span className="text-sm text-[var(--text-secondary)]">Create a new destination for this order.</span>
           </button>
         )}
 
-        <div className="flex justify-end gap-4 pt-8">
-          <button type="button" onClick={() => navigate("/cart")} className="h-16 min-w-[220px] rounded-xl border border-black text-[1.15rem] font-medium text-black">Back</button>
+        <div className="flex flex-wrap justify-end gap-4 pt-6">
+          <button type="button" onClick={() => navigate("/cart")} className="cy-btn-secondary h-14 min-w-[200px]">
+            Back
+          </button>
           <button
             type="button"
             disabled={!selectedAddress}
             onClick={() => navigate("/checkout/shipping")}
-            className="h-16 min-w-[220px] rounded-xl bg-black text-[1.15rem] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="cy-btn-primary h-14 min-w-[220px] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Next
+            Continue to shipping
           </button>
         </div>
       </div>

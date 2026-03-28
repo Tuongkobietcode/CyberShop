@@ -13,14 +13,26 @@ export default function ShippingMethodItem({
     <button
       type="button"
       onClick={onSelect}
-      className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-5 rounded-2xl border border-black/12 bg-white px-6 py-8 text-left transition hover:border-black/25"
+      className={[
+        "grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-5 rounded-[28px] border px-6 py-6 text-left transition",
+        checked
+          ? "border-[rgba(143,185,255,0.4)] bg-[linear-gradient(180deg,rgba(143,185,255,0.16),rgba(255,255,255,0.03))]"
+          : "border-[var(--line-soft)] bg-white/[0.03] hover:border-[rgba(255,255,255,0.18)]",
+      ].join(" ")}
     >
-      <input type="radio" checked={checked} readOnly className="h-7 w-7" />
-      <div className="flex flex-wrap items-center gap-6 text-[1.15rem]">
-        <span className={checked ? "font-semibold text-black" : "text-black/35"}>{method.label}</span>
-        <span className={checked ? "text-black/75" : "text-black/30"}>{method.description}</span>
+      <input type="radio" checked={checked} readOnly className="h-5 w-5 accent-[var(--accent)]" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{method.label}</span>
+          {checked ? (
+            <span className="rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]">
+              Selected
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">{method.description}</p>
       </div>
-      <span className={checked ? "text-[1.1rem] font-medium text-[#202348]" : "text-[1.1rem] text-black/28"}>{method.etaLabel}</span>
+      <span className="font-mono text-sm uppercase tracking-[0.2em] text-[var(--text-secondary)]">{method.etaLabel}</span>
     </button>
   );
 }

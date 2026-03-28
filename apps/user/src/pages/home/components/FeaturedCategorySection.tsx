@@ -1,148 +1,267 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { resolveAssetUrl } from "@/utils/assets";
+import { formatCurrencyVnd } from "@/utils/format";
 
-type PromoCard = {
+type CarouselItem = {
   title: string;
-  copy: string;
+  subtitle: string;
+  price?: number;
+  copy?: string;
   image: string;
+  to: string;
   imageClassName: string;
-  theme: "light" | "dark";
-  action?: boolean;
-  productSlug?: string;
+  imageWrapClassName?: string;
 };
 
-const promos: PromoCard[] = [
+const curatedItems: CarouselItem[] = [
   {
-    title: "Playstation 5",
-    copy:
-      "Incredibly powerful CPUs, GPUs, and an SSD with integrated I/O will redefine your PlayStation experience.",
-    image: "/assets/images/playstation-5.png",
+    title: "Liquid Silver",
+    subtitle: "iPhone 17 Pro Max",
+    copy: "The sharpest flagship surface in the opening edit, tuned for camera-first attention.",
+    price: 38990000,
+    image: "/assets/images/iphone-17-promax.png",
+    to: "/products/iphone-17-pro-max",
     imageClassName:
-      "left-[-18%] bottom-[-2%] w-[60%] max-w-[500px] sm:left-[-10%] sm:w-[60%] 2xl:max-w-[600px]",
-    theme: "light",
+      "mx-auto h-[220px] w-full max-w-[220px] object-contain sm:h-[250px] sm:max-w-[240px]",
+    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
   },
   {
-    title: "Apple AirPods Max",
-    copy: "Computational audio. Listen, it is powerful.",
-    image: "/assets/images/wireless-headphones.png",
+    title: "Studio audio",
+    subtitle: "AirPods Pro 3",
+    copy: "Compact audio hardware framed with the same visual priority as a hero device.",
+    price: 6490000,
+    image: "/assets/images/airpods-pro-3.png",
+    to: "/products/airpods-pro-3",
     imageClassName:
-      "left-[-10%] bottom-[2%] w-[48%] max-w-[150px] sm:left-[-6%] sm:w-[40%] 2xl:max-w-[180px]",
-    theme: "light",
+      "mx-auto h-[210px] w-full max-w-[220px] object-contain sm:h-[245px] sm:max-w-[250px]",
+    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
   },
   {
-    title: "Apple Vision Pro",
-    copy: "An immersive way to experience entertainment.",
-    image: "/assets/images/apple-vision-pro.png",
+    title: "Portable performance",
+    subtitle: "MacBook Pro 14-inch",
+    copy: "Portable pro hardware treated like a compact desk surface instead of another listing tile.",
+    price: 46990000,
+    image: "/assets/images/macbook-pro-14-inch.png",
+    to: "/products/macbook-pro-14-inch",
     imageClassName:
-      "left-[-8%] bottom-[2%] w-[54%] max-w-[170px] sm:left-[-4%] sm:w-[44%] 2xl:max-w-[190px]",
-    theme: "dark",
-  },
-  {
-    title: "Macbook Air",
-    copy:
-      "The new 15-inch MacBook Air makes room for more of what you love with a spacious Liquid Retina display.",
-    image: "/assets/images/macbook-air-main.png",
-    imageClassName:
-      "right-[-8%] bottom-[2%] w-[54%] max-w-[320px] sm:right-[-4%] sm:w-[46%] 2xl:max-w-[390px]",
-    theme: "light",
-    action: true,
-    productSlug: "macbook-air-15-inch",
+      "mx-auto h-[190px] w-full max-w-[300px] object-contain sm:h-[225px] sm:max-w-[360px]",
+    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
   },
 ];
 
-function Promo({ item, large = false }: { item: PromoCard; large?: boolean }) {
-  const isDark = item.theme === "dark";
-  const isPlaystation = item.title === "Playstation 5";
-
-  return (
-    <article
-      className={[
-        "group relative overflow-hidden transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(15,23,42,0.12)]",
-        isDark ? "bg-[#2a2a2a] text-white" : "bg-white text-slate-900",
-        large
-          ? "min-h-[340px] p-6 sm:min-h-[380px] sm:p-8 lg:min-h-[420px] lg:p-10 2xl:min-h-[500px] 2xl:p-12"
-          : "min-h-[220px] p-5 sm:min-h-[210px] sm:p-6 2xl:min-h-[260px]",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100",
-          isDark
-            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.08),transparent_40%)]"
-            : "bg-[radial-gradient(circle_at_80%_10%,rgba(15,23,42,0.06),transparent_40%)]",
-        ].join(" ")}
-      />
-
-      <img
-        src={resolveAssetUrl(item.image)}
-        alt={item.title}
-        className={[
-          "pointer-events-none absolute object-contain drop-shadow-[0_20px_40px_rgba(15,23,42,0.18)] transition duration-500 group-hover:scale-105",
-          item.imageClassName,
-        ].join(" ")}
-      />
-
-      <div
-        className={[
-          "relative z-10",
-          isPlaystation
-            ? "ml-auto max-w-[52%] sm:max-w-[48%] lg:max-w-[44%]"
-            : large
-              ? "max-w-[58%] sm:max-w-[52%] lg:max-w-[48%]"
-              : "ml-auto max-w-[62%] sm:max-w-[58%]",
-        ].join(" ")}
-      >
-        <h2
-          className={[
-            "leading-none tracking-[-0.04em]",
-            large
-              ? "text-[2.5rem] font-light sm:text-5xl lg:text-6xl 2xl:text-7xl"
-              : "text-[1.75rem] font-light sm:text-[2rem] 2xl:text-[2.4rem]",
-          ].join(" ")}
-        >
-          {item.title.split(" ").slice(0, -1).join(" ")}{" "}
-          <span className="font-semibold">{item.title.split(" ").slice(-1)}</span>
-        </h2>
-
-        <p
-          className={[
-            "mt-4 text-xs leading-5 sm:text-sm sm:leading-6 2xl:text-base",
-            isDark ? "text-white/70" : "text-slate-500",
-          ].join(" ")}
-        >
-          {item.copy}
-        </p>
-
-        {item.action ? (
-          <Link
-            to={item.productSlug ? `/products/${item.productSlug}` : "/products"}
-            className="mt-7 inline-flex items-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white sm:px-6 2xl:px-7"
-          >
-            Shop Now
-            <span className="h-px w-7 bg-current" />
-          </Link>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
 export default function FeaturedCategorySection() {
+  const carouselItems = useMemo<CarouselItem[]>(() => curatedItems.slice(0, 9), []);
+  const loopItems = useMemo(() => [...carouselItems, ...carouselItems], [carouselItems]);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const firstCardRef = useRef<HTMLAnchorElement | null>(null);
+  const offsetRef = useRef(0);
+  const loopWidthRef = useRef(0);
+  const stepRef = useRef(0);
+  const frameRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const applyTransform = useCallback((value: number) => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    track.style.transform = `translate3d(-${value}px, 0, 0)`;
+  }, []);
+
+  const measureTrack = useCallback(() => {
+    const firstCard = firstCardRef.current;
+    const track = trackRef.current;
+    if (!firstCard || !track || carouselItems.length === 0) {
+      stepRef.current = 0;
+      loopWidthRef.current = 0;
+      return;
+    }
+
+    const cardWidth = firstCard.getBoundingClientRect().width;
+    const gapValue = Number.parseFloat(window.getComputedStyle(track).gap || "0");
+    const step = cardWidth + gapValue;
+
+    stepRef.current = step;
+    loopWidthRef.current = step * carouselItems.length;
+    offsetRef.current = offsetRef.current % loopWidthRef.current;
+    applyTransform(offsetRef.current);
+  }, [applyTransform, carouselItems.length]);
+
+  const nudgeCarousel = useCallback(
+    (direction: 1 | -1) => {
+      if (!loopWidthRef.current || !stepRef.current) {
+        return;
+      }
+
+      offsetRef.current =
+        (offsetRef.current + direction * stepRef.current + loopWidthRef.current) %
+        loopWidthRef.current;
+      applyTransform(offsetRef.current);
+    },
+    [applyTransform]
+  );
+
+  useEffect(() => {
+    measureTrack();
+
+    const handleResize = () => measureTrack();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [measureTrack]);
+
+  useEffect(() => {
+    const speed = 28;
+
+    const tick = (time: number) => {
+      if (previousTimeRef.current === null) {
+        previousTimeRef.current = time;
+      }
+
+      const delta = time - previousTimeRef.current;
+      previousTimeRef.current = time;
+
+      if (!isHovered && loopWidthRef.current > 0) {
+        offsetRef.current = (offsetRef.current + speed * (delta / 1000)) % loopWidthRef.current;
+        applyTransform(offsetRef.current);
+      }
+
+      frameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    frameRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+      previousTimeRef.current = null;
+    };
+  }, [applyTransform, isHovered]);
+
   return (
-    <section className="bg-[#f6f6f6]">
-      <div className="grid gap-0 px-0 lg:grid-cols-[1.04fr_0.96fr]">
-        <div className="grid gap-0">
-          <Promo item={promos[0]} large />
-          <div className="grid gap-0 sm:grid-cols-2">
-            <Promo item={promos[1]} />
-            <Promo item={promos[2]} />
+    <section className="py-12 sm:py-16">
+      <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-[720px]">
+            <p className="cy-kicker">Curated flagships</p>
+            <h2 className="mt-3 max-w-[13ch] text-[2.2rem] font-semibold leading-[0.96] tracking-[-0.06em] text-white sm:text-[3rem]">
+              A tighter edit of the products worth opening first.
+            </h2>
+            <p className="mt-4 max-w-[48ch] text-[15px] leading-7 text-white/58 sm:text-base">
+              Less storefront clutter, more product framing. Think of these as
+              the opening compositions of the catalog rather than another
+              product strip.
+            </p>
           </div>
+
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/52 transition hover:text-white"
+          >
+            View complete archive
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-base">
+              {"->"}
+            </span>
+          </Link>
         </div>
 
-        <Promo item={promos[3]} large />
+        <div
+          className="group relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <button
+            type="button"
+            aria-label="Previous featured products"
+            onClick={() => nudgeCarousel(-1)}
+            className={[
+              "absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white/80 shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300",
+              isHovered
+                ? "pointer-events-auto opacity-100"
+                : "pointer-events-none opacity-0",
+            ].join(" ")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Next featured products"
+            onClick={() => nudgeCarousel(1)}
+            className={[
+              "absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white/80 shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300",
+              isHovered
+                ? "pointer-events-auto opacity-100"
+                : "pointer-events-none opacity-0",
+            ].join(" ")}
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+
+          <div className="overflow-hidden">
+            <div ref={trackRef} className="flex gap-5 will-change-transform">
+              {loopItems.map((item, index) => (
+                <Link
+                  key={`${item.title}-${index}`}
+                  ref={index === 0 ? firstCardRef : null}
+                  to={item.to}
+                  className="group/card relative w-[min(72vw,300px)] shrink-0 overflow-hidden rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(14,18,24,0.98),rgba(9,12,17,0.94))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.28)] transition duration-500 hover:-translate-y-[3px] hover:border-white/16 hover:shadow-[0_36px_110px_rgba(0,0,0,0.36)] sm:p-6"
+                >
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.14),transparent_42%)] opacity-0 transition duration-500 group-hover/card:opacity-100" />
+
+                  <div
+                    className={[
+                      "relative flex items-center justify-center overflow-hidden",
+                      item.imageWrapClassName ?? "",
+                    ].join(" ")}
+                  >
+                    <img
+                      src={resolveAssetUrl(item.image)}
+                      alt={item.subtitle}
+                      className={[
+                        item.imageClassName,
+                        "transition duration-500 group-hover/card:scale-[1.03]",
+                      ].join(" ")}
+                    />
+                  </div>
+
+                  <div className="relative mt-6 space-y-3">
+                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
+                      {item.title}
+                    </p>
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <h3 className="text-[1.2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-[1.38rem]">
+                          {item.subtitle}
+                        </h3>
+                        {typeof item.price === "number" ? (
+                          <p className="mt-2 text-[12px] uppercase tracking-[0.18em] text-white/42 sm:text-[13px]">
+                            {formatCurrencyVnd(item.price)}
+                          </p>
+                        ) : item.copy ? (
+                          <p className="mt-2 max-w-[24ch] text-[13px] leading-6 text-white/54 line-clamp-2">
+                            {item.copy}
+                          </p>
+                        ) : null}
+                      </div>
+                      <span className="text-sm font-medium text-white/46 transition group-hover/card:text-white/76">
+                        Open
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-
-

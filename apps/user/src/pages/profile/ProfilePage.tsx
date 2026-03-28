@@ -1,13 +1,10 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import { useAuth } from "@/features/auth/auth.context";
 import type { CheckoutAddress } from "@/features/cart/cart.types";
 import AddressForm from "@/pages/checkout/address/components/AddressForm";
-
-function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
-}
+import { formatCurrencyVnd } from "@/utils/format";
 
 function formatDate(value: string | null) {
   if (!value) return "Never";
@@ -63,38 +60,38 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-[#fafafa] pb-20">
+    <div className="pb-24">
       <Breadcrumb items={[{ label: "Home", to: "/home" }, { label: "Profile" }]} />
 
-      <div className="mx-auto max-w-[1200px] space-y-10 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-        <section className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
-          <article className="rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+      <div className="cy-shell space-y-10 pt-10">
+        <section className="grid gap-6 lg:grid-cols-[0.84fr_1.16fr]">
+          <article className="cy-panel p-8">
             <div className="flex items-center gap-4">
-              <div className="flex h-18 w-18 items-center justify-center rounded-full bg-black text-2xl font-semibold text-white">
+              <div className="flex h-18 w-18 items-center justify-center rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-2xl font-semibold text-[var(--accent)]">
                 {customer.name.slice(0, 1).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm uppercase tracking-[0.22em] text-black/35">Customer profile</p>
-                <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-black">{customer.name}</h1>
+                <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Customer profile</p>
+                <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{customer.name}</h1>
               </div>
             </div>
 
-            <dl className="mt-8 space-y-5 text-[15px] text-black/65">
-              <div className="flex items-start justify-between gap-6 border-b border-black/8 pb-4">
+            <dl className="mt-8 space-y-5 text-[15px] text-[var(--text-secondary)]">
+              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
                 <dt>Email</dt>
-                <dd className="text-right font-medium text-black">{customer.email}</dd>
+                <dd className="text-right font-medium text-[var(--text-primary)]">{customer.email}</dd>
               </div>
-              <div className="flex items-start justify-between gap-6 border-b border-black/8 pb-4">
+              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
                 <dt>Phone</dt>
-                <dd className="text-right font-medium text-black">{customer.phone}</dd>
+                <dd className="text-right font-medium text-[var(--text-primary)]">{customer.phone}</dd>
               </div>
-              <div className="flex items-start justify-between gap-6 border-b border-black/8 pb-4">
+              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
                 <dt>Joined</dt>
-                <dd className="text-right font-medium text-black">{formatDate(customer.createdAt)}</dd>
+                <dd className="text-right font-medium text-[var(--text-primary)]">{formatDate(customer.createdAt)}</dd>
               </div>
               <div className="flex items-start justify-between gap-6">
                 <dt>Last login</dt>
-                <dd className="text-right font-medium text-black">{formatDate(customer.lastLoginAt)}</dd>
+                <dd className="text-right font-medium text-[var(--text-primary)]">{formatDate(customer.lastLoginAt)}</dd>
               </div>
             </dl>
 
@@ -104,7 +101,7 @@ export default function ProfilePage() {
                 await signOut();
                 navigate("/sign-in", { replace: true });
               }}
-              className="mt-8 inline-flex h-13 items-center justify-center rounded-xl border border-black px-6 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+              className="cy-btn-secondary mt-8 inline-flex h-13 items-center justify-center px-6 text-sm"
             >
               Sign out
             </button>
@@ -112,25 +109,16 @@ export default function ProfilePage() {
 
           <div className="space-y-6">
             <div className="grid gap-6 sm:grid-cols-3">
-              <article className="rounded-[32px] border border-black/10 bg-white p-7 shadow-sm">
-                <p className="text-sm uppercase tracking-[0.2em] text-black/35">Orders</p>
-                <p className="mt-4 text-[2.5rem] font-semibold tracking-[-0.06em] text-black">{customer.orderCount}</p>
-              </article>
-              <article className="rounded-[32px] border border-black/10 bg-white p-7 shadow-sm">
-                <p className="text-sm uppercase tracking-[0.2em] text-black/35">Saved addresses</p>
-                <p className="mt-4 text-[2.5rem] font-semibold tracking-[-0.06em] text-black">{customer.addresses.length}</p>
-              </article>
-              <article className="rounded-[32px] border border-black/10 bg-white p-7 shadow-sm">
-                <p className="text-sm uppercase tracking-[0.2em] text-black/35">Total spend</p>
-                <p className="mt-4 text-[2.5rem] font-semibold tracking-[-0.06em] text-black">{formatMoney(customer.totalSpend)}</p>
-              </article>
+              <StatCard label="Orders" value={String(customer.orderCount)} />
+              <StatCard label="Saved addresses" value={String(customer.addresses.length)} />
+              <StatCard label="Total spend" value={formatCurrencyVnd(customer.totalSpend)} mono />
             </div>
 
-            <article className="rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+            <article className="cy-panel p-8">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-black/35">Account</p>
-                  <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Edit your details</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Account</p>
+                  <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Edit your details</h2>
                 </div>
               </div>
 
@@ -152,7 +140,7 @@ export default function ProfilePage() {
                       setSavingProfile(false);
                     }
                   }}
-                  className="inline-flex h-12 items-center justify-center rounded-xl bg-black px-6 text-sm font-semibold text-white transition hover:bg-[#1d1d1d] disabled:opacity-60"
+                  className="cy-btn-primary inline-flex h-12 items-center justify-center px-6 text-sm disabled:opacity-60"
                 >
                   {savingProfile ? "Saving..." : "Save profile"}
                 </button>
@@ -162,11 +150,11 @@ export default function ProfilePage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[0.94fr_1.06fr]">
-          <article className="rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+          <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-black/35">Addresses</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Delivery book</h2>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Addresses</p>
+                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Delivery book</h2>
               </div>
               <button
                 type="button"
@@ -174,7 +162,7 @@ export default function ProfilePage() {
                   setEditingAddress(null);
                   setShowAddressForm(true);
                 }}
-                className="inline-flex h-11 items-center justify-center rounded-xl border border-black px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+                className="cy-btn-secondary inline-flex h-11 items-center justify-center px-5 text-sm"
               >
                 Add address
               </button>
@@ -182,26 +170,28 @@ export default function ProfilePage() {
 
             <div className="mt-6 space-y-4">
               {addresses.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-black/12 px-6 py-12 text-center text-sm text-black/45">
+                <div className="rounded-2xl border border-dashed border-[var(--line-soft)] px-6 py-12 text-center text-sm text-[var(--text-secondary)]">
                   You have not saved any address yet.
                 </div>
               ) : (
                 addresses.map((address) => (
-                  <article key={address.id} className="rounded-2xl bg-[#f7f7f8] px-5 py-4">
+                  <article key={address.id} className="rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-5 py-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="text-lg font-semibold text-black">{address.fullName}</h3>
+                          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{address.fullName}</h3>
                           <span
                             className={[
-                              "rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]",
-                              address.isDefault ? "bg-black text-white" : "bg-white text-black/55",
+                              "rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em]",
+                              address.isDefault
+                                ? "border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-[var(--accent)]"
+                                : "border border-[var(--line-soft)] bg-white/[0.04] text-[var(--text-secondary)]",
                             ].join(" ")}
                           >
                             {address.label}
                           </span>
                         </div>
-                        <p className="mt-3 text-sm leading-7 text-black/55">
+                        <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
                           {address.addressLine1}
                           {address.addressLine2 ? `, ${address.addressLine2}` : ""}
                           {address.ward ? `, ${address.ward}` : ""}
@@ -209,7 +199,7 @@ export default function ProfilePage() {
                           {`, ${address.city}, ${address.country}`}
                           {address.postalCode ? ` ${address.postalCode}` : ""}
                         </p>
-                        <p className="mt-2 text-sm font-medium text-black">{address.phone}</p>
+                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{address.phone}</p>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -219,7 +209,7 @@ export default function ProfilePage() {
                             setEditingAddress(address);
                             setShowAddressForm(true);
                           }}
-                          className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+                          className="cy-btn-secondary inline-flex h-10 items-center justify-center px-4 text-sm"
                         >
                           Edit
                         </button>
@@ -228,7 +218,7 @@ export default function ProfilePage() {
                           onClick={async () => {
                             await deleteAddress(address.id);
                           }}
-                          className="inline-flex h-10 items-center justify-center rounded-full border border-rose-200 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-500 hover:text-white"
+                          className="inline-flex h-10 items-center justify-center rounded-full border border-rose-400/20 bg-rose-400/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-400/18"
                         >
                           Delete
                         </button>
@@ -257,34 +247,36 @@ export default function ProfilePage() {
             ) : null}
           </article>
 
-          <article className="rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+          <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-black/35">Recent orders</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Your latest purchases</h2>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Recent orders</p>
+                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Your latest purchases</h2>
               </div>
-              <Link to="/products" className="text-sm font-semibold text-black/64 transition hover:text-black">
+              <Link to="/products" className="text-sm font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]">
                 Continue shopping
               </Link>
             </div>
 
             {orders.length === 0 ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-black/12 px-6 py-14 text-center text-sm text-black/45">
+              <div className="mt-6 rounded-2xl border border-dashed border-[var(--line-soft)] px-6 py-14 text-center text-sm text-[var(--text-secondary)]">
                 No orders yet. Your first successful checkout will show up here.
               </div>
             ) : (
               <div className="mt-6 space-y-4">
                 {orders.slice(0, 6).map((order) => (
-                  <article key={order.id} className="rounded-2xl bg-[#f7f7f8] px-5 py-4">
+                  <article key={order.id} className="rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-5 py-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm uppercase tracking-[0.18em] text-black/35">{order.orderCode}</p>
-                        <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-black">{order.items[0]?.name || "Order"}</h3>
-                        <p className="mt-2 text-sm text-black/45">{order.orderStatus} · {order.paymentStatus}</p>
+                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{order.orderCode}</p>
+                        <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">{order.items[0]?.name || "Order"}</h3>
+                        <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                          {order.orderStatus} · {order.paymentStatus}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-black/45">{formatDate(order.createdAt)}</p>
-                        <p className="mt-1 text-lg font-semibold text-black">{formatMoney(order.totalAmount)}</p>
+                        <p className="text-sm text-[var(--text-secondary)]">{formatDate(order.createdAt)}</p>
+                        <p className="mt-1 font-mono text-lg font-semibold text-[var(--text-primary)]">{formatCurrencyVnd(order.totalAmount)}</p>
                       </div>
                     </div>
                   </article>
@@ -298,11 +290,32 @@ export default function ProfilePage() {
   );
 }
 
-function Field({ label, value, onChange, className = "" }: { label: string; value: string; onChange: (value: string) => void; className?: string }) {
+function StatCard({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <article className="cy-panel p-7">
+      <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{label}</p>
+      <p className={["mt-4 text-[2.3rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)]", mono ? "font-mono text-[1.8rem]" : ""].join(" ")}>
+        {value}
+      </p>
+    </article>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}) {
   return (
     <label className={["block space-y-2", className].join(" ")}>
-      <span className="text-sm font-medium text-black/58">{label}</span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none" />
+      <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{label}</span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="cy-input" />
     </label>
   );
 }

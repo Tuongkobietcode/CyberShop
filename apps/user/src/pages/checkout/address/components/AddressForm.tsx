@@ -12,10 +12,31 @@ const emptyAddress: CheckoutAddress = {
   ward: "",
   district: "",
   city: "",
-  country: "USA",
+  country: "Vietnam",
   postalCode: "",
   isDefault: false,
 };
+
+function FormField({
+  value,
+  placeholder,
+  onChange,
+  className = "",
+}: {
+  value: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+  className?: string;
+}) {
+  return (
+    <input
+      className={["cy-input", className].join(" ")}
+      placeholder={placeholder}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+    />
+  );
+}
 
 export default function AddressForm({
   initialValue,
@@ -37,26 +58,52 @@ export default function AddressForm({
   const [saving, setSaving] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-6">
-      <div className="grid gap-4 md:grid-cols-2">
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Full Name" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Label (HOME/OFFICE)" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value.toUpperCase() })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none md:col-span-2" placeholder="Address line 1" value={form.addressLine1} onChange={(e) => setForm({ ...form, addressLine1: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none md:col-span-2" placeholder="Address line 2" value={form.addressLine2} onChange={(e) => setForm({ ...form, addressLine2: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Ward" value={form.ward} onChange={(e) => setForm({ ...form, ward: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="District" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Postal code" value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} />
-        <input className="h-14 rounded-xl border border-black/10 px-4 outline-none" placeholder="Country" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
+    <div className="cy-panel p-6 sm:p-7">
+      <div className="mb-6">
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+          {initialValue ? "Edit address" : "New address"}
+        </p>
+        <h3 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Recipient details</h3>
       </div>
-      <label className="mt-4 flex items-center gap-3 text-sm text-black/70">
-        <input type="checkbox" checked={form.isDefault} onChange={(e) => setForm({ ...form, isDefault: e.target.checked })} />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <FormField value={form.fullName} onChange={(value) => setForm({ ...form, fullName: value })} placeholder="Full name" />
+        <FormField value={form.label} onChange={(value) => setForm({ ...form, label: value.toUpperCase() })} placeholder="Label (HOME / OFFICE)" />
+        <FormField value={form.email} onChange={(value) => setForm({ ...form, email: value })} placeholder="Email" />
+        <FormField value={form.phone} onChange={(value) => setForm({ ...form, phone: value })} placeholder="Phone" />
+        <FormField
+          className="md:col-span-2"
+          value={form.addressLine1}
+          onChange={(value) => setForm({ ...form, addressLine1: value })}
+          placeholder="Address line 1"
+        />
+        <FormField
+          className="md:col-span-2"
+          value={form.addressLine2}
+          onChange={(value) => setForm({ ...form, addressLine2: value })}
+          placeholder="Address line 2"
+        />
+        <FormField value={form.ward} onChange={(value) => setForm({ ...form, ward: value })} placeholder="Ward" />
+        <FormField value={form.district} onChange={(value) => setForm({ ...form, district: value })} placeholder="District" />
+        <FormField value={form.city} onChange={(value) => setForm({ ...form, city: value })} placeholder="City" />
+        <FormField value={form.postalCode} onChange={(value) => setForm({ ...form, postalCode: value })} placeholder="Postal code" />
+        <FormField value={form.country} onChange={(value) => setForm({ ...form, country: value })} placeholder="Country" />
+      </div>
+
+      <label className="mt-5 flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+        <input
+          type="checkbox"
+          checked={form.isDefault}
+          onChange={(event) => setForm({ ...form, isDefault: event.target.checked })}
+          className="h-4 w-4 accent-[var(--accent)]"
+        />
         Set as default address
       </label>
-      <div className="mt-6 flex gap-4">
-        <button type="button" onClick={onCancel} className="h-12 rounded-xl border border-black px-6 text-sm font-medium text-black">Cancel</button>
+
+      <div className="mt-7 flex flex-wrap gap-4">
+        <button type="button" onClick={onCancel} className="cy-btn-secondary h-12 px-6 text-sm">
+          Cancel
+        </button>
         <button
           type="button"
           disabled={saving}
@@ -68,9 +115,9 @@ export default function AddressForm({
               setSaving(false);
             }
           }}
-          className="h-12 rounded-xl bg-black px-6 text-sm font-medium text-white disabled:opacity-60"
+          className="cy-btn-primary h-12 px-6 text-sm disabled:opacity-60"
         >
-          {saving ? "Saving..." : "Save Address"}
+          {saving ? "Saving..." : "Save address"}
         </button>
       </div>
     </div>

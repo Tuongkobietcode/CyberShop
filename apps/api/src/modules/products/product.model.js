@@ -72,12 +72,6 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    brand: {
-      type: String,
-      default: "",
-      trim: true,
-      index: true,
-    },
     batteryCapacity: {
       type: String,
       default: "",

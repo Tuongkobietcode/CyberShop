@@ -12,16 +12,25 @@ export default function ShippingPage() {
   }
 
   return (
-    <CheckoutShell currentStep={2} title="Shipment Method">
-      <ShippingMethodList
-        methods={shippingMethods}
-        selectedMethodId={checkout.shippingMethodId}
-        onSelect={setShippingMethod}
-      />
+    <CheckoutShell currentStep={2} title="Shipping method">
+      <div className="space-y-6">
+        <div className="max-w-3xl">
+          <p className="text-sm uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Delivery speed</p>
+          <p className="mt-4 text-base leading-8 text-[var(--text-secondary)]">
+            Pick the delivery rhythm that fits the order. ETA, surface treatment, and motion language stay consistent with the darker storefront.
+          </p>
+        </div>
 
-      <div className="flex justify-end gap-4 pt-24">
-        <button type="button" onClick={() => navigate("/checkout/address")} className="h-16 min-w-[220px] rounded-xl border border-black text-[1.15rem] font-medium text-black">Back</button>
-        <button type="button" onClick={() => navigate("/checkout/payment")} className="h-16 min-w-[220px] rounded-xl bg-black text-[1.15rem] font-medium text-white">Next</button>
+        <ShippingMethodList methods={shippingMethods} selectedMethodId={checkout.shippingMethodId} onSelect={setShippingMethod} />
+
+        <div className="flex flex-wrap justify-end gap-4 pt-6">
+          <button type="button" onClick={() => navigate("/checkout/address")} className="cy-btn-secondary h-14 min-w-[200px]">
+            Back
+          </button>
+          <button type="button" onClick={() => navigate("/checkout/payment")} className="cy-btn-primary h-14 min-w-[220px]">
+            Continue to payment
+          </button>
+        </div>
       </div>
     </CheckoutShell>
   );

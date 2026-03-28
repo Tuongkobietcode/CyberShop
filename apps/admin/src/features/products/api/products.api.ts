@@ -10,7 +10,6 @@ export type AdminProduct = {
   compareAtPrice: number | null;
   stock: number;
   featured: boolean;
-  brand: string;
   batteryCapacity: string;
   screenType: string;
   screenDiagonal: string;

@@ -2,9 +2,9 @@ import { MapPin, Truck, WalletCards } from "lucide-react";
 import type { ReactNode } from "react";
 
 const steps = [
-  { id: 1, label: "Address", icon: MapPin, path: "/checkout/address" },
-  { id: 2, label: "Shipping", icon: Truck, path: "/checkout/shipping" },
-  { id: 3, label: "Payment", icon: WalletCards, path: "/checkout/payment" },
+  { id: 1, label: "Address", helper: "Choose recipient", icon: MapPin },
+  { id: 2, label: "Shipping", helper: "Delivery speed", icon: Truck },
+  { id: 3, label: "Payment", helper: "Complete purchase", icon: WalletCards },
 ];
 
 export default function CheckoutShell({
@@ -17,30 +17,55 @@ export default function CheckoutShell({
   children: ReactNode;
 }) {
   return (
-    <div className="bg-[#fafafa] pb-16">
-      <div className="mx-auto max-w-[1200px] px-4 pt-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 sm:grid-cols-3">
-          {steps.map((step) => {
-            const Icon = step.icon;
-            const isActive = step.id === currentStep;
-            return (
-              <div key={step.id} className={isActive ? "text-black" : "text-black/28"}>
-                <div className="flex items-start gap-3">
-                  <Icon className="mt-1 h-7 w-7" />
-                  <div>
-                    <p className="text-[1.05rem]">Step {step.id}</p>
-                    <p className="text-[1.9rem] font-medium tracking-[-0.04em]">{step.label}</p>
+    <div className="pb-24">
+      <div className="cy-shell pt-12">
+        <div className="mb-10 grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-end">
+          <div className="space-y-4">
+            <span className="cy-kicker">Checkout Flow</span>
+            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-[var(--text-primary)] sm:text-5xl">{title}</h1>
+            <p className="max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+              Every step is designed to feel calm, clear, and trustworthy. Progress stays visible and the total context remains easy to scan.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              const isActive = step.id === currentStep;
+              const isPast = step.id < currentStep;
+
+              return (
+                <div
+                  key={step.id}
+                  className={[
+                    "rounded-[28px] border px-5 py-5 transition",
+                    isActive
+                      ? "border-[rgba(143,185,255,0.4)] bg-[linear-gradient(180deg,rgba(143,185,255,0.16),rgba(255,255,255,0.03))] shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
+                      : "border-[var(--line-soft)] bg-white/[0.03]",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center justify-between">
+                    <div
+                      className={[
+                        "inline-flex h-11 w-11 items-center justify-center rounded-2xl border",
+                        isActive || isPast
+                          ? "border-[rgba(143,185,255,0.36)] bg-[rgba(143,185,255,0.12)] text-[var(--text-primary)]"
+                          : "border-[var(--line-soft)] text-[var(--text-secondary)]",
+                      ].join(" ")}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">0{step.id}</span>
                   </div>
+                  <p className="mt-5 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{step.helper}</p>
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{step.label}</p>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        <div className="pt-18">
-          <h1 className="text-[2.25rem] font-semibold tracking-[-0.04em] text-[#202348]">{title}</h1>
-          <div className="mt-8">{children}</div>
-        </div>
+        <div>{children}</div>
       </div>
     </div>
   );

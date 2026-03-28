@@ -41,7 +41,6 @@ function sanitizeProduct(product) {
     compareAtPrice: product.compareAtPrice,
     stock: product.stock,
     featured: product.featured,
-    brand: product.brand,
     batteryCapacity: product.batteryCapacity,
     screenType: product.screenType,
     screenDiagonal: product.screenDiagonal,
@@ -79,7 +78,6 @@ async function buildProductFilter(query, options = {}) {
   const category = String(query.category || "").trim();
   const status = String(query.status || "").trim();
   const featured = query.featured;
-  const brandValues = parseQueryValues(query.brand);
   const batteryCapacityValues = parseQueryValues(query.batteryCapacity);
   const screenTypeValues = parseQueryValues(query.screenType);
   const screenDiagonalValues = parseQueryValues(query.screenDiagonal);
@@ -105,10 +103,6 @@ async function buildProductFilter(query, options = {}) {
 
   if (featured !== undefined) {
     filter.featured = String(featured) === "true";
-  }
-
-  if (brandValues.length) {
-    filter.brand = { $in: brandValues };
   }
 
   if (batteryCapacityValues.length) {
@@ -229,14 +223,13 @@ export const listProductFilters = asyncHandler(async (req, res) => {
   );
 
   const items = await Product.find(filter)
-    .select("brand batteryCapacity screenType screenDiagonal protectionClass builtInMemory")
+    .select("batteryCapacity screenType screenDiagonal protectionClass builtInMemory")
     .lean();
 
   res.json({
     success: true,
     message: "Product filters fetched successfully",
     data: {
-      brands: buildOptionList(items, "brand"),
       batteryCapacity: buildOptionList(items, "batteryCapacity"),
       screenType: buildOptionList(items, "screenType"),
       screenDiagonal: buildOptionList(items, "screenDiagonal"),
@@ -301,7 +294,6 @@ export const createProduct = asyncHandler(async (req, res) => {
     stock: Number(req.body.stock ?? 0),
     status: String(req.body.status || "draft"),
     featured: Boolean(req.body.featured),
-    brand: String(req.body.brand || "").trim(),
     batteryCapacity: String(req.body.batteryCapacity || "").trim(),
     screenType: String(req.body.screenType || "").trim(),
     screenDiagonal: String(req.body.screenDiagonal || "").trim(),
@@ -365,7 +357,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
   product.status = req.body.status === undefined ? product.status : String(req.body.status);
   product.featured =
     req.body.featured === undefined ? product.featured : Boolean(req.body.featured);
-  product.brand = req.body.brand === undefined ? product.brand : String(req.body.brand || "").trim();
   product.batteryCapacity =
     req.body.batteryCapacity === undefined ? product.batteryCapacity : String(req.body.batteryCapacity || "").trim();
   product.screenType =

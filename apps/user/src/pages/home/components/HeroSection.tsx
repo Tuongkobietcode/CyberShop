@@ -3,49 +3,54 @@ import { resolveAssetUrl } from "@/utils/assets";
 
 export default function HeroSection() {
   return (
-    <section className="overflow-hidden bg-[#18121f] text-white">
-      <div className="mx-auto grid max-w-[1720px] items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-10 lg:py-0 2xl:min-h-[720px] 2xl:px-16">
-        <div className="relative z-10 py-6 sm:py-10 lg:py-16 2xl:py-24">
-          <div className="max-w-xl 2xl:max-w-2xl">
-            <p className="animate-fade-in-left text-xs font-medium tracking-[0.18em] text-white/55 sm:text-sm lg:text-base">
-              Pro.Beyond.
-            </p>
+    <section className="relative overflow-hidden pb-8 pt-2 text-white sm:pb-12 sm:pt-4">
+      <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
+        <div className="relative grid gap-8 lg:min-h-[calc(100dvh-6.5rem)] lg:grid-cols-[0.74fr_1.26fr] lg:items-center">
+          <div className="relative z-10 flex min-h-full flex-col justify-center pb-4 pt-8 lg:pb-10 lg:pt-12 animate-fade-in-left">
+            <div className="max-w-[560px]">
+              <div className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.24em] text-white/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                Studio archive
+              </div>
 
-            <h1 className="mt-4 animate-fade-in-left text-[3rem] font-light leading-none tracking-[-0.05em] sm:text-[4.6rem] lg:text-[6.3rem] 2xl:text-[8.2rem]">
-              iPhone 14{" "}
-              <span className="font-semibold text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
-                Pro
-              </span>
-            </h1>
+              <h1 className="mt-6 max-w-[8ch] text-[3.9rem] font-semibold leading-[0.88] tracking-[-0.1em] text-white sm:text-[5.2rem] lg:text-[6.9rem] 2xl:text-[8.2rem]">
+                Flagship
+                <span className="block font-light text-white/78">hardware.</span>
+              </h1>
 
-            <p className="mt-5 max-w-lg animate-fade-in-left text-sm leading-6 text-white/65 sm:text-base sm:leading-7 2xl:max-w-2xl 2xl:text-lg">
-              Created to change everything for the better. A premium flagship
-              experience shaped for speed, detail, and everyday style.
-            </p>
+              <p className="mt-6 max-w-[42ch] text-[15px] leading-7 text-white/62 sm:text-base sm:leading-8">
+                CyberShop reimagined as a dark product gallery. Fewer blocks,
+                stronger imagery, and a calmer rhythm built around premium
+                devices, not commodity cards.
+              </p>
 
-            <div className="mt-8 animate-fade-in-left">
-              <Link
-                to="/products/apple-iphone-14-pro-max-128gb-deep-purple"
-                className="group inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition duration-300 hover:border-white/40 hover:bg-white/10 sm:px-7 2xl:px-8 2xl:py-4"
-              >
-                Shop Now
-                <span className="inline-block h-px w-8 bg-white/70 transition duration-300 group-hover:w-10" />
-              </Link>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  to="/products/iphone-17-pro-max"
+                  className="cy-btn-primary"
+                >
+                  View collection
+                </Link>
+                <Link to="/products" className="cy-btn-secondary">
+                  Shop flagships
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="relative flex min-h-[320px] items-end justify-center sm:min-h-[380px] lg:min-h-[560px] 2xl:min-h-[720px]">
-          <div className="absolute left-1/2 top-10 h-52 w-52 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(107,56,255,0.55),_rgba(24,18,31,0)_68%)] blur-2xl sm:h-64 sm:w-64 2xl:top-20 2xl:h-80 2xl:w-80" />
-          <img
-            src={resolveAssetUrl("/assets/images/iphone-14-front.png")}
-            alt="iPhone 14 Pro"
-            className="relative z-10 animate-fade-in-right w-full max-w-[360px] object-contain drop-shadow-[0_55px_80px_rgba(0,0,0,0.65)] transition duration-500 hover:scale-[1.02] sm:max-w-[480px] lg:max-w-[620px] 2xl:max-w-[760px]"
-          />
+          <div className="relative min-h-[560px] animate-fade-in-right sm:min-h-[700px] lg:min-h-[860px]">
+            <div className="absolute right-[2%] top-6 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-white/48 backdrop-blur-sm">
+              New arrival
+            </div>
+
+            <div className="pointer-events-none absolute right-[3%] top-[16%] h-[78%] w-[92%] rounded-[44px] bg-[radial-gradient(circle_at_center,rgba(255,137,55,0.18),rgba(255,137,55,0)_60%)] blur-3xl" />
+            <img
+              src={resolveAssetUrl("/assets/images/product-hero.png")}
+              alt="iPhone 17 hero"
+              className="absolute bottom-[20%] right-[-10%] w-[1000px] object-contain"
+            />
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-

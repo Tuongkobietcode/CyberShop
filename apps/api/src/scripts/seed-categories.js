@@ -7,45 +7,45 @@ dotenv.config();
 
 const categories = [
   {
-    name: "Phones",
-    slug: "phones",
-    image: "/assets/images/iphone-14-front.png",
-    description: "Flagship phones and foldable devices.",
+    name: "Mac",
+    slug: "mac",
+    image: "/assets/images/macbook-pro-16-inch.png",
+    description: "Mac notebooks and desktops for creative work, productivity, and studio setups.",
     sortOrder: 1,
   },
   {
-    name: "Smart Watches",
-    slug: "smart-watches",
-    image: "/assets/images/apple-watch.png",
-    description: "Wearables built for health, style, and fitness.",
+    name: "iPhone",
+    slug: "iphone",
+    image: "/assets/images/iphone-17-promax.png",
+    description: "Current iPhone lineup with standard, Plus, Pro, and Pro Max hardware.",
     sortOrder: 2,
   },
   {
-    name: "Cameras",
-    slug: "cameras",
-    image: "/assets/images/profile-image-41.png",
-    description: "Portable cinema and mirrorless camera gear.",
+    name: "iPad",
+    slug: "ipad",
+    image: "/assets/images/ipad-pro-13-inch.png",
+    description: "iPad tablets for note taking, sketching, media, and portable workflows.",
     sortOrder: 3,
   },
   {
-    name: "Headphones",
-    slug: "headphones",
-    image: "/assets/images/airpods-max-silver.png",
-    description: "Over-ear, in-ear, and wireless audio devices.",
+    name: "Apple Watch",
+    slug: "apple-watch",
+    image: "/assets/images/apple-watch-ultra-3.png",
+    description: "Apple Watch models built around health, fitness, and daily connectivity.",
     sortOrder: 4,
   },
   {
-    name: "Computers",
-    slug: "computers",
-    image: "/assets/images/macbook-air-main.png",
-    description: "Laptops, tablets, and desktop-grade devices.",
+    name: "Apple Vision Pro",
+    slug: "apple-vision-pro",
+    image: "/assets/images/apple-vision-pro.png",
+    description: "Spatial computing hardware built around immersive apps, video, and workspaces.",
     sortOrder: 5,
   },
   {
-    name: "Gaming",
-    slug: "gaming",
-    image: "/assets/images/playstation-5.png",
-    description: "Consoles and gaming accessories.",
+    name: "AirPods",
+    slug: "airpods",
+    image: "/assets/images/airpods-pro-3.png",
+    description: "AirPods audio products spanning open-fit, Pro, and over-ear listening.",
     sortOrder: 6,
   },
 ];
@@ -75,5 +75,3 @@ seedCategories()
   .finally(async () => {
     await mongoose.connection.close();
   });
-
-

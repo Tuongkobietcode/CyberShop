@@ -63,15 +63,6 @@ export default function AppRoutes() {
               />
             }
           />
-          <Route
-            path="brands"
-            element={
-              <Placeholder
-                title="Brands"
-                description="Brand management is currently folded into product and category data. A separate brands module can be added when the data model needs it."
-              />
-            }
-          />
           <Route path="admin-role" element={<AdminRolePage />} />
           <Route
             path="control-authority"

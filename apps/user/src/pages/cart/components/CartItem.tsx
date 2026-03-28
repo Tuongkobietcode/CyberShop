@@ -1,10 +1,7 @@
-import { X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import type { CartItem as CartItemType } from "@/features/cart/cart.types";
 import { resolveAssetUrl } from "@/utils/assets";
-
-function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
-}
+import { formatCurrencyVnd } from "@/utils/format";
 
 export default function CartItem({
   item,
@@ -18,28 +15,53 @@ export default function CartItem({
   onRemove: () => void;
 }) {
   return (
-    <article className="flex flex-col gap-6 border-b border-black/10 pb-8 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-6">
-        <div className="flex h-[120px] w-[120px] items-center justify-center rounded-3xl bg-white p-4">
-          <img src={resolveAssetUrl(item.image)} alt={item.name} className="max-h-full object-contain" />
-        </div>
-        <div>
-          <h3 className="max-w-[280px] text-[1.1rem] font-medium leading-8 text-black">{item.name}</h3>
-          <p className="mt-3 text-[1.15rem] text-black/65">#{item.sku}</p>
-        </div>
+    <article className="grid gap-6 border-b border-[var(--line-soft)] py-6 last:border-b-0 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
+      <div className="flex h-28 w-28 items-center justify-center rounded-[28px] border border-[var(--line-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 shadow-[0_22px_50px_rgba(0,0,0,0.22)]">
+        <img src={resolveAssetUrl(item.image)} alt={item.name} className="max-h-full object-contain" />
       </div>
 
-      <div className="flex items-center gap-6 self-end sm:self-auto">
-        <div className="flex items-center gap-3 text-2xl text-black">
-          <button type="button" onClick={onDecrease} className="h-10 w-10">-</button>
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-black/10 text-base">{item.quantity}</div>
-          <button type="button" onClick={onIncrease} className="h-10 w-10">+</button>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="rounded-full border border-[var(--line-soft)] bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            {item.categoryName}
+          </span>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{item.sku}</span>
         </div>
-        <p className="min-w-[88px] text-right text-[2rem] font-medium tracking-[-0.04em] text-black">
-          {formatMoney(item.price * item.quantity)}
+        <h3 className="mt-4 max-w-[28ch] text-xl font-semibold leading-8 tracking-[-0.05em] text-[var(--text-primary)]">
+          {item.name}
+        </h3>
+        <p className="mt-3 text-sm text-[var(--text-secondary)]">Unit price {formatCurrencyVnd(item.price)}</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4 sm:justify-end">
+        <div className="inline-flex items-center rounded-full border border-[var(--line-soft)] bg-white/[0.03] p-1">
+          <button
+            type="button"
+            onClick={onDecrease}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[var(--text-secondary)] transition hover:bg-white/[0.06] hover:text-[var(--text-primary)]"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <div className="min-w-[44px] text-center font-mono text-sm font-medium text-[var(--text-primary)]">{item.quantity}</div>
+          <button
+            type="button"
+            onClick={onIncrease}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[var(--text-secondary)] transition hover:bg-white/[0.06] hover:text-[var(--text-primary)]"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+
+        <p className="min-w-[160px] text-right font-mono text-2xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">
+          {formatCurrencyVnd(item.price * item.quantity)}
         </p>
-        <button type="button" onClick={onRemove} className="text-black/70">
-          <X className="h-7 w-7" />
+
+        <button
+          type="button"
+          onClick={onRemove}
+          className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line-soft)] text-[var(--text-secondary)] transition hover:border-[rgba(255,255,255,0.22)] hover:text-[var(--text-primary)]"
+        >
+          <X className="h-5 w-5" />
         </button>
       </div>
     </article>
