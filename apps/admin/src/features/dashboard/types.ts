@@ -5,6 +5,7 @@ export type DashboardOverview = {
   newCustomersLast30Days: number;
   totalOrders: number;
   pendingOrders: number;
+  cancelledOrders: number;
   totalRevenue: number;
 };
 

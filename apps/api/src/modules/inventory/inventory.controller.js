@@ -26,6 +26,11 @@ export const listAdminInventoryLogs = asyncHandler(async (req, res) => {
   const search = String(req.query.search || "").trim();
   const reason = String(req.query.reason || "").trim();
   const actorType = String(req.query.actorType || "").trim();
+  const deltaType = String(req.query.deltaType || "").trim();
+  const nextStockZero =
+    req.query.nextStockZero === undefined
+      ? undefined
+      : String(req.query.nextStockZero) === "true";
   const filter = {};
 
   if (search) {
@@ -42,6 +47,16 @@ export const listAdminInventoryLogs = asyncHandler(async (req, res) => {
 
   if (actorType) {
     filter.actorType = actorType;
+  }
+
+  if (deltaType === "positive") {
+    filter.delta = { $gt: 0 };
+  } else if (deltaType === "negative") {
+    filter.delta = { $lt: 0 };
+  }
+
+  if (typeof nextStockZero === "boolean") {
+    filter.nextStock = nextStockZero ? 0 : { $ne: 0 };
   }
 
   const [items, total] = await Promise.all([

@@ -1,59 +1,96 @@
+import { formatCurrencyVnd } from "@/utils/format";
+
+export type FinishOption = {
+  value: string;
+  label: string;
+  swatch: string;
+};
+
+export type CapacityOption = {
+  value: string;
+  label: string;
+  price: number;
+};
+
 export default function VariantSelector({
-  colors,
-  selectedColor,
-  onSelectColor,
+  finishes,
+  selectedFinish,
+  onSelectFinish,
+  showFinishSelector,
+  showCapacitySelector,
   capacities,
   selectedCapacity,
   onSelectCapacity,
 }: {
-  colors: string[];
-  selectedColor: string;
-  onSelectColor: (value: string) => void;
-  capacities: string[];
+  finishes: FinishOption[];
+  selectedFinish: string;
+  onSelectFinish: (value: string) => void;
+  showFinishSelector: boolean;
+  showCapacitySelector: boolean;
+  capacities: CapacityOption[];
   selectedCapacity: string;
   onSelectCapacity: (value: string) => void;
 }) {
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm font-medium text-white/52">Finish</p>
-        <div className="mt-3 flex items-center gap-3">
-          {colors.map((color) => (
-            <button
-              key={color}
-              type="button"
-              aria-label={color}
-              onClick={() => onSelectColor(color)}
-              className={[
-                "h-9 w-9 rounded-full border-2 transition",
-                selectedColor === color ? "border-white scale-110" : "border-transparent",
-              ].join(" ")}
-              style={{ backgroundColor: color }}
-            />
-          ))}
+    <div className="space-y-5">
+      {showFinishSelector ? (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            Color
+          </p>
+          <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+            Pick your favourite color.
+          </p>
+          <div className="mt-4 flex items-center gap-3">
+            {finishes.map((finish) => (
+              <button
+                key={finish.value}
+                type="button"
+                aria-label={finish.label}
+                onClick={() => onSelectFinish(finish.value)}
+                className={[
+                  "h-11 w-11 rounded-full border-2 transition",
+                  selectedFinish === finish.value
+                    ? "border-[var(--text-primary)] scale-105 shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
+                    : "border-white/0 hover:border-black/12",
+                ].join(" ")}
+                style={{ backgroundColor: finish.swatch }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      <div>
-        <p className="text-sm font-medium text-white/52">Storage</p>
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {capacities.map((capacity) => (
-            <button
-              key={capacity}
-              type="button"
-              onClick={() => onSelectCapacity(capacity)}
-              className={[
-                "h-14 rounded-2xl border text-sm transition",
-                selectedCapacity === capacity
-                  ? "border-[var(--accent)] bg-[var(--accent)]/12 text-white"
-                  : "border-white/10 bg-white/[0.03] text-white/45 hover:border-white/18 hover:text-white/82",
-              ].join(" ")}
-            >
-              {capacity}
-            </button>
-          ))}
+      {showCapacitySelector ? (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            Storage
+          </p>
+          <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+            Pick the capacity that fits your setup.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {capacities.map((capacity) => (
+              <button
+                key={capacity.value}
+                type="button"
+                onClick={() => onSelectCapacity(capacity.value)}
+                className={[
+                  "rounded-[22px] border px-4 py-4 text-left transition",
+                  selectedCapacity === capacity.value
+                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] shadow-[0_12px_28px_rgba(14,165,233,0.1)]"
+                    : "border-[var(--line-soft)] bg-white/82 text-[var(--text-secondary)] hover:border-[var(--line-strong)] hover:text-[var(--text-primary)]",
+                ].join(" ")}
+              >
+                <span className="block text-[1.1rem] font-medium">{capacity.label}</span>
+                <span className="mt-1 block text-sm text-[var(--text-secondary)]">
+                  {formatCurrencyVnd(capacity.price)}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

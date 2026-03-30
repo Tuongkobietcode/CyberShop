@@ -14,7 +14,7 @@ export type BlogPost = {
   sections: BlogPostSection[];
 };
 
-export const blogPosts: BlogPost[] = [
+export const fallbackBlogPosts: BlogPost[] = [
   {
     slug: "device-ai-everyday-utility",
     category: "AI Devices",
@@ -176,5 +176,5 @@ export const blogPosts: BlogPost[] = [
 ];
 
 export function getBlogPostBySlug(slug: string) {
-  return blogPosts.find((post) => post.slug === slug) || null;
+  return fallbackBlogPosts.find((post) => post.slug === slug) || null;
 }

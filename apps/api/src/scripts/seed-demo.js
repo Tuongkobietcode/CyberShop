@@ -4,6 +4,7 @@ const steps = [
   ["node", ["src/scripts/seed-admin.js"]],
   ["node", ["src/scripts/seed-categories.js"]],
   ["node", ["src/scripts/seed-products.js"]],
+  ["node", ["src/scripts/seed-blog.js"]],
   ["node", ["src/scripts/seed-customers.js"]],
   ["node", ["src/scripts/seed-orders.js"]],
 ];

@@ -6,9 +6,52 @@ import { createHttpError } from "../../utils/createHttpError.js";
 import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
 import {
   createCheckoutOrder,
+  expireStalePendingVnpayOrders,
   finalizeCodOrder,
   sanitizeOrder,
 } from "./order.service.js";
+
+function scheduleAdminOrderCleanup() {
+  void expireStalePendingVnpayOrders().catch(() => {
+    // Admin reads should not block while stale VNPay orders are being reconciled.
+  });
+}
+
+function applyOrderStatusGroupFilter(filter, statusGroup) {
+  if (!statusGroup) return;
+
+  if (statusGroup === "completed") {
+    filter.orderStatus = { $in: ["confirmed", "delivered"] };
+    return;
+  }
+
+  if (statusGroup === "pending") {
+    filter.orderStatus = { $in: ["pending", "shipping"] };
+    return;
+  }
+
+  if (statusGroup === "cancelled") {
+    filter.orderStatus = "cancelled";
+  }
+}
+
+function applyPaymentStatusGroupFilter(filter, paymentGroup) {
+  if (!paymentGroup) return;
+
+  if (paymentGroup === "completed") {
+    filter.paymentStatus = "paid";
+    return;
+  }
+
+  if (paymentGroup === "pending") {
+    filter.paymentStatus = "pending";
+    return;
+  }
+
+  if (paymentGroup === "failed") {
+    filter.paymentStatus = { $in: ["failed", "refunded"] };
+  }
+}
 
 export const createOrder = asyncHandler(async (req, res) => {
   const paymentMethod = String(req.body.paymentMethod || "").trim();
@@ -40,10 +83,14 @@ export const createOrder = asyncHandler(async (req, res) => {
 });
 
 export const listAdminOrders = asyncHandler(async (req, res) => {
+  scheduleAdminOrderCleanup();
+
   const { page, limit, skip } = getPagination(req.query);
   const search = String(req.query.search || "").trim();
   const orderStatus = String(req.query.orderStatus || "").trim();
+  const orderStatusGroup = String(req.query.orderStatusGroup || "").trim();
   const paymentStatus = String(req.query.paymentStatus || "").trim();
+  const paymentStatusGroup = String(req.query.paymentStatusGroup || "").trim();
   const filter = {};
 
   if (search) {
@@ -57,10 +104,14 @@ export const listAdminOrders = asyncHandler(async (req, res) => {
 
   if (orderStatus) {
     filter.orderStatus = orderStatus;
+  } else {
+    applyOrderStatusGroupFilter(filter, orderStatusGroup);
   }
 
   if (paymentStatus) {
     filter.paymentStatus = paymentStatus;
+  } else {
+    applyPaymentStatusGroupFilter(filter, paymentStatusGroup);
   }
 
   const [items, total] = await Promise.all([
@@ -77,6 +128,8 @@ export const listAdminOrders = asyncHandler(async (req, res) => {
 });
 
 export const getAdminOrderDetail = asyncHandler(async (req, res) => {
+  scheduleAdminOrderCleanup();
+
   const order = await Order.findById(req.params.id);
 
   if (!order) {

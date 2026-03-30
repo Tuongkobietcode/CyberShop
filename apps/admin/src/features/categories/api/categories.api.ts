@@ -8,6 +8,7 @@ export type AdminCategory = {
   description: string;
   isActive: boolean;
   sortOrder: number;
+  productCount: number;
   createdAt: string;
   updatedAt: string;
 };

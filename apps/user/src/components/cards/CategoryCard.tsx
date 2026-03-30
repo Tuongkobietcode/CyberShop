@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import { buildCatalogCategoryPath, getCategoryQueryValue } from "@/features/catalog/category-links";
 import type { CatalogCategory } from "@/features/catalog/catalog.types";
 import { resolveAssetUrl } from "@/utils/assets";
 
 export function CategoryCard({ category }: { category: CatalogCategory }) {
   return (
     <Link
-      to={`/products?category=${category.id}`}
+      to={buildCatalogCategoryPath(getCategoryQueryValue(category))}
       className="group flex items-center gap-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-4 shadow-[0_18px_48px_rgba(0,0,0,0.22)] backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/14 hover:bg-white/[0.05]"
     >
       <img

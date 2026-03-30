@@ -1,5 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { MoreHorizontal, PlusCircle, Search, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import {
+  ImagePlus,
+  MoreHorizontal,
+  PlusCircle,
+  Search,
+  Trash2,
+  Upload,
+  XCircle,
+} from "lucide-react";
+import { uploadAdminImages } from "@/features/uploads/api/uploads.api";
 import { resolveAssetUrl } from "@/utils/assets";
 import {
   createAdminCategory,
@@ -8,16 +17,39 @@ import {
   updateAdminCategory,
   type AdminCategory,
 } from "../api/categories.api";
-import { getAdminProducts } from "@/features/products/api/products.api";
 
-const surface = "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
+const surface =
+  "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
+
+function Field({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-black/58">{label}</span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none"
+      />
+    </label>
+  );
+}
 
 export function CategoriesPage() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [categories, setCategories] = useState<AdminCategory[]>([]);
-  const [productCounts, setProductCounts] = useState<Record<string, number>>({});
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [mediaError, setMediaError] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [form, setForm] = useState({
     name: "",
@@ -30,36 +62,30 @@ export function CategoriesPage() {
 
   async function loadData() {
     setLoading(true);
+
     try {
-      const [categoryResponse, productResponse] = await Promise.all([
-        getAdminCategories({ limit: 40 }),
-        getAdminProducts({ limit: 200 }),
-      ]);
+      const categoryResponse = await getAdminCategories({ limit: 40 });
       setCategories(categoryResponse.data);
-      setProductCounts(
-        productResponse.data.reduce<Record<string, number>>((acc, item) => {
-          if (item.category?.id) {
-            acc[item.category.id] = (acc[item.category.id] || 0) + 1;
-          }
-          return acc;
-        }, {})
-      );
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, []);
 
   const filteredCategories = useMemo(
-    () => categories.filter((item) => `${item.name} ${item.slug}`.toLowerCase().includes(search.toLowerCase())),
+    () =>
+      categories.filter((item) =>
+        `${item.name} ${item.slug}`.toLowerCase().includes(search.toLowerCase())
+      ),
     [categories, search]
   );
 
   function resetForm() {
     setSelectedId("");
+    setMediaError("");
     setForm({
       name: "",
       slug: "",
@@ -72,6 +98,7 @@ export function CategoriesPage() {
 
   function handleSelect(category: AdminCategory) {
     setSelectedId(category.id);
+    setMediaError("");
     setForm({
       name: category.name,
       slug: category.slug,
@@ -84,16 +111,19 @@ export function CategoriesPage() {
 
   async function handleSubmit() {
     setSaving(true);
+
     try {
       const payload = {
         ...form,
         sortOrder: Number(form.sortOrder) || 0,
       };
+
       if (selectedId) {
         await updateAdminCategory(selectedId, payload);
       } else {
         await createAdminCategory(payload);
       }
+
       resetForm();
       await loadData();
     } finally {
@@ -103,8 +133,40 @@ export function CategoriesPage() {
 
   async function handleDelete(categoryId: string) {
     await deleteAdminCategory(categoryId);
-    if (selectedId === categoryId) resetForm();
+
+    if (selectedId === categoryId) {
+      resetForm();
+    }
+
     await loadData();
+  }
+
+  async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setMediaError("");
+    setUploading(true);
+
+    try {
+      const [uploadedImage] = await uploadAdminImages([file], "categories");
+      setForm((current) => ({ ...current, image: uploadedImage?.url || "" }));
+    } catch (error) {
+      setMediaError(error instanceof Error ? error.message : "Category image upload failed");
+    } finally {
+      setUploading(false);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }
+
+  function openFilePicker() {
+    fileInputRef.current?.click();
   }
 
   return (
@@ -112,14 +174,23 @@ export function CategoriesPage() {
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <p className="text-sm font-medium text-black/45">Discover</p>
-          <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-black">Shared catalog categories</h1>
+          <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-black">
+            Shared catalog categories
+          </h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button type="button" onClick={resetForm} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f]">
+          <button
+            type="button"
+            onClick={resetForm}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f]"
+          >
             <PlusCircle className="h-4 w-4" />
             Add Category
           </button>
-          <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
+          <button
+            type="button"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+          >
             More Action
             <MoreHorizontal className="h-4 w-4" />
           </button>
@@ -128,13 +199,27 @@ export function CategoriesPage() {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {filteredCategories.slice(0, 8).map((category) => (
-          <button key={category.id} type="button" onClick={() => handleSelect(category)} className={[surface, "flex items-center gap-4 p-4 text-left transition hover:-translate-y-1"] .join(" ")}>
+          <button
+            key={category.id}
+            type="button"
+            onClick={() => handleSelect(category)}
+            className={[
+              surface,
+              "flex items-center gap-4 p-4 text-left transition hover:-translate-y-1",
+            ].join(" ")}
+          >
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-[#f7f7f8]">
-              <img src={resolveAssetUrl(category.image)} alt={category.name} className="h-full w-full object-cover" />
+              <img
+                src={resolveAssetUrl(category.image)}
+                alt={category.name}
+                className="h-full w-full object-cover"
+              />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-semibold tracking-[-0.03em] text-black">{category.name}</p>
-              <p className="mt-1 text-sm text-black/42">{productCounts[category.id] || 0} products</p>
+              <p className="truncate text-lg font-semibold tracking-[-0.03em] text-black">
+                {category.name}
+              </p>
+              <p className="mt-1 text-sm text-black/42">{category.productCount} products</p>
             </div>
           </button>
         ))}
@@ -145,16 +230,25 @@ export function CategoriesPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-black/45">Category inventory</p>
-              <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Manage categories</h2>
+              <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">
+                Manage categories
+              </h2>
             </div>
             <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
               <Search className="h-4 w-4" />
-              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search category" className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search category"
+                className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35"
+              />
             </label>
           </div>
 
           {loading ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center text-sm text-black/45">Loading categories...</div>
+            <div className="mt-6 rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center text-sm text-black/45">
+              Loading categories...
+            </div>
           ) : (
             <div className="mt-6 overflow-hidden rounded-[24px] border border-black/8">
               <table className="min-w-full text-left text-sm">
@@ -174,26 +268,53 @@ export function CategoriesPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[#f7f7f8]">
-                            <img src={resolveAssetUrl(category.image)} alt={category.name} className="h-full w-full object-cover" />
+                            <img
+                              src={resolveAssetUrl(category.image)}
+                              alt={category.name}
+                              className="h-full w-full object-cover"
+                            />
                           </div>
                           <div>
                             <p className="font-semibold text-black">{category.name}</p>
-                            <p className="mt-1 text-sm text-black/42">{category.description || "No description"}</p>
+                            <p className="mt-1 text-sm text-black/42">
+                              {category.description || "No description"}
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-5 py-4 text-black/52">{category.slug}</td>
-                      <td className="px-5 py-4 text-black/42">{new Date(category.createdAt).toLocaleDateString()}</td>
-                      <td className="px-5 py-4 font-medium text-black">{productCounts[category.id] || 0}</td>
+                      <td className="px-5 py-4 text-black/42">
+                        {new Date(category.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-4 font-medium text-black">
+                        {category.productCount}
+                      </td>
                       <td className="px-5 py-4">
-                        <span className={["inline-flex rounded-full px-3 py-1 text-xs font-semibold", category.isActive ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"].join(" ")}>
+                        <span
+                          className={[
+                            "inline-flex rounded-full px-3 py-1 text-xs font-semibold",
+                            category.isActive
+                              ? "bg-slate-900 text-white"
+                              : "bg-slate-100 text-slate-600",
+                          ].join(" ")}
+                        >
                           {category.isActive ? "Live" : "Hidden"}
                         </span>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
-                          <button type="button" onClick={() => handleSelect(category)} className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white">Edit</button>
-                          <button type="button" onClick={() => handleDelete(category.id)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 text-rose-500 transition hover:bg-rose-500 hover:text-white">
+                          <button
+                            type="button"
+                            onClick={() => handleSelect(category)}
+                            className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(category.id)}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 text-rose-500 transition hover:bg-rose-500 hover:text-white"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -207,36 +328,126 @@ export function CategoriesPage() {
         </section>
 
         <section className={surface}>
-          <p className="text-sm font-medium text-black/45">{selectedId ? "Edit category" : "Create category"}</p>
-          <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">Category form</h2>
+          <p className="text-sm font-medium text-black/45">
+            {selectedId ? "Edit category" : "Create category"}
+          </p>
+          <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-black">
+            Category form
+          </h2>
 
           <div className="mt-6 space-y-4">
-            <Field label="Category name" value={form.name} onChange={(value) => setForm((current) => ({ ...current, name: value }))} />
-            <Field label="Slug" value={form.slug} onChange={(value) => setForm((current) => ({ ...current, slug: value }))} />
-            <Field label="Image path" value={form.image} onChange={(value) => setForm((current) => ({ ...current, image: value }))} />
-            <Field label="Sort order" value={form.sortOrder} onChange={(value) => setForm((current) => ({ ...current, sortOrder: value }))} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelection}
+              className="hidden"
+            />
+
+            <Field
+              label="Category name"
+              value={form.name}
+              onChange={(value) => setForm((current) => ({ ...current, name: value }))}
+            />
+            <Field
+              label="Slug"
+              value={form.slug}
+              onChange={(value) => setForm((current) => ({ ...current, slug: value }))}
+            />
+            <Field
+              label="Sort order"
+              value={form.sortOrder}
+              onChange={(value) => setForm((current) => ({ ...current, sortOrder: value }))}
+            />
             <label className="block space-y-2">
               <span className="text-sm font-medium text-black/58">Description</span>
-              <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 py-3 text-sm outline-none" />
+              <textarea
+                value={form.description}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, description: event.target.value }))
+                }
+                className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 py-3 text-sm outline-none"
+              />
             </label>
             <label className="flex items-center gap-3 rounded-2xl border border-black/10 bg-[#f7f7f8] px-4 py-4 text-sm font-medium text-black">
-              <input type="checkbox" checked={form.isActive} onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))} className="h-4 w-4 rounded border-black/20" />
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, isActive: event.target.checked }))
+                }
+                className="h-4 w-4 rounded border-black/20"
+              />
               Visible on user storefront
             </label>
 
-            {form.image ? (
-              <div className="rounded-[24px] bg-[#f7f7f8] p-4">
-                <div className="flex h-40 items-center justify-center overflow-hidden rounded-2xl bg-white">
-                  <img src={resolveAssetUrl(form.image)} alt={form.name || "Preview"} className="h-full w-full object-cover" />
-                </div>
+            <div className="rounded-[24px] border border-dashed border-black/12 bg-[#f7f7f8] p-4">
+              <div className="flex h-44 items-center justify-center overflow-hidden rounded-2xl bg-white">
+                {form.image ? (
+                  <img
+                    src={resolveAssetUrl(form.image)}
+                    alt={form.name || "Preview"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center text-black/35">
+                    <ImagePlus className="mx-auto h-8 w-8" />
+                    <p className="mt-3 text-sm">
+                      Upload a category image for storefront navigation and admin preview.
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={openFilePicker}
+                  disabled={uploading}
+                  className="inline-flex h-11 items-center justify-center rounded-2xl border border-black/10 bg-white px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Upload
+                </button>
+                <button
+                  type="button"
+                  onClick={openFilePicker}
+                  disabled={uploading}
+                  className="inline-flex h-11 items-center justify-center rounded-2xl border border-black/10 bg-white px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  {uploading ? "Uploading..." : "Replace"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm((current) => ({ ...current, image: "" }))}
+                  className="inline-flex h-11 items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 text-sm font-semibold text-rose-500 transition hover:bg-rose-500 hover:text-white"
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            {mediaError ? (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                {mediaError}
               </div>
             ) : null}
 
             <div className="flex gap-3 pt-2">
-              <button type="button" onClick={handleSubmit} disabled={saving} className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={saving}
+                className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60"
+              >
                 {saving ? "Saving..." : selectedId ? "Update Category" : "Create Category"}
               </button>
-              <button type="button" onClick={resetForm} className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+              >
                 Reset
               </button>
             </div>
@@ -244,14 +455,5 @@ export function CategoriesPage() {
         </section>
       </div>
     </div>
-  );
-}
-
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label className="block space-y-2">
-      <span className="text-sm font-medium text-black/58">{label}</span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none" />
-    </label>
   );
 }

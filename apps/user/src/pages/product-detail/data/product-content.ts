@@ -5,6 +5,15 @@ export type ProductSpecRow = {
   value: string;
 };
 
+export type ProductGalleryItem = {
+  id: string;
+  image: string;
+  fallbackImage: string;
+  alt: string;
+  label: string;
+  imageClassName?: string;
+};
+
 export type ProductReview = {
   id: string;
   author: string;
@@ -25,6 +34,28 @@ const productMediaMap: Record<string, string[]> = {
   "apple-vision-pro": [
     "/assets/images/apple-vision-pro.png",
   ],
+};
+
+export type ProductReason = {
+  title: string;
+  copy: string;
+};
+
+export type ProductBoxItem = {
+  title: string;
+  copy: string;
+};
+
+export type ProductSupportItem = {
+  title: string;
+  copy: string;
+};
+
+export type ProductServiceItem = {
+  title: string;
+  copy: string;
+  accentClassName: string;
+  badge: string;
 };
 
 function getPhoneChip(name: string) {
@@ -50,10 +81,53 @@ function getPhoneResolution(screenDiagonal: string, name: string) {
   return "2532x1170";
 }
 
-export function getProductGallery(product: CatalogProduct) {
+function toAssetToken(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export function getProductGallery(product: CatalogProduct, finish = ""): ProductGalleryItem[] {
   const mapped = productMediaMap[product.slug] || [];
-  const media = [product.image, ...mapped, ...product.images.map((item) => item.url)].filter(Boolean);
-  return [...new Set(media)];
+  const baseImage = product.image || mapped[0] || product.images[0]?.url || "";
+  const extraImages = [...mapped, ...product.images.map((item) => item.url)].filter(Boolean);
+  const uniqueImages = [...new Set([baseImage, ...extraImages])];
+  const primary = uniqueImages[0] || baseImage;
+  const finishToken = finish ? toAssetToken(finish) : "default";
+  const variantRoot = `/assets/images/variants/${product.slug}`;
+
+  function variantImage(view: string, fallbackImage: string) {
+    return {
+      image: `${variantRoot}/${product.slug}--${finishToken}--${view}.png`,
+      fallbackImage,
+    };
+  }
+
+  return [
+    {
+      id: "hero",
+      ...variantImage("hero", primary),
+      alt: product.name,
+      label: "Studio view",
+    },
+    {
+      id: "detail",
+      ...variantImage("display", uniqueImages[1] || primary),
+      alt: `${product.name} display view`,
+      label: "Display view",
+      imageClassName: "scale-[1.08] sm:scale-[1.12]",
+    },
+    {
+      id: "focus",
+      ...variantImage("detail", uniqueImages[2] || primary),
+      alt: `${product.name} close-up`,
+      label: "Material focus",
+      imageClassName: "scale-[0.92] sm:scale-[0.96]",
+    },
+  ];
 }
 
 export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
@@ -144,38 +218,126 @@ export function getProductSpecs(product: CatalogProduct): ProductSpecRow[] {
   ];
 }
 
-export function getProductReviews(product: CatalogProduct): ProductReview[] {
-  const gallery = getProductGallery(product);
-  const reviewPhotos = gallery.slice(0, 2);
+export function getWhyThisModel(product: CatalogProduct): ProductReason[] {
+  if (product.category?.slug === "mac") {
+    return [
+      {
+        title: "Built for lighter daily work",
+        copy: "The lineup balance is tuned for portability, battery life, and a cleaner notebook footprint.",
+      },
+      {
+        title: "Enough screen without the bulk",
+        copy: "The display and chassis stay compact enough for coffee shops, campus bags, and desk-to-desk movement.",
+      },
+      {
+        title: "A calmer step into Apple silicon",
+        copy: "It gives you the Mac workflow without pushing you into the heavier Pro hardware tier too early.",
+      },
+    ];
+  }
+
+  if (product.category?.slug === "iphone") {
+    return [
+      {
+        title: "Camera-first daily flagship",
+        copy: "It balances image quality, battery confidence, and the cleanest all-day smartphone footprint.",
+      },
+      {
+        title: "Fast enough to stay out of the way",
+        copy: "Performance stays responsive across messaging, camera, maps, and longer media sessions.",
+      },
+      {
+        title: "A better fit than overbuying",
+        copy: "You get the capabilities people feel every day without paying extra for specs they never use.",
+      },
+    ];
+  }
 
   return [
     {
-      id: `${product.id}-review-1`,
-      author: "Minh Anh",
-      avatar: "/assets/images/profile-image-41.png",
-      rating: 5,
-      date: "24 March, 2026",
-      content:
-        "The product detail page reads much more clearly now. The device feels like the focus instead of the interface chrome.",
+      title: "A focused product fit",
+      copy: "This model sits in a narrower position in the lineup so the choice feels clearer and more intentional.",
     },
     {
-      id: `${product.id}-review-2`,
-      author: "Bao Chau",
-      avatar: "/assets/images/profile-group-1.png",
-      rating: 4,
-      date: "24 March, 2026",
-      content:
-        "Specs, finishes, and pricing are much easier to compare. It feels closer to a premium Apple-style retail presentation.",
+      title: "Premium hardware, less noise",
+      copy: "The visual and technical priorities are kept direct so you can evaluate the product faster.",
     },
     {
-      id: `${product.id}-review-3`,
-      author: "Quoc Viet",
-      avatar: "/assets/images/profile-image-64.png",
-      rating: 4,
-      date: "24 March, 2026",
-      content:
-        "The darker surfaces let the hardware materials stand out. The overall experience feels calmer and more intentional.",
-      photos: reviewPhotos,
+      title: "Configured around real use",
+      copy: "Storage, finish, and delivery details are surfaced early so the buying decision is easier to complete.",
+    },
+  ];
+}
+
+export function getInTheBoxItems(
+  product: CatalogProduct,
+  selectedCapacity: string,
+  finishLabel: string
+): ProductBoxItem[] {
+  return [
+    {
+      title: product.name,
+      copy: `${finishLabel} finish with ${selectedCapacity} configured in this selection.`,
+    },
+    {
+      title: "USB-C charging cable",
+      copy: "Braided charging cable included inside the box for setup and daily power.",
+    },
+    {
+      title: "Quick start and warranty",
+      copy: "Printed setup essentials, warranty coverage, and support references for a cleaner first run.",
+    },
+  ];
+}
+
+export function getSupportDeliveryItems(product: CatalogProduct): ProductSupportItem[] {
+  return [
+    {
+      title: "Fast delivery",
+      copy: product.category?.slug === "mac" ? "1-2 business days in major cities." : "Same-week shipping with tracked delivery windows.",
+    },
+    {
+      title: "Official warranty",
+      copy: "12-month official coverage with support handling directly through the storefront.",
+    },
+    {
+      title: "Setup guidance",
+      copy: "Help with migration, first-run configuration, and continuity features after purchase.",
+    },
+    {
+      title: "Trade and upgrade path",
+      copy: "A cleaner route for future upgrades without turning the page into a finance maze.",
+    },
+  ];
+}
+
+export function getIncludedServices(product: CatalogProduct): ProductServiceItem[] {
+  const lineupLabel = product.category?.slug === "mac" ? "Your new Mac" : "Your new device";
+
+  return [
+    {
+      title: `${lineupLabel} starts with TV`,
+      copy: "Three months of cinematic streaming, launch events, and flagship originals.",
+      accentClassName: "from-[#171717] to-[#353535]",
+      badge: "TV",
+    },
+    {
+      title: "Music and lossless audio",
+      copy: "A subscription-ready library that makes new speakers, headphones, and laptops feel more complete.",
+      accentClassName: "from-[#ff3b82] to-[#ff6b47]",
+      badge: "M",
+    },
+    {
+      title: "Arcade and family play",
+      copy: "A premium entertainment layer that turns the device into more than a work surface.",
+      accentClassName: "from-[#ff6b47] to-[#ff8b4a]",
+      badge: "A",
+    },
+    {
+      title: "News and reading",
+      copy: "Magazine, news, and publication access that fits larger displays and longer sessions.",
+      accentClassName: "from-[#ff4d7e] to-[#ff7f5a]",
+      badge: "N",
     },
   ];
 }

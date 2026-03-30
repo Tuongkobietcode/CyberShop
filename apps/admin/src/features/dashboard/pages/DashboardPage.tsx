@@ -4,7 +4,6 @@ import { ArrowRight, MoreHorizontal, Package2, ReceiptText, UsersRound } from "l
 import { resolveAssetUrl } from "@/utils/assets";
 import { getDashboardSummary } from "../api/dashboard.api";
 import type { DashboardSummary } from "../types";
-import { getAdminOrders } from "@/features/orders/api/orders.api";
 import { getAdminProducts } from "@/features/products/api/products.api";
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 
@@ -22,7 +21,6 @@ const surface = "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18p
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [cancelledCount, setCancelledCount] = useState(0);
   const [products, setProducts] = useState<Array<{ id: string; name: string; image: string; price: number }>>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string; image: string }>>([]);
   const [loading, setLoading] = useState(true);
@@ -31,17 +29,13 @@ export default function DashboardPage() {
     async function load() {
       setLoading(true);
       try {
-        const [nextSummary, ordersResponse, productsResponse, categoriesResponse] = await Promise.all([
+        const [nextSummary, productsResponse, categoriesResponse] = await Promise.all([
           getDashboardSummary(),
-          getAdminOrders({ limit: 100 }),
           getAdminProducts({ limit: 8 }),
           getAdminCategories({ limit: 6 }),
         ]);
 
         setSummary(nextSummary);
-        setCancelledCount(
-          ordersResponse.data.filter((order) => order.orderStatus.toLowerCase().includes("cancel")).length
-        );
         setProducts(
           productsResponse.data.slice(0, 5).map((item) => ({
             id: item.id,
@@ -77,17 +71,17 @@ export default function DashboardPage() {
       {
         title: "Total Orders",
         value: formatCompact(summary.overview.totalOrders),
-        subtitle: "All order activity in the system",
+        subtitle: "Valid orders excluding failed and cancelled",
         accent: "text-black",
       },
       {
         title: "Pending & Cancelled",
-        value: `${summary.overview.pendingOrders} / ${cancelledCount}`,
+        value: `${summary.overview.pendingOrders} / ${summary.overview.cancelledOrders}`,
         subtitle: "Orders needing review or recovery",
         accent: "text-black",
       },
     ];
-  }, [cancelledCount, summary]);
+  }, [summary]);
 
   const revenueMax = Math.max(...(summary?.recentRevenue.map((item) => item.revenue) || [1]));
 

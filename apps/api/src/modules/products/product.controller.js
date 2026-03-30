@@ -5,6 +5,13 @@ import { buildMeta, getPagination } from "../../utils/pagination.js";
 import { createHttpError } from "../../utils/createHttpError.js";
 import { toSlug } from "../../utils/slug.js";
 import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
+import { expireStalePendingVnpayOrders } from "../orders/order.service.js";
+
+function scheduleCatalogInventoryCleanup() {
+  void expireStalePendingVnpayOrders().catch(() => {
+    // Cleanup keeps inventory reasonably fresh, but catalog responses must not block on it.
+  });
+}
 
 function mapProductStatus(product) {
   if (product.stock === 0 || product.status === "out_of_stock") {
@@ -76,6 +83,7 @@ async function buildProductFilter(query, options = {}) {
   const filter = {};
   const search = String(query.search || "").trim();
   const category = String(query.category || "").trim();
+  const hasCategoryQuery = Boolean(category);
   const status = String(query.status || "").trim();
   const featured = query.featured;
   const batteryCapacityValues = parseQueryValues(query.batteryCapacity);
@@ -96,7 +104,10 @@ async function buildProductFilter(query, options = {}) {
     if (/^[a-f\d]{24}$/i.test(category)) {
       filter.categoryId = category;
     } else {
-      const matchedCategory = await Category.findOne({ slug: category }).select("_id");
+      const matchedCategory = await Category.findOne({
+        slug: category,
+        ...(options.publicOnly ? { isActive: true } : {}),
+      }).select("_id");
       filter.categoryId = matchedCategory ? matchedCategory._id : null;
     }
   }
@@ -142,6 +153,17 @@ async function buildProductFilter(query, options = {}) {
   }
 
   if (options.publicOnly) {
+    const activeCategoryIds = await Category.find({ isActive: true }).distinct("_id");
+
+    if (hasCategoryQuery) {
+      const isActiveCategory = activeCategoryIds.some(
+        (categoryId) => String(categoryId) === String(filter.categoryId)
+      );
+      filter.categoryId = isActiveCategory ? filter.categoryId : null;
+    } else {
+      filter.categoryId = { $in: activeCategoryIds };
+    }
+
     filter.status = { $in: ["active", "out_of_stock"] };
   }
 
@@ -165,17 +187,23 @@ function buildProductSort(query) {
   return { createdAt: -1 };
 }
 
-async function ensureCategoryExists(categoryId) {
+async function ensureCategoryExists(categoryId, options = {}) {
   const category = await Category.findById(categoryId);
 
   if (!category) {
     throw createHttpError(400, "Category does not exist");
   }
 
+  if (options.requireActive && !category.isActive) {
+    throw createHttpError(409, "Category is disabled and cannot accept live products");
+  }
+
   return category;
 }
 
 export const listProducts = asyncHandler(async (req, res) => {
+  scheduleCatalogInventoryCleanup();
+
   const { page, limit, skip } = getPagination(req.query);
   const filter = await buildProductFilter(req.query, { publicOnly: true });
   const sort = buildProductSort(req.query);
@@ -198,12 +226,14 @@ export const listProducts = asyncHandler(async (req, res) => {
 });
 
 export const getProductDetail = asyncHandler(async (req, res) => {
+  scheduleCatalogInventoryCleanup();
+
   const product = await Product.findOne({
     slug: req.params.slug,
     status: { $in: ["active", "out_of_stock"] },
-  }).populate("categoryId", "name slug");
+  }).populate("categoryId", "name slug isActive");
 
-  if (!product) {
+  if (!product || !product.categoryId?.isActive) {
     throw createHttpError(404, "Product not found");
   }
 
@@ -215,6 +245,8 @@ export const getProductDetail = asyncHandler(async (req, res) => {
 });
 
 export const listProductFilters = asyncHandler(async (req, res) => {
+  scheduleCatalogInventoryCleanup();
+
   const filter = await buildProductFilter(
     {
       category: req.query.category,
@@ -270,7 +302,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     throw createHttpError(400, "Name, SKU, and categoryId are required");
   }
 
-  await ensureCategoryExists(categoryId);
+  await ensureCategoryExists(categoryId, { requireActive: true });
 
   const slug = String(req.body.slug || toSlug(name)).trim().toLowerCase();
   const duplicate = await Product.findOne({
@@ -330,7 +362,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
       : String(req.body.slug || toSlug(nextName)).trim().toLowerCase();
 
   if (req.body.categoryId !== undefined) {
-    await ensureCategoryExists(String(req.body.categoryId).trim());
+    await ensureCategoryExists(String(req.body.categoryId).trim(), { requireActive: true });
   }
 
   const duplicate = await Product.findOne({

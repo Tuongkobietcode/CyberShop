@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { resolveAssetUrl } from "@/utils/assets";
+import { buildCatalogCategoryPath } from "@/features/catalog/category-links";
 
 const setupSteps = [
   {
@@ -8,21 +8,21 @@ const setupSteps = [
     title: "Flagship phone core",
     copy:
       "Start with a hero device that carries the visual weight of the setup and anchors the entire collection.",
-    to: "/products?category=iphone",
+    to: buildCatalogCategoryPath("iphone"),
   },
   {
     id: "02",
     title: "Wearables and audio",
     copy:
       "Layer in watch and audio products as supporting pieces so the homepage feels like a kit, not a catalog dump.",
-    to: "/products?category=airpods",
+    to: buildCatalogCategoryPath("airpods"),
   },
   {
     id: "03",
     title: "Portable performance",
     copy:
       "Close with a Mac surface to give the composition depth and make the archive feel complete.",
-    to: "/products?category=mac",
+    to: buildCatalogCategoryPath("mac"),
   },
 ];
 
@@ -59,40 +59,32 @@ const rightItemVariants = {
 export default function BrowseCategorySection() {
   return (
     <motion.section
-      className="relative py-14 sm:py-20"
+      className="relative py-16 sm:py-24"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.4 }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_52%,rgba(143,185,255,0.1),transparent_20%),radial-gradient(circle_at_68%_34%,rgba(255,255,255,0.04),transparent_18%)]" />
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
-        <div className="grid gap-12 lg:grid-cols-[0.82fr_minmax(620px,0.96fr)] lg:items-center lg:justify-between">
-          <motion.div className="relative min-h-[420px] sm:min-h-[520px]" variants={leftVariants}>
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_38%,rgba(143,185,255,0.1),transparent_28%),linear-gradient(90deg,rgba(4,7,11,0.92)_0%,rgba(4,7,11,0.72)_34%,rgba(4,7,11,0.18)_72%,rgba(4,7,11,0)_100%)]" />
-            <div className="absolute bottom-0 left-0 z-20 max-w-[340px] sm:max-w-[430px]">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_minmax(720px,1fr)] lg:items-center lg:justify-between">
+          <motion.div className="relative flex min-h-[320px] flex-col justify-end sm:min-h-[360px]" variants={leftVariants}>
+            <div className="relative z-20 max-w-[340px] sm:max-w-[430px]">
               <p className="cy-kicker">The architecture of a setup</p>
-              <h2 className="mt-4 text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.07em] text-white sm:text-[3.8rem]">
+              <h2 className="mt-4 text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.07em] text-[#1d1d1f] sm:text-[3.8rem]">
                 Build around
-                <span className="block font-light text-white/74">
+                <span className="block font-light text-[rgba(29,29,31,0.46)]">
                   one strong object.
                 </span>
               </h2>
-              <p className="mt-5 max-w-[34ch] text-[15px] leading-7 text-white/58 sm:text-base">
+              <p className="mt-5 max-w-[34ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
                 Premium electronics do not need louder layouts. They need a
                 clearer hierarchy, stronger staging, and room for materials to
-                read correctly against the dark.
+                read correctly inside lighter, calmer surfaces.
               </p>
             </div>
-
-            <img
-              src={resolveAssetUrl("/assets/images/product-group.png")}
-              alt="Product group composition"
-              className="pointer-events-none absolute left-[6%] top-[-50%] z-0 w-[1000px] object-contain opacity-[0.42] blur-[1.8px] drop-shadow-[0_40px_110px_rgba(0,0,0,0.42)] saturate-[0.96] "
-            />
           </motion.div>
 
           <motion.div
-            className="relative ml-auto grid w-full max-w-[400px] gap-6 xl:max-w-[400px]"
+            className="relative ml-auto grid w-full max-w-[620px] gap-4 xl:max-w-[660px]"
             variants={rightContainerVariants}
           >
             {setupSteps.map((item) => (
@@ -100,28 +92,28 @@ export default function BrowseCategorySection() {
                 key={item.id}
                 variants={rightItemVariants}
                 className={[
-                  "grid gap-5 px-2 py-2 transition-transform sm:grid-cols-[58px_minmax(0,1fr)] sm:px-6 sm:py-7",
+                  "grid items-start gap-4 rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.88)] px-5 py-4 shadow-[0_10px_26px_rgba(15,23,42,0.05)] transition-transform sm:grid-cols-[52px_minmax(0,1fr)] sm:px-6 sm:py-4",
                   item.id === "01" || item.id === "03"
                     ? "lg:-translate-x-[50px]"
                     : "",
                 ].join(" ")}
               >
                 <div className="relative">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[11px] font-semibold uppercase tracking-[0.18em] text-white/52">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-[rgba(245,245,247,0.9)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
                     {item.id}
                   </span>
                 </div>
 
                 <div>
-                  <h3 className="text-[1.4rem] font-semibold tracking-[-0.04em] text-white sm:text-[1.7rem]">
+                  <h3 className="text-[1.3rem] font-semibold tracking-[-0.04em] text-[#1d1d1f] sm:text-[1.55rem]">
                     {item.title}
                   </h3>
-                  <p className="mt-3 max-w-[36ch] text-[15px] leading-7 text-white/56">
+                  <p className="mt-2 max-w-[46ch] text-[14px] leading-6 text-[var(--text-secondary)]">
                     {item.copy}
                   </p>
                   <Link
                     to={item.to}
-                    className="mt-5 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/54 transition hover:text-white"
+                    className="mt-4 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:text-[var(--accent)]"
                   >
                     Open category
                     <span className="h-px w-7 bg-current" />

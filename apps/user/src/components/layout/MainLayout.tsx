@@ -9,16 +9,14 @@ export default function MainLayout() {
   const location = useLocation();
   const { notification, clearNotification } = useCart();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const previousPath = useRef(`${location.pathname}${location.search}`);
+  const previousPathname = useRef(location.pathname);
 
   useEffect(() => {
-    const currentPath = `${location.pathname}${location.search}`;
-
-    if (previousPath.current === currentPath) {
+    if (previousPathname.current === location.pathname) {
       return;
     }
 
-    previousPath.current = currentPath;
+    previousPathname.current = location.pathname;
     setIsTransitioning(true);
 
     const timeout = window.setTimeout(() => {
@@ -26,7 +24,7 @@ export default function MainLayout() {
     }, 420);
 
     return () => window.clearTimeout(timeout);
-  }, [location.pathname, location.search]);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!notification) {
@@ -41,32 +39,32 @@ export default function MainLayout() {
   }, [clearNotification, notification]);
 
   return (
-    <div className="min-h-screen bg-transparent text-white">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
       <div
         className={[
-          "fixed inset-x-0 top-0 z-[70] h-1 origin-left bg-[linear-gradient(90deg,rgba(255,255,255,0.04),rgba(143,185,255,0.48),rgba(255,255,255,0.1))] shadow-[0_8px_24px_rgba(111,142,194,0.18)] transition-transform duration-500",
+          "fixed inset-x-0 top-0 z-[70] h-[3px] origin-left bg-[linear-gradient(90deg,rgba(0,113,227,0.18),rgba(0,113,227,0.82),rgba(0,113,227,0.12))] shadow-[0_8px_22px_rgba(0,113,227,0.22)] transition-transform duration-500",
           isTransitioning ? "scale-x-100" : "scale-x-0",
         ].join(" ")}
       />
       <div
         className={[
-          "pointer-events-none fixed inset-0 z-[60] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.035),transparent_24%),radial-gradient(circle_at_82%_10%,rgba(103,128,168,0.08),transparent_26%)] transition duration-300",
+          "pointer-events-none fixed inset-0 z-[60] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_24%),radial-gradient(circle_at_82%_10%,rgba(0,113,227,0.08),transparent_26%)] transition duration-300",
           isTransitioning ? "opacity-100" : "opacity-0",
         ].join(" ")}
       />
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[560px] bg-[radial-gradient(circle_at_top,rgba(89,110,145,0.14),transparent_62%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_18%,transparent_82%,rgba(255,255,255,0.01))]" />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.028),transparent_18%),radial-gradient(circle_at_76%_72%,rgba(80,103,145,0.08),transparent_24%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[520px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.88),transparent_62%)]" />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.24),transparent_18%,transparent_100%)]" />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.22),transparent_18%),radial-gradient(circle_at_76%_72%,rgba(0,113,227,0.06),transparent_24%)]" />
       <div
         className={[
-          "pointer-events-none fixed right-5 top-24 z-[80] w-[min(380px,calc(100vw-2.5rem))] rounded-[26px] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300",
+          "pointer-events-none fixed right-5 top-24 z-[80] w-[min(380px,calc(100vw-2.5rem))] rounded-[28px] p-4 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl transition duration-300",
           notification?.type === "wishlist"
-            ? "border border-rose-300/30 bg-[#171217]/92"
+            ? "border border-rose-200/70 bg-[rgba(255,247,248,0.92)]"
             : notification?.type === "order"
-              ? "border border-sky-300/30 bg-[#101722]/92"
+              ? "border border-sky-200/70 bg-[rgba(246,250,255,0.94)]"
               : notification?.type === "stock"
-                ? "border border-amber-300/30 bg-[#171510]/92"
-            : "border border-emerald-300/30 bg-[#0e1713]/92",
+                ? "border border-amber-200/70 bg-[rgba(255,251,242,0.94)]"
+            : "border border-emerald-200/70 bg-[rgba(244,252,247,0.94)]",
           notification ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0",
         ].join(" ")}
       >
@@ -94,7 +92,7 @@ export default function MainLayout() {
               )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">
               {notification?.type === "wishlist"
                 ? notification.action === "added"
                   ? "Saved to wishlist"
@@ -105,7 +103,7 @@ export default function MainLayout() {
                     ? "Inventory limit reached"
                 : "Added to cart"}
             </p>
-            <p className="mt-1 text-sm leading-5 text-white/62">
+            <p className="mt-1 text-sm leading-5 text-[var(--text-secondary)]">
               {notification
                 ? notification.type === "wishlist"
                   ? notification.name
@@ -117,7 +115,7 @@ export default function MainLayout() {
                 : ""}
             </p>
           </div>
-          <div className="rounded-full bg-white/6 p-2 text-white/44">
+          <div className="rounded-full bg-black/[0.035] p-2 text-[var(--text-tertiary)]">
             {notification?.type === "wishlist" ? (
               <Heart className="h-4 w-4" fill="currentColor" />
             ) : notification?.type === "order" ? (
@@ -131,7 +129,7 @@ export default function MainLayout() {
         </div>
       </div>
       <Header />
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
         <Outlet />
       </main>
       <Footer />

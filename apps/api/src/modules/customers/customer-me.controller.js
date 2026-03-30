@@ -1,6 +1,7 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { createHttpError } from "../../utils/createHttpError.js";
 import { Order } from "../orders/order.model.js";
+import { expireStalePendingVnpayOrders } from "../orders/order.service.js";
 
 function sanitizeCustomerProfile(customer) {
   return {
@@ -203,6 +204,8 @@ export const deleteMyAddress = asyncHandler(async (req, res) => {
 });
 
 export const getMyOrders = asyncHandler(async (req, res) => {
+  await expireStalePendingVnpayOrders();
+
   const orders = await Order.find({ customerId: req.customer._id })
     .sort({ createdAt: -1 })
     .limit(20);

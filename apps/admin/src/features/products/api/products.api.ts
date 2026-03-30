@@ -1,6 +1,11 @@
 import { http } from "@/services/http";
 
 export type AdminProduct = {
+  images: Array<{
+    url: string;
+    alt: string;
+    sortOrder: number;
+  }>;
   id: string;
   name: string;
   slug: string;

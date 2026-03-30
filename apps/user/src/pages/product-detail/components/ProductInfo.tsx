@@ -1,102 +1,147 @@
 import { ShieldCheck, Sparkles, Truck } from "lucide-react";
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
 import { formatCurrencyVnd } from "@/utils/format";
-import VariantSelector from "./VariantSelector";
+import VariantSelector, { type CapacityOption, type FinishOption } from "./VariantSelector";
 
 export default function ProductInfo({
   product,
-  selectedColor,
-  onSelectColor,
+  selectedFinish,
+  selectedFinishLabel,
+  onSelectFinish,
+  finishes,
+  showFinishSelector,
+  showCapacitySelector,
   selectedCapacity,
   onSelectCapacity,
+  capacities,
+  displayPrice,
+  stockLabel,
+  isOutOfStock,
 }: {
   product: CatalogProduct;
-  selectedColor: string;
-  onSelectColor: (value: string) => void;
+  selectedFinish: string;
+  selectedFinishLabel: string;
+  onSelectFinish: (value: string) => void;
+  finishes: FinishOption[];
+  showFinishSelector: boolean;
+  showCapacitySelector: boolean;
   selectedCapacity: string;
   onSelectCapacity: (value: string) => void;
+  capacities: CapacityOption[];
+  displayPrice: number;
+  stockLabel: string;
+  isOutOfStock: boolean;
 }) {
-  const infoTiles = [
+  const quickSpecs = [
     { label: "Display", value: product.screenDiagonal || "Studio panel" },
-    { label: "Screen type", value: product.screenType || "OLED" },
-      { label: "Battery", value: product.batteryCapacity || "All-day" },
-      { label: "Protection", value: product.protectionClass || "Premium build" },
-      { label: "Storage", value: product.builtInMemory || "Flagship" },
-      { label: "Line", value: product.category?.name || "Apple hardware" },
-    ];
+    { label: "Battery", value: product.batteryCapacity || "All-day" },
+    { label: "Platform", value: product.screenType || product.category?.name || "Apple hardware" },
+  ];
+
+  const selectedConfiguration = showFinishSelector
+    ? showCapacitySelector && selectedCapacity
+      ? `${selectedFinishLabel} · ${selectedCapacity}`
+      : selectedFinishLabel
+    : showCapacitySelector && selectedCapacity
+      ? selectedCapacity
+      : "Standard configuration";
 
   return (
-    <div>
+    <div className="space-y-6">
       <p className="cy-kicker">{product.category?.name || "Apple hardware"}</p>
-      <h1 className="mt-3 text-[2.5rem] font-semibold tracking-[-0.05em] text-white sm:text-[3.2rem]">
+      <h1 className="text-[2.4rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)] sm:text-[3.2rem] xl:text-[4rem]">
         {product.name}
       </h1>
-      <div className="mt-4 flex flex-wrap items-end gap-3">
-        <span className="font-mono text-[2rem] font-semibold tracking-[-0.04em] text-white sm:text-[2.35rem]">
-          {formatCurrencyVnd(product.price)}
-        </span>
-        {product.compareAtPrice ? (
-          <span className="pb-1 font-mono text-lg text-white/30 line-through">
-            {formatCurrencyVnd(product.compareAtPrice)}
+
+      <div className="rounded-[30px] border border-black/6 bg-white/82 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+              Selected configuration
+            </p>
+            <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+              {selectedConfiguration}
+            </p>
+          </div>
+          <div className="text-right">
+            <span className="block font-mono text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-[2.35rem]">
+              {formatCurrencyVnd(displayPrice)}
+            </span>
+            {product.compareAtPrice ? (
+              <span className="mt-1 block font-mono text-sm text-[var(--text-tertiary)] line-through">
+                {formatCurrencyVnd(product.compareAtPrice)}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <p className="mt-5 max-w-[48ch] text-[15px] leading-7 text-[var(--text-secondary)]">
+          {product.description}
+        </p>
+
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <span className="cy-chip">{product.category?.name || "Electronics"}</span>
+          <span className="cy-chip">{product.displayStatus || "Featured"}</span>
+          <span
+            className={[
+              "rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]",
+              isOutOfStock ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-700",
+            ].join(" ")}
+          >
+            {stockLabel}
           </span>
-        ) : null}
+        </div>
       </div>
 
-      <p className="mt-5 max-w-[42rem] text-[15px] leading-7 text-white/62">
-        {product.description}
-      </p>
+      {showFinishSelector || showCapacitySelector ? (
+        <div className="rounded-[30px] border border-black/6 bg-white/82 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.05)]">
+          <VariantSelector
+            finishes={finishes}
+            selectedFinish={selectedFinish}
+            onSelectFinish={onSelectFinish}
+            showFinishSelector={showFinishSelector}
+            showCapacitySelector={showCapacitySelector}
+            capacities={capacities}
+            selectedCapacity={selectedCapacity}
+            onSelectCapacity={onSelectCapacity}
+          />
+        </div>
+      ) : null}
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        <span className="cy-chip">{product.category?.name || "Electronics"}</span>
-        <span className="cy-chip">{product.displayStatus || "Featured"}</span>
-        <span className="cy-chip">{selectedCapacity}</span>
-      </div>
-
-      <div className="mt-8">
-        <VariantSelector
-          colors={["#10141A", "#334155", "#9AA5B1", "#5B6070", "#DCE4ED"]}
-          selectedColor={selectedColor}
-          onSelectColor={onSelectColor}
-          capacities={["128GB", "256GB", "512GB", "1TB"]}
-          selectedCapacity={selectedCapacity}
-          onSelectCapacity={onSelectCapacity}
-        />
-      </div>
-
-      <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {infoTiles.map((item) => (
+      <div className="grid gap-3 sm:grid-cols-3">
+        {quickSpecs.map((item) => (
           <div
             key={item.label}
-            className="rounded-[24px] border border-white/8 bg-white/[0.03] px-4 py-4"
+            className="rounded-[24px] border border-[var(--line-soft)] bg-white/82 px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]"
           >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/34">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
               {item.label}
             </p>
-            <p className="mt-2 text-sm font-medium text-white/82">{item.value}</p>
+            <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{item.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <div className="flex items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.03] p-4 text-sm text-white/62">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
           <Truck className="h-5 w-5 text-[var(--accent)]" />
           <div>
             <p>Fast delivery</p>
-            <p className="font-medium text-white">1-2 business days</p>
+            <p className="font-medium text-[var(--text-primary)]">1-2 business days</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.03] p-4 text-sm text-white/62">
+        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
           <ShieldCheck className="h-5 w-5 text-[var(--accent)]" />
           <div>
             <p>Warranty</p>
-            <p className="font-medium text-white">Official 12 months</p>
+            <p className="font-medium text-[var(--text-primary)]">Official 12 months</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.03] p-4 text-sm text-white/62">
+        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
           <Sparkles className="h-5 w-5 text-[var(--accent)]" />
           <div>
             <p>Condition</p>
-            <p className="font-medium text-white">Premium finish</p>
+            <p className="font-medium text-[var(--text-primary)]">Premium finish</p>
           </div>
         </div>
       </div>

@@ -299,5 +299,6 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 orderSchema.index({ paymentStatus: 1, createdAt: -1 });
 orderSchema.index({ "paymentMeta.txnRef": 1 }, { sparse: true });
+orderSchema.index({ paymentMethod: 1, paymentStatus: 1, orderStatus: 1, "paymentMeta.expiresAt": 1 });
 
 export const Order = mongoose.model("Order", orderSchema);

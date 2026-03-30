@@ -3,6 +3,7 @@ import { Customer } from "../customers/customer.model.js";
 import { Order } from "../orders/order.model.js";
 import { Product } from "../products/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { expireStalePendingVnpayOrders } from "../orders/order.service.js";
 
 function getDateDaysAgo(days) {
   const date = new Date();
@@ -10,10 +11,26 @@ function getDateDaysAgo(days) {
   return date;
 }
 
+function scheduleDashboardInventoryCleanup() {
+  void expireStalePendingVnpayOrders().catch(() => {
+    // Dashboard reads should not block while stale VNPay orders are being reconciled.
+  });
+}
+
 export const getDashboardSummary = asyncHandler(async (_req, res) => {
+  scheduleDashboardInventoryCleanup();
+
   const now = new Date();
   const sevenDaysAgo = getDateDaysAgo(7);
   const thirtyDaysAgo = getDateDaysAgo(30);
+  const validOrderFilter = {
+    orderStatus: { $ne: "cancelled" },
+    paymentStatus: { $ne: "failed" },
+  };
+  const paidOrderFilter = {
+    orderStatus: { $ne: "cancelled" },
+    paymentStatus: "paid",
+  };
 
   const [
     totalProducts,
@@ -25,14 +42,18 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
     revenueResult,
     topProducts,
     pendingOrders,
+    cancelledOrders,
   ] = await Promise.all([
     Product.countDocuments(),
     Category.countDocuments({ isActive: true }),
     Customer.countDocuments(),
     Customer.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
-    Order.countDocuments(),
-    Order.find().sort({ createdAt: -1 }).limit(5),
+    Order.countDocuments(validOrderFilter),
+    Order.find(validOrderFilter).sort({ createdAt: -1 }).limit(5),
     Order.aggregate([
+      {
+        $match: paidOrderFilter,
+      },
       {
         $group: {
           _id: null,
@@ -41,6 +62,9 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
       },
     ]),
     Order.aggregate([
+      {
+        $match: paidOrderFilter,
+      },
       { $unwind: "$items" },
       {
         $group: {
@@ -54,13 +78,18 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
       { $limit: 5 },
     ]),
     Order.countDocuments({
+      paymentStatus: { $ne: "failed" },
       orderStatus: { $in: ["pending", "confirmed", "shipping"] },
+    }),
+    Order.countDocuments({
+      orderStatus: "cancelled",
     }),
   ]);
 
   const recentRevenue = await Order.aggregate([
     {
       $match: {
+        ...paidOrderFilter,
         createdAt: { $gte: sevenDaysAgo, $lte: now },
       },
     },
@@ -89,6 +118,7 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
         newCustomersLast30Days,
         totalOrders,
         pendingOrders,
+        cancelledOrders,
         totalRevenue: revenueResult[0]?.revenue || 0,
       },
       recentOrders: recentOrders.map((order) => ({

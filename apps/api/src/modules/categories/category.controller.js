@@ -1,10 +1,11 @@
 import { Category } from "./category.model.js";
+import { Product } from "../products/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { buildMeta, getPagination } from "../../utils/pagination.js";
 import { createHttpError } from "../../utils/createHttpError.js";
 import { toSlug } from "../../utils/slug.js";
 
-function sanitizeCategory(category) {
+function sanitizeCategory(category, extras = {}) {
   return {
     id: category.id,
     name: category.name,
@@ -15,7 +16,22 @@ function sanitizeCategory(category) {
     sortOrder: category.sortOrder,
     createdAt: category.createdAt,
     updatedAt: category.updatedAt,
+    productCount: extras.productCount ?? 0,
   };
+}
+
+async function ensureCategoryCanBeDisabled(category) {
+  const activeProductCount = await Product.countDocuments({
+    categoryId: category._id,
+    status: { $in: ["active", "out_of_stock"] },
+  });
+
+  if (activeProductCount > 0) {
+    throw createHttpError(
+      409,
+      `Cannot disable category while ${activeProductCount} live product(s) still use it`
+    );
+  }
 }
 
 async function queryCategories(req, options = {}) {
@@ -64,11 +80,26 @@ export const listCategories = asyncHandler(async (req, res) => {
 
 export const listAdminCategories = asyncHandler(async (req, res) => {
   const result = await queryCategories(req);
+  const categoryIds = result.items.map((item) => item._id);
+  const productCounts = categoryIds.length
+    ? await Product.aggregate([
+        { $match: { categoryId: { $in: categoryIds } } },
+        { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+      ])
+    : [];
+  const productCountMap = productCounts.reduce((acc, item) => {
+    acc[String(item._id)] = item.count;
+    return acc;
+  }, {});
 
   res.json({
     success: true,
     message: "Admin categories fetched successfully",
-    data: result.items.map(sanitizeCategory),
+    data: result.items.map((item) =>
+      sanitizeCategory(item, {
+        productCount: productCountMap[String(item._id)] || 0,
+      })
+    ),
     meta: result.meta,
   });
 });
@@ -146,6 +177,12 @@ export const updateCategory = asyncHandler(async (req, res) => {
     throw createHttpError(409, "Category name or slug already exists");
   }
 
+  const willDisableCategory = req.body.isActive !== undefined && !Boolean(req.body.isActive) && category.isActive;
+
+  if (willDisableCategory) {
+    await ensureCategoryCanBeDisabled(category);
+  }
+
   category.name = nextName;
   category.slug = nextSlug;
   category.image =
@@ -175,6 +212,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     throw createHttpError(404, "Category not found");
   }
 
+  await ensureCategoryCanBeDisabled(category);
   category.isActive = false;
   await category.save();
 

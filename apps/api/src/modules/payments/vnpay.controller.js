@@ -4,6 +4,7 @@ import { createHttpError } from "../../utils/createHttpError.js";
 import {
   commitCustomerOrderStats,
   createCheckoutOrder,
+  expireOrderIfNeeded,
   findOrderByTxnRef,
   generateVnpayTxnRef,
   markOrderFailed,
@@ -184,6 +185,8 @@ export const getMyVnpayPaymentStatus = asyncHandler(async (req, res) => {
   if (!order || String(order.customerId || "") !== String(req.customer?._id || "")) {
     throw createHttpError(404, "VNPay order not found");
   }
+
+  await expireOrderIfNeeded(order);
 
   res.json({
     success: true,

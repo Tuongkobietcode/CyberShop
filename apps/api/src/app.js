@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { apiRouter } from "./routes/index.js";
 import { notFoundHandler } from "./middlewares/notFoundHandler.js";
@@ -13,6 +14,9 @@ export const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const sharedImagesDir = path.resolve(__dirname, "../../../shared/assets/images");
+const uploadsDir = path.resolve(__dirname, "../uploads");
+
+fs.mkdirSync(uploadsDir, { recursive: true });
 
 const allowedOrigins = new Set(
   [
@@ -93,7 +97,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(uploadsDir));
 app.use("/assets/images", express.static(sharedImagesDir));
 
 app.get("/", (_req, res) => {

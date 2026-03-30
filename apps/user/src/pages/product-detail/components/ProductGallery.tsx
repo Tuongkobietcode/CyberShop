@@ -1,35 +1,102 @@
-import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { resolveAssetUrl } from "@/utils/assets";
+import type { ProductGalleryItem } from "../data/product-content";
 
-export default function ProductGallery({ images, name }: { images: string[]; name: string }) {
-  const [activeImage, setActiveImage] = useState(images[0] || "");
+export default function ProductGallery({
+  items,
+  name,
+  glowColor,
+  finishLabel,
+}: {
+  items: ProductGalleryItem[];
+  name: string;
+  glowColor: string;
+  finishLabel?: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [imageSrc, setImageSrc] = useState("");
+  const activeItem = items[activeIndex] || items[0] || null;
+  const hasNavigation = items.length > 1;
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [items]);
+
+  useEffect(() => {
+    setImageSrc(resolveAssetUrl(activeItem?.image));
+  }, [activeItem]);
+
+  function move(step: 1 | -1) {
+    if (!items.length) {
+      return;
+    }
+
+    setActiveIndex((current) => (current + step + items.length) % items.length);
+  }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-[82px_minmax(0,1fr)]">
-      <div className="order-2 flex gap-3 sm:order-1 sm:flex-col">
-        {images.map((image) => (
-          <button
-            key={image}
-            type="button"
-            onClick={() => setActiveImage(image)}
-            className={[
-              "flex h-[86px] w-[78px] items-center justify-center rounded-[22px] border bg-white/[0.03] p-2 transition",
-              activeImage === image
-                ? "border-[var(--accent)]/40 bg-white/[0.05]"
-                : "border-white/8 opacity-70 hover:opacity-100",
-            ].join(" ")}
-          >
-            <img src={resolveAssetUrl(image)} alt={name} className="max-h-full object-contain" />
-          </button>
-        ))}
-      </div>
-
-      <div className="order-1 flex min-h-[520px] items-center justify-center rounded-[34px] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.12),rgba(255,255,255,0.02)_44%,rgba(255,255,255,0.01)_100%)] p-6 sm:order-2">
+    <div>
+      <div
+        className="relative order-1 flex h-[420px] items-end justify-center rounded-[34px] border border-black/6 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.06)] sm:order-2 sm:h-[540px] lg:h-[min(78vh,760px)] lg:p-8"
+        style={{
+          background: `radial-gradient(circle_at_50%_16%, ${glowColor}, rgba(255,255,255,0.94) 36%, rgba(244,246,249,1) 100%)`,
+        }}
+      >
+        {finishLabel ? (
+          <div className="absolute left-6 top-6 rounded-full border border-black/6 bg-white/84 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[var(--text-secondary)] shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+            {finishLabel}
+          </div>
+        ) : null}
+        {activeItem?.label ? (
+          <div className="absolute right-6 top-6 rounded-full border border-black/6 bg-white/84 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[var(--text-secondary)] shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+            {activeItem.label}
+          </div>
+        ) : null}
         <img
-          src={resolveAssetUrl(activeImage)}
-          alt={name}
-          className="max-h-[500px] object-contain drop-shadow-[0_40px_80px_rgba(0,0,0,0.38)]"
+          src={imageSrc}
+          alt={activeItem?.alt || name}
+          className={[
+            "max-h-[72%] w-full object-contain drop-shadow-[0_28px_54px_rgba(15,23,42,0.14)] sm:max-h-[76%] lg:max-h-[78%]",
+            activeItem?.imageClassName || "",
+          ].join(" ")}
+          onError={() => setImageSrc(resolveAssetUrl(activeItem?.fallbackImage))}
         />
+
+        {hasNavigation ? (
+          <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-4">
+            <button
+              type="button"
+              aria-label="Previous product image"
+              onClick={() => move(-1)}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-black/8 bg-white/84 text-[var(--text-secondary)] shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition hover:bg-white hover:text-[var(--text-primary)]"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2 rounded-full border border-black/6 bg-white/84 px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
+              {items.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-label={`Show ${item.label}`}
+                  onClick={() => setActiveIndex(index)}
+                  className={[
+                    "h-2.5 w-2.5 rounded-full transition",
+                    activeIndex === index ? "bg-[var(--text-primary)]" : "bg-black/18 hover:bg-black/35",
+                  ].join(" ")}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              aria-label="Next product image"
+              onClick={() => move(1)}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-black/8 bg-white/84 text-[var(--text-secondary)] shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition hover:bg-white hover:text-[var(--text-primary)]"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -25,7 +25,12 @@ export const listCustomers = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
   const search = String(req.query.search || "").trim();
   const status = String(req.query.status || "").trim();
+  const recentDays = Number(req.query.recentDays || 0);
   const filter = {};
+  const isRegistered =
+    req.query.isRegistered === undefined
+      ? undefined
+      : String(req.query.isRegistered) === "true";
 
   if (search) {
     filter.$or = [
@@ -37,6 +42,16 @@ export const listCustomers = asyncHandler(async (req, res) => {
 
   if (status) {
     filter.status = status;
+  }
+
+  if (typeof isRegistered === "boolean") {
+    filter.isRegistered = isRegistered;
+  }
+
+  if (recentDays > 0) {
+    const since = new Date();
+    since.setDate(since.getDate() - recentDays);
+    filter.createdAt = { $gte: since };
   }
 
   const [items, total] = await Promise.all([

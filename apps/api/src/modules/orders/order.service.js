@@ -1,4 +1,5 @@
 import { Customer } from "../customers/customer.model.js";
+import { recordInventoryLog, syncProductInventoryStatus } from "../inventory/inventory.service.js";
 import { Product } from "../products/product.model.js";
 import { Order } from "./order.model.js";
 import { createHttpError } from "../../utils/createHttpError.js";
@@ -24,6 +25,7 @@ export const SHIPPING_METHODS = {
 
 const TAX_RATE = 0.0213;
 const SUPPORTED_PAYMENT_METHODS = new Set(["cod", "bank_transfer", "card", "vnpay"]);
+const VNPAY_EXPIRY_GRACE_MS = 2 * 60 * 1000;
 
 function sanitizePaymentMeta(paymentMeta = null) {
   if (!paymentMeta?.provider) {
@@ -238,19 +240,48 @@ export function generateVnpayTxnRef() {
     .padStart(6, "0")}`;
 }
 
-async function reserveOrderInventory(orderItems) {
+function getVnpayExpiryCutoff(now = new Date()) {
+  return new Date(now.getTime() - VNPAY_EXPIRY_GRACE_MS);
+}
+
+function isExpiredPendingVnpayOrder(order, now = new Date()) {
+  const expiresAt = order.paymentMeta?.expiresAt ? new Date(order.paymentMeta.expiresAt) : null;
+
+  if (!expiresAt) {
+    return false;
+  }
+
+  return (
+    order.paymentMethod === "vnpay" &&
+    order.paymentStatus === "pending" &&
+    order.orderStatus === "pending" &&
+    expiresAt <= getVnpayExpiryCutoff(now)
+  );
+}
+
+async function reserveOrderInventory(order, orderItems) {
   for (const item of orderItems) {
     if (item.product.stock < item.quantity) {
       throw createHttpError(409, `Insufficient stock for ${item.product.name}`);
     }
 
+    const previousStock = item.product.stock;
     item.product.stock -= item.quantity;
-
-    if (item.product.stock === 0) {
-      item.product.status = "out_of_stock";
-    }
+    syncProductInventoryStatus(item.product);
 
     await item.product.save();
+    await recordInventoryLog({
+      product: item.product,
+      delta: -item.quantity,
+      previousStock,
+      nextStock: item.product.stock,
+      reason: "order_reserved",
+      note: `Stock reserved for order ${order.orderCode}`,
+      actorType: "system",
+      referenceType: "order",
+      referenceId: order._id,
+      referenceCode: order.orderCode,
+    });
   }
 }
 
@@ -266,18 +297,66 @@ export async function releaseOrderInventory(order) {
       continue;
     }
 
+    const previousStock = product.stock;
     product.stock += item.quantity;
-
-    if (product.stock > 0 && product.status === "out_of_stock") {
-      product.status = "active";
-    }
+    syncProductInventoryStatus(product);
 
     await product.save();
+    await recordInventoryLog({
+      product,
+      delta: item.quantity,
+      previousStock,
+      nextStock: product.stock,
+      reason: "order_released",
+      note: `Stock returned from released order ${order.orderCode}`,
+      actorType: "system",
+      referenceType: "order",
+      referenceId: order._id,
+      referenceCode: order.orderCode,
+    });
   }
 
   order.inventoryReleasedAt = new Date();
   await order.save();
   return order;
+}
+
+export async function expireOrderIfNeeded(order, now = new Date()) {
+  if (!isExpiredPendingVnpayOrder(order, now)) {
+    return order;
+  }
+
+  order.paymentMeta = {
+    ...(order.paymentMeta?.toObject?.() || order.paymentMeta || {}),
+    provider: "vnpay",
+    responseCode: String(order.paymentMeta?.responseCode || "").trim() || "24",
+    transactionStatus: "expired",
+    lastUpdatedAt: now,
+  };
+
+  await markOrderFailed(order);
+  await releaseOrderInventory(order);
+  return order;
+}
+
+export async function expireStalePendingVnpayOrders({ limit = 50, now = new Date() } = {}) {
+  const expiredOrders = await Order.find({
+    paymentMethod: "vnpay",
+    paymentStatus: "pending",
+    orderStatus: "pending",
+    "paymentMeta.expiresAt": {
+      $ne: null,
+      $lte: getVnpayExpiryCutoff(now),
+    },
+  })
+    .sort({ "paymentMeta.expiresAt": 1 })
+    .limit(limit);
+
+  for (const order of expiredOrders) {
+    await expireOrderIfNeeded(order, now);
+  }
+
+  return expiredOrders.length;
 }
 
 export async function commitCustomerOrderStats(order, customer) {
@@ -308,6 +387,8 @@ export async function createCheckoutOrder({
   if (!SUPPORTED_PAYMENT_METHODS.has(paymentMethod)) {
     throw createHttpError(400, "Unsupported payment method");
   }
+
+  await expireStalePendingVnpayOrders();
 
   const shippingAddress = normalizeShippingAddress(shippingAddressPayload);
   const customer = await resolveCustomer(customerPayload, shippingAddress, authenticatedCustomer);
@@ -343,7 +424,7 @@ export async function createCheckoutOrder({
   });
 
   try {
-    await reserveOrderInventory(orderItems);
+    await reserveOrderInventory(order, orderItems);
     order.inventoryReservedAt = new Date();
     await order.save();
   } catch (error) {

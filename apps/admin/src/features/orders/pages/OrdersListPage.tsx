@@ -1,22 +1,22 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Ban, CheckCheck, ChevronLeft, ChevronRight, MoreHorizontal, Search, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Ban, CheckCheck, Truck, Search } from "lucide-react";
 import { getAdminOrders, updateAdminOrderStatus, type AdminOrder } from "../api/orders.api";
 import { resolveAssetUrl } from "@/utils/assets";
 
-const surface = "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
+const surface =
+  "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
 
-type OrderTab = "all" | "completed" | "pending" | "canceled";
+type OrderTab = "all" | "completed" | "pending" | "cancelled";
 
 function formatMoney(value: number) {
   return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
 }
 
-function matchesTab(order: AdminOrder, tab: OrderTab) {
-  const status = order.orderStatus.toLowerCase();
-  if (tab === "all") return true;
-  if (tab === "completed") return status.includes("deliver") || status.includes("complete") || status.includes("confirmed");
-  if (tab === "pending") return status.includes("pending") || status.includes("shipping") || status.includes("new");
-  return status.includes("cancel");
+function getStatusGroup(tab: OrderTab) {
+  if (tab === "completed") return "completed";
+  if (tab === "pending") return "pending";
+  if (tab === "cancelled") return "cancelled";
+  return "";
 }
 
 export default function OrdersListPage() {
@@ -25,50 +25,96 @@ export default function OrdersListPage() {
   const [tab, setTab] = useState<OrderTab>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRows, setTotalRows] = useState(0);
   const [updatingId, setUpdatingId] = useState("");
-  const pageSize = 8;
-
-  async function loadOrders() {
-    setLoading(true);
-    try {
-      const response = await getAdminOrders({ limit: 100 });
-      setOrders(response.data);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    pending: 0,
+    cancelled: 0,
+  });
 
   useEffect(() => {
-    loadOrders();
+    async function loadOrderStats() {
+      const [allResponse, completedResponse, pendingResponse, cancelledResponse] =
+        await Promise.all([
+          getAdminOrders({ limit: 1 }),
+          getAdminOrders({ limit: 1, orderStatusGroup: "completed" }),
+          getAdminOrders({ limit: 1, orderStatusGroup: "pending" }),
+          getAdminOrders({ limit: 1, orderStatusGroup: "cancelled" }),
+        ]);
+
+      setStats({
+        total: allResponse.meta?.total || 0,
+        completed: completedResponse.meta?.total || 0,
+        pending: pendingResponse.meta?.total || 0,
+        cancelled: cancelledResponse.meta?.total || 0,
+      });
+    }
+
+    void loadOrderStats();
   }, []);
 
-  const filtered = useMemo(() => {
-    return orders.filter((order) => {
-      const keyword = `${order.orderCode} ${order.customerName} ${order.customerEmail} ${order.items[0]?.name || ""}`.toLowerCase();
-      return matchesTab(order, tab) && keyword.includes(search.toLowerCase());
-    });
-  }, [orders, search, tab]);
+  useEffect(() => {
+    async function loadOrders() {
+      setLoading(true);
+      try {
+        const response = await getAdminOrders({
+          page,
+          limit: 8,
+          search,
+          ...(getStatusGroup(tab) ? { orderStatusGroup: getStatusGroup(tab) } : {}),
+        });
 
-  const pagedOrders = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, page]);
+        setOrders(response.data);
+        setTotalRows(response.meta?.total || 0);
+        setTotalPages(response.meta?.totalPages || 1);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const totalOrders = orders.length;
-  const completedOrders = orders.filter((item) => matchesTab(item, "completed")).length;
-  const pendingOrders = orders.filter((item) => matchesTab(item, "pending")).length;
-  const canceledOrders = orders.filter((item) => matchesTab(item, "canceled")).length;
+    void loadOrders();
+  }, [page, search, tab]);
 
   useEffect(() => {
     setPage(1);
   }, [search, tab]);
 
+  async function refreshCurrentPage() {
+    const response = await getAdminOrders({
+      page,
+      limit: 8,
+      search,
+      ...(getStatusGroup(tab) ? { orderStatusGroup: getStatusGroup(tab) } : {}),
+    });
+
+    setOrders(response.data);
+    setTotalRows(response.meta?.total || 0);
+    setTotalPages(response.meta?.totalPages || 1);
+
+    const [allResponse, completedResponse, pendingResponse, cancelledResponse] =
+      await Promise.all([
+        getAdminOrders({ limit: 1 }),
+        getAdminOrders({ limit: 1, orderStatusGroup: "completed" }),
+        getAdminOrders({ limit: 1, orderStatusGroup: "pending" }),
+        getAdminOrders({ limit: 1, orderStatusGroup: "cancelled" }),
+      ]);
+
+    setStats({
+      total: allResponse.meta?.total || 0,
+      completed: completedResponse.meta?.total || 0,
+      pending: pendingResponse.meta?.total || 0,
+      cancelled: cancelledResponse.meta?.total || 0,
+    });
+  }
+
   async function handleConfirm(orderId: string) {
     setUpdatingId(orderId);
     try {
       await updateAdminOrderStatus(orderId, { orderStatus: "confirmed" });
-      await loadOrders();
+      await refreshCurrentPage();
     } finally {
       setUpdatingId("");
     }
@@ -78,7 +124,7 @@ export default function OrdersListPage() {
     setUpdatingId(orderId);
     try {
       await updateAdminOrderStatus(orderId, { orderStatus: "shipping" });
-      await loadOrders();
+      await refreshCurrentPage();
     } finally {
       setUpdatingId("");
     }
@@ -88,17 +134,17 @@ export default function OrdersListPage() {
     setUpdatingId(orderId);
     try {
       await updateAdminOrderStatus(orderId, { orderStatus: "cancelled" });
-      await loadOrders();
+      await refreshCurrentPage();
     } finally {
       setUpdatingId("");
     }
   }
 
   const summaryCards = [
-    { label: "Total Orders", value: totalOrders },
-    { label: "New Orders", value: pendingOrders },
-    { label: "Completed Orders", value: completedOrders },
-    { label: "Canceled Orders", value: canceledOrders },
+    { label: "Total Orders", value: stats.total },
+    { label: "Pending Orders", value: stats.pending },
+    { label: "Completed Orders", value: stats.completed },
+    { label: "Cancelled Orders", value: stats.cancelled },
   ];
 
   return (
@@ -106,15 +152,12 @@ export default function OrdersListPage() {
       <div className="grid gap-4 xl:grid-cols-4">
         {summaryCards.map((card) => (
           <section key={card.label} className={surface}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-black/45">{card.label}</p>
-                <p className="mt-5 text-[2.4rem] font-semibold tracking-[-0.06em] text-black">{card.value.toLocaleString("en-US")}</p>
-                <p className="mt-2 text-sm text-black/42">Last 7 days snapshot</p>
-              </div>
-              <button type="button" className="rounded-full p-2 text-black/35 transition hover:bg-black/5 hover:text-black">
-                <MoreHorizontal className="h-5 w-5" />
-              </button>
+            <div>
+              <p className="text-sm font-medium text-black/45">{card.label}</p>
+              <p className="mt-5 text-[2.4rem] font-semibold tracking-[-0.06em] text-black">
+                {card.value.toLocaleString("en-US")}
+              </p>
+              <p className="mt-2 text-sm text-black/42">Live operational totals</p>
             </div>
           </section>
         ))}
@@ -124,10 +167,10 @@ export default function OrdersListPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="inline-flex rounded-full bg-[#f5f5f5] p-1 text-sm">
             {([
-              ["all", `All order (${totalOrders})`],
+              ["all", `All (${stats.total})`],
               ["completed", "Completed"],
               ["pending", "Pending"],
-              ["canceled", "Canceled"],
+              ["cancelled", "Cancelled"],
             ] as const).map(([value, label]) => (
               <button
                 key={value}
@@ -135,7 +178,9 @@ export default function OrdersListPage() {
                 onClick={() => setTab(value)}
                 className={[
                   "rounded-full px-4 py-2 font-medium transition",
-                  tab === value ? "bg-white text-black shadow-sm" : "text-black/45 hover:text-black",
+                  tab === value
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black/45 hover:text-black",
                 ].join(" ")}
               >
                 {label}
@@ -143,22 +188,21 @@ export default function OrdersListPage() {
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
-              <Search className="h-4 w-4" />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search order report"
-                className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35"
-              />
-            </label>
-            <button type="button" className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-4 text-sm font-semibold text-black">More Action</button>
-          </div>
+          <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
+            <Search className="h-4 w-4" />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search order report"
+              className="w-full bg-transparent text-sm text-black outline-none placeholder:text-black/35"
+            />
+          </label>
         </div>
 
         {loading ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center text-sm text-black/45">Loading orders...</div>
+          <div className="mt-6 rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center text-sm text-black/45">
+            Loading orders...
+          </div>
         ) : (
           <div className="mt-6 overflow-hidden rounded-[24px] border border-black/8">
             <table className="min-w-full text-left text-sm">
@@ -174,17 +218,18 @@ export default function OrdersListPage() {
                 </tr>
               </thead>
               <tbody>
-                {pagedOrders.length === 0 ? (
+                {orders.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-12 text-center text-sm text-black/45">
                       No orders match the current filter.
                     </td>
                   </tr>
                 ) : (
-                  pagedOrders.map((order) => {
+                  orders.map((order) => {
                     const leadItem = order.items[0];
                     const isCancelled = order.orderStatus === "cancelled";
                     const isDelivered = order.orderStatus === "delivered";
+
                     return (
                       <tr key={order.id} className="border-t border-black/6 align-top">
                         <td className="px-5 py-4">
@@ -194,19 +239,40 @@ export default function OrdersListPage() {
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
                             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f7f7f8]">
-                              {leadItem?.image ? <img src={resolveAssetUrl(leadItem.image)} alt={leadItem.name} className="max-h-10 object-contain" /> : null}
+                              {leadItem?.image ? (
+                                <img
+                                  src={resolveAssetUrl(leadItem.image)}
+                                  alt={leadItem.name}
+                                  className="max-h-10 object-contain"
+                                />
+                              ) : null}
                             </div>
                             <div>
-                              <p className="font-medium text-black">{leadItem?.name || "Order items"}</p>
-                              <p className="mt-1 text-sm text-black/42">{order.items.length} item(s)</p>
+                              <p className="font-medium text-black">
+                                {leadItem?.name || "Order items"}
+                              </p>
+                              <p className="mt-1 text-sm text-black/42">
+                                {order.items.length} item(s)
+                              </p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-black/45">{new Date(order.createdAt).toLocaleDateString()}</td>
-                        <td className="px-5 py-4 font-medium text-black">{formatMoney(order.totalAmount)}</td>
+                        <td className="px-5 py-4 text-black/45">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-5 py-4 font-medium text-black">
+                          {formatMoney(order.totalAmount)}
+                        </td>
                         <td className="px-5 py-4">
                           <span className="inline-flex items-center gap-2 text-black/65">
-                            <span className={["h-2 w-2 rounded-full", order.paymentStatus === "paid" ? "bg-emerald-500" : "bg-rose-500"].join(" ")} />
+                            <span
+                              className={[
+                                "h-2 w-2 rounded-full",
+                                order.paymentStatus === "paid"
+                                  ? "bg-emerald-500"
+                                  : "bg-rose-500",
+                              ].join(" ")}
+                            />
                             {order.paymentStatus}
                           </span>
                         </td>
@@ -219,7 +285,7 @@ export default function OrdersListPage() {
                           <div className="flex flex-wrap items-center gap-2">
                             <button
                               type="button"
-                              onClick={() => handleConfirm(order.id)}
+                              onClick={() => void handleConfirm(order.id)}
                               disabled={updatingId === order.id || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
                             >
@@ -228,7 +294,7 @@ export default function OrdersListPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleShip(order.id)}
+                              onClick={() => void handleShip(order.id)}
                               disabled={updatingId === order.id || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60"
                             >
@@ -237,7 +303,7 @@ export default function OrdersListPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleCancel(order.id)}
+                              onClick={() => void handleCancel(order.id)}
                               disabled={updatingId === order.id || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full border border-rose-200 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-600 hover:text-white disabled:opacity-60"
                             >
@@ -256,31 +322,24 @@ export default function OrdersListPage() {
         )}
 
         <div className="mt-6 flex items-center justify-between gap-4">
-          <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
-            <ChevronLeft className="mr-2 h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+            disabled={page === 1}
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
+          >
             Previous
           </button>
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }).slice(0, 5).map((_, index) => {
-              const pageNumber = index + 1;
-              return (
-                <button
-                  key={pageNumber}
-                  type="button"
-                  onClick={() => setPage(pageNumber)}
-                  className={[
-                    "h-11 min-w-11 rounded-xl px-3 text-sm font-semibold transition",
-                    page === pageNumber ? "bg-black text-white" : "border border-black/10 text-black/65 hover:bg-black hover:text-white",
-                  ].join(" ")}
-                >
-                  {pageNumber}
-                </button>
-              );
-            })}
-          </div>
-          <button type="button" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white">
+          <p className="text-sm text-black/45">
+            Page {page} of {totalPages} · {totalRows} result(s)
+          </p>
+          <button
+            type="button"
+            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+            disabled={page >= totalPages}
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/10 px-5 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
+          >
             Next
-            <ChevronRight className="ml-2 h-4 w-4" />
           </button>
         </div>
       </section>

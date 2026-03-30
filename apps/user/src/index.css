@@ -1,21 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  --bg-base: #020304;
-  --bg-surface: #080b0f;
-  --bg-surface-2: #0d1117;
-  --bg-elevated: rgba(10, 14, 20, 0.72);
-  --line-soft: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.14);
-  --text-primary: #f4f7fb;
-  --text-secondary: rgba(244, 247, 251, 0.72);
-  --text-tertiary: rgba(244, 247, 251, 0.42);
-  --accent: #8fb9ff;
-  --accent-strong: #c7ddff;
-  --success: #9ae6b4;
-  --danger: #ff918d;
+  color-scheme: light;
+  --bg-base: #f5f5f7;
+  --bg-canvas: #fbfbfd;
+  --bg-surface: rgba(255, 255, 255, 0.88);
+  --bg-surface-2: #ffffff;
+  --bg-elevated: rgba(255, 255, 255, 0.94);
+  --line-soft: rgba(17, 24, 39, 0.08);
+  --line-strong: rgba(17, 24, 39, 0.12);
+  --text-primary: #1d1d1f;
+  --text-secondary: rgba(29, 29, 31, 0.72);
+  --text-tertiary: rgba(29, 29, 31, 0.46);
+  --accent: #0071e3;
+  --accent-strong: #0056b3;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --success: #248a3d;
+  --danger: #cf1d2e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,70 +25,261 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg-base);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    background: #f5f5f7;
+    color: var(--text-primary);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  a:focus-visible {
+    outline: 2px solid rgba(0, 113, 227, 0.38);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: rgba(0, 113, 227, 0.16);
+  }
 }
 
-html {
-  background: var(--bg-base);
-}
+@layer components {
+  .cy-shell {
+    width: 100%;
+    max-width: 1680px;
+    margin-inline: auto;
+    padding-inline: 0.75rem;
+  }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: "Outfit", sans-serif;
-  background:
-    radial-gradient(circle at 16% 10%, rgba(255, 255, 255, 0.045), transparent 16%),
-    radial-gradient(circle at 82% 12%, rgba(118, 142, 184, 0.08), transparent 20%),
-    radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.018), transparent 32%),
-    linear-gradient(180deg, #070a0e 0%, #040608 24%, #020304 58%, #010203 100%);
-  color: var(--text-primary);
-}
+  @media (min-width: 640px) {
+    .cy-shell {
+      padding-inline: 1rem;
+    }
+  }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
+  @media (min-width: 1024px) {
+    .cy-shell {
+      padding-inline: 2rem;
+    }
+  }
 
-a:hover {
-  color: #535bf2;
-}
+  @media (min-width: 1536px) {
+    .cy-shell {
+      padding-inline: 2.5rem;
+    }
+  }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  .cy-display {
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.07em;
+    line-height: 0.92;
+    text-wrap: balance;
+  }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
+  .cy-copy {
+    color: var(--text-secondary);
+    max-width: 65ch;
+    line-height: 1.75;
+  }
 
-button:hover {
-  border-color: #646cff;
-}
+  .cy-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  .cy-panel {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line-soft);
+    border-radius: 2rem;
+    box-shadow:
+      0 18px 48px rgba(17, 24, 39, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(18px);
+  }
+
+  .cy-input {
+    width: 100%;
+    border: 1px solid var(--line-soft);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary);
+    caret-color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 0.95rem 1rem;
+    transition:
+      border-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cy-input::placeholder {
+    color: var(--text-tertiary);
+    -webkit-text-fill-color: var(--text-tertiary);
+    opacity: 1;
+  }
+
+  .cy-input:hover {
+    border-color: var(--line-strong);
+  }
+
+  .cy-input:focus {
+    border-color: rgba(0, 113, 227, 0.26);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.08);
+    background: #fff;
+    outline: none;
+  }
+
+  .cy-input:disabled {
+    color: var(--text-secondary) !important;
+    -webkit-text-fill-color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  .cy-input:-webkit-autofill,
+  .cy-input:-webkit-autofill:hover,
+  .cy-input:-webkit-autofill:focus,
+  .cy-input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary);
+    box-shadow:
+      0 0 0 1000px rgba(255, 255, 255, 0.96) inset,
+      0 0 0 1px var(--line-soft) inset !important;
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  .cy-btn-primary,
+  .cy-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.15rem;
+    border-radius: 999px;
+    padding-inline: 1.55rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    transition:
+      transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cy-btn-primary {
+    background: var(--text-primary);
+    color: #fff !important;
+    -webkit-text-fill-color: #fff;
+    box-shadow: 0 10px 22px rgba(29, 29, 31, 0.14);
+  }
+
+  .cy-btn-primary,
+  .cy-btn-primary:link,
+  .cy-btn-primary:visited,
+  .cy-btn-primary * {
+    color: #fff !important;
+  }
+
+  .cy-btn-primary:hover {
+    background: #000;
+    transform: translateY(-1px);
+  }
+
+  .cy-btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .cy-btn-secondary {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line-soft);
+    color: var(--text-primary);
+    box-shadow: 0 8px 20px rgba(17, 24, 39, 0.04);
+  }
+
+  .cy-btn-secondary:hover {
+    background: #fff;
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
+  }
+
+  .cy-btn-secondary:active {
+    transform: scale(0.98);
+  }
+
+  .cy-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-soft);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--text-secondary);
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 }
 
 @layer utilities {
   @keyframes fadeInLeft {
     from {
       opacity: 0;
-      transform: translateX(-200px);
+      transform: translateX(-32px);
     }
     to {
       opacity: 1;
@@ -97,7 +290,7 @@ button:focus-visible {
   @keyframes fadeInRight {
     from {
       opacity: 0;
-      transform: translateX(200px);
+      transform: translateX(32px);
     }
     to {
       opacity: 1;
@@ -106,10 +299,10 @@ button:focus-visible {
   }
 
   .animate-fade-in-left {
-    animation: fadeInLeft 1s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+    animation: fadeInLeft 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .animate-fade-in-right {
-    animation: fadeInRight 1s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+    animation: fadeInRight 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }

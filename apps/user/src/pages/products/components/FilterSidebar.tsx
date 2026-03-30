@@ -1,5 +1,5 @@
-import { ChevronDown, Search } from "lucide-react";
-import { useState } from "react";
+import { Check, ChevronDown, Search } from "lucide-react";
+import { memo, useState } from "react";
 import type { CatalogCategory, CatalogProductFilters } from "@/features/catalog/catalog.types";
 
 type FilterKey =
@@ -32,7 +32,7 @@ const filterSections: Array<{
   { key: "builtInMemory", label: "Built-in memory", source: "builtInMemory" },
 ];
 
-export default function FilterSidebar({
+function FilterSidebar({
   categories,
   activeCategory,
   search,
@@ -55,55 +55,70 @@ export default function FilterSidebar({
     setOpenSections((current) => ({ ...current, [key]: !current[key] }));
   }
 
+  function isCategoryActive(category: CatalogCategory) {
+    return activeCategory === category.slug || activeCategory === category.id;
+  }
+
   return (
     <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
       <section className="cy-panel p-6">
         <button
           type="button"
           onClick={() => toggleSection("category")}
-          className="mb-4 flex w-full items-center justify-between border-b border-white/8 pb-4"
+          className="mb-4 flex w-full items-center justify-between border-b border-[var(--line-soft)] pb-4"
         >
-          <h3 className="text-[1.7rem] font-medium tracking-[-0.04em] text-white">Category</h3>
+          <h3 className="text-[1.7rem] font-medium tracking-[-0.04em] text-[var(--text-primary)]">
+            Category
+          </h3>
           <ChevronDown
             className={[
-              "h-5 w-5 text-white transition",
+              "h-5 w-5 text-[var(--text-secondary)] transition",
               openSections.category ? "rotate-180" : "rotate-0",
             ].join(" ")}
           />
         </button>
 
-        <label className="mb-4 flex h-12 items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.04] px-4 text-white/38">
+        <label className="mb-4 flex h-12 items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/82 px-4 text-[var(--text-tertiary)]">
           <Search className="h-4 w-4" />
           <input
             value={search}
             onChange={(event) => onSearch(event.target.value)}
             placeholder="Search"
-            className="w-full border-0 bg-transparent text-sm text-white outline-none placeholder:text-white/32"
+            className="w-full border-0 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
           />
         </label>
 
         {openSections.category ? (
-          <div className="space-y-3 text-[15px] text-white/82">
+          <div className="space-y-3 text-[15px] text-[var(--text-primary)]">
             <label className="flex cursor-pointer items-center gap-3">
               <input
                 type="checkbox"
                 checked={!activeCategory}
                 onChange={() => onSelectCategory("")}
-                className="h-4 w-4 rounded border-white/20 bg-transparent"
+                className="h-4 w-4 rounded border-[var(--line-soft)] bg-transparent accent-[var(--accent)]"
               />
               <span>All</span>
-              <span className="text-white/28">{categories.length}</span>
+              <span className="text-[var(--text-tertiary)]">{categories.length}</span>
             </label>
             {categories.map((category) => (
-              <label key={category.id} className="flex cursor-pointer items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={activeCategory === category.id}
-                  onChange={() => onSelectCategory(activeCategory === category.id ? "" : category.id)}
-                  className="h-4 w-4 rounded border-white/20 bg-transparent"
-                />
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => onSelectCategory(isCategoryActive(category) ? "" : category.slug)}
+                className="flex w-full items-center gap-3 text-left transition hover:text-[var(--text-primary)]"
+              >
+                <span
+                  className={[
+                    "inline-flex h-5 w-5 items-center justify-center rounded-md border transition",
+                    isCategoryActive(category)
+                      ? "border-[var(--accent)] bg-[var(--accent)]/12 text-[var(--accent)]"
+                      : "border-[var(--line-soft)] bg-transparent text-transparent",
+                  ].join(" ")}
+                >
+                  <Check className="h-3.5 w-3.5" />
+                </span>
                 <span>{category.name}</span>
-              </label>
+              </button>
             ))}
           </div>
         ) : null}
@@ -118,12 +133,12 @@ export default function FilterSidebar({
             <button
               type="button"
               onClick={() => toggleSection(section.key)}
-              className="flex w-full items-center justify-between border-b border-white/8 pb-4 text-left"
+              className="flex w-full items-center justify-between border-b border-[var(--line-soft)] pb-4 text-left"
             >
-              <span className="text-[1.05rem] text-white/88">{section.label}</span>
+              <span className="text-[1.05rem] text-[var(--text-primary)]">{section.label}</span>
               <ChevronDown
                 className={[
-                  "h-4 w-4 text-white transition",
+                  "h-4 w-4 text-[var(--text-secondary)] transition",
                   openSections[section.key] ? "rotate-180" : "rotate-0",
                 ].join(" ")}
               />
@@ -131,21 +146,21 @@ export default function FilterSidebar({
 
             {openSections[section.key] ? (
               options.length ? (
-                <div className="mt-4 max-h-64 space-y-3 overflow-y-auto pr-2 text-[15px] text-white/82">
+                <div className="mt-4 max-h-64 space-y-3 overflow-y-auto pr-2 text-[15px] text-[var(--text-primary)]">
                   {options.map((option) => (
                     <label key={option} className="flex cursor-pointer items-center gap-3">
                       <input
                         type="checkbox"
                         checked={selectedValues.includes(option)}
                         onChange={() => onToggleFilter(section.key, option)}
-                        className="h-4 w-4 rounded border-white/20 bg-transparent"
+                        className="h-4 w-4 rounded border-[var(--line-soft)] bg-transparent accent-[var(--accent)]"
                       />
                       <span>{option}</span>
                     </label>
                   ))}
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-white/35">No options available</p>
+                <p className="mt-4 text-sm text-[var(--text-tertiary)]">No options available</p>
               )
             ) : null}
           </section>
@@ -154,3 +169,5 @@ export default function FilterSidebar({
     </aside>
   );
 }
+
+export default memo(FilterSidebar);

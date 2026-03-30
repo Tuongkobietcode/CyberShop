@@ -56,10 +56,10 @@ export default function ContactPage() {
         <section className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div className="max-w-[620px]">
             <p className="cy-kicker">Contact</p>
-            <h1 className="mt-4 text-[3rem] font-semibold leading-[0.9] tracking-[-0.08em] text-white sm:text-[4.6rem]">
+            <h1 className="mt-4 text-[3rem] font-semibold leading-[0.9] tracking-[-0.08em] text-[var(--text-primary)] sm:text-[4.6rem]">
               Find the fastest path to help.
             </h1>
-            <p className="mt-6 max-w-[40ch] text-[15px] leading-7 text-white/58 sm:text-base">
+            <p className="mt-6 max-w-[40ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
               We treat support as part of the storefront, not a page hidden after checkout.
               Reach out for product comparisons, order updates, payment questions, or a second opinion before you buy.
             </p>
@@ -69,18 +69,15 @@ export default function ContactPage() {
             {supportPaths.map((item) => {
               const Icon = item.icon;
               return (
-                <article
-                  key={item.title}
-                  className="rounded-[26px] border border-white/8 bg-white/[0.02] p-5"
-                >
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-white/82">
+                <article key={item.title} className="cy-panel p-5">
+                  <div className="rounded-2xl border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-3 text-[var(--accent)]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <p className="mt-5 text-sm text-white/44">{item.title}</p>
-                  <p className="mt-1 text-[1rem] font-semibold tracking-[-0.03em] text-white">
+                  <p className="mt-5 text-sm text-[var(--text-tertiary)]">{item.title}</p>
+                  <p className="mt-1 text-[1rem] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
                     {item.value}
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-white/54">{item.copy}</p>
+                  <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{item.copy}</p>
                 </article>
               );
             })}
@@ -89,45 +86,48 @@ export default function ContactPage() {
 
         <section className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr]">
           <div className="space-y-4">
-            <article className="rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(10,13,18,0.9),rgba(7,9,13,0.96))] p-7">
+            <article className="cy-panel p-7">
               <p className="cy-kicker">Before you write</p>
-              <h2 className="mt-4 text-[2rem] font-semibold leading-[0.96] tracking-[-0.05em] text-white">
+              <h2 className="mt-4 text-[2rem] font-semibold leading-[0.96] tracking-[-0.05em] text-[var(--text-primary)]">
                 Start with the simplest channel first.
               </h2>
               <div className="mt-6 space-y-4">
                 {quickAnswers.map((item, index) => (
-                  <div key={item.title} className="grid gap-3 border-t border-white/6 pt-4 first:border-t-0 first:pt-0 md:grid-cols-[56px_1fr]">
-                    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/34">
+                  <div
+                    key={item.title}
+                    className="grid gap-3 border-t border-[var(--line-soft)] pt-4 first:border-t-0 first:pt-0 md:grid-cols-[56px_1fr]"
+                  >
+                    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
                       0{index + 1}
                     </p>
                     <div>
-                      <h3 className="text-[1.08rem] font-semibold tracking-[-0.03em] text-white">
+                      <h3 className="text-[1.08rem] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
                         {item.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-7 text-white/56">{item.copy}</p>
+                      <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">{item.copy}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </article>
 
-            <article className="rounded-[30px] border border-white/8 bg-white/[0.02] p-6">
-              <div className="flex items-center gap-3 text-sm text-white/58">
-                <Clock3 className="h-4 w-4 text-white/70" />
+            <article className="cy-panel p-6">
+              <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+                <Clock3 className="h-4 w-4 text-[var(--accent)]" />
                 Support window: Monday to Friday, 09:00 to 18:00
               </div>
             </article>
           </div>
 
-          <article className="rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,rgba(12,16,22,0.92),rgba(8,10,14,0.96))] p-7 sm:p-8">
+          <article className="cy-panel p-7 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="cy-kicker">Send a message</p>
-                <h2 className="mt-4 text-[2.2rem] font-semibold leading-[0.96] tracking-[-0.05em] text-white">
+                <h2 className="mt-4 text-[2.2rem] font-semibold leading-[0.96] tracking-[-0.05em] text-[var(--text-primary)]">
                   Talk to a real person.
                 </h2>
               </div>
-              <div className="rounded-full border border-white/10 bg-white/[0.04] p-3 text-white/80">
+              <div className="rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-3 text-[var(--accent)]">
                 <Headphones className="h-5 w-5" />
               </div>
             </div>
@@ -178,11 +178,11 @@ export default function ContactPage() {
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 placeholder="Tell us what you need"
-                className="min-h-[200px] rounded-[24px] border border-white/8 bg-white/[0.03] px-4 py-4 text-sm leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[rgba(143,185,255,0.35)]"
+                className="min-h-[200px] rounded-[24px] border border-[var(--line-soft)] bg-white/84 px-4 py-4 text-sm leading-7 text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-tertiary)] focus:border-[rgba(0,113,227,0.26)] focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]"
               />
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-sm text-white/52">
+                <div className="text-sm text-[var(--text-secondary)]">
                   Best for sales guidance, order help, and after-purchase questions.
                 </div>
                 <button
@@ -190,18 +190,18 @@ export default function ContactPage() {
                   disabled={isSubmitting}
                   className="cy-btn-primary inline-flex h-14 items-center justify-center gap-3 px-8 disabled:opacity-60"
                 >
-                  {isSubmitting ? "Sending..." : "Send message"}
-                  <Send className="h-4 w-4" />
+                  <span className="text-white">{isSubmitting ? "Sending..." : "Send message"}</span>
+                  <Send className="h-4 w-4 text-white" />
                 </button>
               </div>
 
               {error ? (
-                <div className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                   {error}
                 </div>
               ) : null}
               {submitted ? (
-                <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                   Message sent successfully. Support now has your request.
                 </div>
               ) : null}

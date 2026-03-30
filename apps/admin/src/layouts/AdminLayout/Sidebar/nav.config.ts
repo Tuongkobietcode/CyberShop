@@ -3,16 +3,14 @@ import {
   LayoutDashboard,
   ShoppingCart,
   Users,
-  TicketPercent,
   Shapes,
+  Newspaper,
   Wallet,
+  Inbox,
   PlusCircle,
-  Image,
   PackageSearch,
   List,
-  Star,
   UserCog,
-  ShieldCheck,
 } from "lucide-react";
 
 export type SidebarItem = {
@@ -33,30 +31,24 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
       { label: "Order Management", to: "/admin/orders", icon: ShoppingCart },
       { label: "Customers", to: "/admin/customers", icon: Users },
-      { label: "Coupon Code", to: "/admin/coupons", icon: TicketPercent },
       { label: "Categories", to: "/admin/categories", icon: Shapes },
+      { label: "Blog", to: "/admin/blog", icon: Newspaper },
       { label: "Transaction", to: "/admin/transactions", icon: Wallet },
+      { label: "Contact Inbox", to: "/admin/contact-inbox", icon: Inbox },
     ],
   },
   {
     title: "Product",
     items: [
       { label: "Add Products", to: "/admin/products/new", icon: PlusCircle },
-      { label: "Product Media", to: "/admin/products/media", icon: Image },
       { label: "Product List", to: "/admin/products", icon: List },
       { label: "Inventory", to: "/admin/products/inventory", icon: PackageSearch },
-      { label: "Product Reviews", to: "/admin/products/reviews", icon: Star },
     ],
   },
   {
     title: "Admin",
     items: [
       { label: "Admin role", to: "/admin/admin-role", icon: UserCog },
-      {
-        label: "Control Authority",
-        to: "/admin/control-authority",
-        icon: ShieldCheck,
-      },
     ],
   },
 ];

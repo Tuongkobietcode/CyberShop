@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { resolveAssetUrl } from "@/utils/assets";
-import { formatCurrencyVnd } from "@/utils/format";
 
 type CarouselItem = {
+  eyebrow?: string;
   title: string;
   subtitle: string;
   price?: number;
@@ -13,41 +13,102 @@ type CarouselItem = {
   to: string;
   imageClassName: string;
   imageWrapClassName?: string;
+  cardClassName?: string;
+  textClassName?: string;
 };
 
 const curatedItems: CarouselItem[] = [
   {
-    title: "Liquid Silver",
-    subtitle: "iPhone 17 Pro Max",
-    copy: "The sharpest flagship surface in the opening edit, tuned for camera-first attention.",
+    eyebrow: "New",
+    title: "iPhone 17 Pro Max",
+    subtitle: "A18 Pro. Camera-first. Titanium-sharp.",
+    copy: "From 38.990.000 đ or 1.624.583 đ/mo. for 24 mo.",
     price: 38990000,
     image: "/assets/images/iphone-17-promax.png",
     to: "/products/iphone-17-pro-max",
     imageClassName:
-      "mx-auto h-[220px] w-full max-w-[220px] object-contain sm:h-[250px] sm:max-w-[240px]",
-    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
+      "mx-auto h-[245px] w-full max-w-[238px] object-contain sm:h-[275px] sm:max-w-[268px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#ffffff_0%,#f8f9fb_100%)]",
   },
   {
-    title: "Studio audio",
-    subtitle: "AirPods Pro 3",
-    copy: "Compact audio hardware framed with the same visual priority as a hero device.",
+    eyebrow: "New",
+    title: "iPad Pro 13-inch",
+    subtitle: "Ultra Retina XDR. M5. Pencil-first.",
+    copy: "From 34.990.000 đ or 1.457.916 đ/mo. for 24 mo.",
+    price: 34990000,
+    image: "/assets/images/ipad-pro-13-inch.png",
+    to: "/products/ipad-pro-13-inch",
+    imageClassName:
+      "mx-auto h-[250px] w-full max-w-[278px] object-contain sm:h-[284px] sm:max-w-[318px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#eaf6ff_0%,#d7ecfb_100%)]",
+  },
+  {
+    eyebrow: "New",
+    title: "Apple Watch Series 11",
+    subtitle: "The most personal health surface.",
+    copy: "From 11.490.000 đ or 478.750 đ/mo. for 24 mo.",
+    price: 11490000,
+    image: "/assets/images/apple-watch-series-11.png",
+    to: "/products/apple-watch-series-11",
+    imageClassName:
+      "mx-auto h-[232px] w-full max-w-[262px] object-contain sm:h-[264px] sm:max-w-[294px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#ffffff_0%,#f6f6f7_100%)]",
+  },
+  {
+    eyebrow: "New",
+    title: "iPhone 17",
+    subtitle: "Everyday flagship. Clean silhouette.",
+    copy: "From 25.990.000 đ or 1.082.916 đ/mo. for 24 mo.",
+    price: 25990000,
+    image: "/assets/images/iphone-17.png",
+    to: "/products/iphone-17",
+    imageClassName:
+      "mx-auto h-[240px] w-full max-w-[228px] object-contain sm:h-[270px] sm:max-w-[260px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#ffffff_0%,#f7f8fb_100%)]",
+  },
+  {
+    eyebrow: "New",
+    title: "AirPods Pro 3",
+    subtitle: "Adaptive Audio with quieter edges.",
+    copy: "From 6.490.000 đ or 270.416 đ/mo. for 24 mo.",
     price: 6490000,
     image: "/assets/images/airpods-pro-3.png",
     to: "/products/airpods-pro-3",
     imageClassName:
-      "mx-auto h-[210px] w-full max-w-[220px] object-contain sm:h-[245px] sm:max-w-[250px]",
-    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
+      "mx-auto h-[214px] w-full max-w-[224px] object-contain sm:h-[242px] sm:max-w-[252px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#ffffff_0%,#f7f8fa_100%)]",
   },
   {
-    title: "Portable performance",
-    subtitle: "MacBook Pro 14-inch",
-    copy: "Portable pro hardware treated like a compact desk surface instead of another listing tile.",
+    eyebrow: "New",
+    title: "Apple Vision Pro",
+    subtitle: "Spatial computing, kept impossibly quiet.",
+    copy: "From 89.990.000 đ or 3.749.583 đ/mo. for 24 mo.",
+    price: 89990000,
+    image: "/assets/images/apple-vision-pro.png",
+    to: "/products/apple-vision-pro",
+    imageClassName:
+      "mx-auto h-[180px] w-full max-w-[238px] object-contain sm:h-[210px] sm:max-w-[276px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#101114_0%,#23252c_100%)]",
+    textClassName: "text-white",
+  },
+  {
+    eyebrow: "New",
+    title: "MacBook Pro 14-inch",
+    subtitle: "Portable pro power for heavier sessions.",
+    copy: "From 46.990.000 đ or 1.957.916 đ/mo. for 24 mo.",
     price: 46990000,
     image: "/assets/images/macbook-pro-14-inch.png",
     to: "/products/macbook-pro-14-inch",
     imageClassName:
-      "mx-auto h-[190px] w-full max-w-[300px] object-contain sm:h-[225px] sm:max-w-[360px]",
-    imageWrapClassName: "min-h-[240px] sm:min-h-[270px]",
+      "mx-auto h-[212px] w-full max-w-[320px] object-contain sm:h-[242px] sm:max-w-[370px]",
+    imageWrapClassName: "min-h-[246px] sm:min-h-[290px]",
+    cardClassName: "bg-[linear-gradient(180deg,#f7f7fb_0%,#eef2f8_100%)]",
   },
 ];
 
@@ -151,22 +212,25 @@ export default function FeaturedCategorySection() {
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-[720px]">
             <p className="cy-kicker">Curated flagships</p>
-            <h2 className="mt-3 max-w-[13ch] text-[2.2rem] font-semibold leading-[0.96] tracking-[-0.06em] text-white sm:text-[3rem]">
-              A tighter edit of the products worth opening first.
+            <h2 className="mt-3 max-w-[14ch] text-[2.2rem] font-semibold leading-[0.96] tracking-[-0.06em] text-[#1d1d1f] sm:text-[3rem]">
+              The latest.
+              <span className="text-[rgba(29,29,31,0.46)]">
+                {" "}
+                Take a look at what’s new, right now.
+              </span>
             </h2>
-            <p className="mt-4 max-w-[48ch] text-[15px] leading-7 text-white/58 sm:text-base">
-              Less storefront clutter, more product framing. Think of these as
-              the opening compositions of the catalog rather than another
-              product strip.
+            <p className="mt-4 max-w-[48ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+              A tighter edit of the products worth opening first, staged as
+              full cards instead of another dense strip.
             </p>
           </div>
 
           <Link
             to="/products"
-            className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-white/52 transition hover:text-white"
+            className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
           >
             View complete archive
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-base">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/8 bg-white text-base shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
               {"->"}
             </span>
           </Link>
@@ -182,7 +246,7 @@ export default function FeaturedCategorySection() {
             aria-label="Previous featured products"
             onClick={() => nudgeCarousel(-1)}
             className={[
-              "absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white/80 shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300",
+              "absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-[var(--text-primary)] shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
               isHovered
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0",
@@ -196,7 +260,7 @@ export default function FeaturedCategorySection() {
             aria-label="Next featured products"
             onClick={() => nudgeCarousel(1)}
             className={[
-              "absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white/80 shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300",
+              "absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-[var(--text-primary)] shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
               isHovered
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0",
@@ -212,49 +276,56 @@ export default function FeaturedCategorySection() {
                   key={`${item.title}-${index}`}
                   ref={index === 0 ? firstCardRef : null}
                   to={item.to}
-                  className="group/card relative w-[min(72vw,300px)] shrink-0 overflow-hidden rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(14,18,24,0.98),rgba(9,12,17,0.94))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.28)] transition duration-500 hover:-translate-y-[3px] hover:border-white/16 hover:shadow-[0_36px_110px_rgba(0,0,0,0.36)] sm:p-6"
+                  className={[
+                      "group/card relative w-[400px] shrink-0 overflow-hidden rounded-[28px] border border-black/7 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_16px_36px_rgba(15,23,42,0.12)] sm:p-5",
+                    item.cardClassName ?? "bg-white",
+                    item.textClassName ?? "text-[#1d1d1f]",
+                  ].join(" ")}
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.14),transparent_42%)] opacity-0 transition duration-500 group-hover/card:opacity-100" />
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.78),transparent_36%)] opacity-0 transition duration-500 group-hover/card:opacity-100" />
 
-                  <div
-                    className={[
-                      "relative flex items-center justify-center overflow-hidden",
-                      item.imageWrapClassName ?? "",
-                    ].join(" ")}
-                  >
-                    <img
-                      src={resolveAssetUrl(item.image)}
-                      alt={item.subtitle}
-                      className={[
-                        item.imageClassName,
-                        "transition duration-500 group-hover/card:scale-[1.03]",
-                      ].join(" ")}
-                    />
-                  </div>
-
-                  <div className="relative mt-6 space-y-3">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
-                      {item.title}
-                    </p>
-                    <div className="flex items-end justify-between gap-4">
-                      <div>
-                        <h3 className="text-[1.2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-[1.38rem]">
-                          {item.subtitle}
-                        </h3>
-                        {typeof item.price === "number" ? (
-                          <p className="mt-2 text-[12px] uppercase tracking-[0.18em] text-white/42 sm:text-[13px]">
-                            {formatCurrencyVnd(item.price)}
-                          </p>
-                        ) : item.copy ? (
-                          <p className="mt-2 max-w-[24ch] text-[13px] leading-6 text-white/54 line-clamp-2">
-                            {item.copy}
-                          </p>
-                        ) : null}
-                      </div>
-                      <span className="text-sm font-medium text-white/46 transition group-hover/card:text-white/76">
-                        Open
-                      </span>
+                    <div className="relative flex h-[500px] flex-col">
+                    <div className="space-y-3">
+                      <p
+                        className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${item.textClassName ? "text-white/80" : "text-[#bf4800]"}`}
+                      >
+                        {item.eyebrow ?? "New"}
+                      </p>
+                      <h3
+                        className={`max-w-[11.5ch] text-[1.66rem] font-semibold leading-[1.02] tracking-[-0.05em] ${item.textClassName ? "text-white" : "text-[#1d1d1f]"} sm:text-[2rem]`}
+                      >
+                        {item.title}
+                      </h3>
+                      <p
+                        className={`max-w-[18ch] text-[1rem] font-medium leading-7 tracking-[-0.02em] ${item.textClassName ? "text-white/88" : "text-[#1d1d1f]"}`}
+                      >
+                        {item.subtitle}
+                      </p>
+                      {item.copy ? (
+                        <p
+                          className={`max-w-[28ch] text-[14px] leading-6 ${item.textClassName ? "text-white/70" : "text-[var(--text-secondary)]"}`}
+                        >
+                          {item.copy}
+                        </p>
+                      ) : null}
                     </div>
+
+                    <div
+                      className={[
+                        "mt-auto flex items-end justify-center overflow-hidden",
+                        item.imageWrapClassName ?? "",
+                      ].join(" ")}
+                    >
+                      <img
+                        src={resolveAssetUrl(item.image)}
+                        alt={item.title}
+                        className={[
+                          item.imageClassName,
+                          "transition duration-500 group-hover/card:scale-[1.03]",
+                        ].join(" ")}
+                      />
+                    </div>
+
                   </div>
                 </Link>
               ))}

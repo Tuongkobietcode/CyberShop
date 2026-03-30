@@ -22,6 +22,19 @@ export type AdminCustomer = {
   updatedAt: string;
 };
 
+export type AdminCustomerOrder = {
+  id: string;
+  orderCode: string;
+  orderStatus: string;
+  paymentStatus: string;
+  totalAmount: number;
+  createdAt: string;
+};
+
+export type AdminCustomerDetail = AdminCustomer & {
+  recentOrders: AdminCustomerOrder[];
+};
+
 type ApiResponse<T> = {
   success: boolean;
   message: string;
@@ -39,5 +52,10 @@ export async function getAdminCustomers(params?: Record<string, string | number>
     params,
   });
 
+  return response.data;
+}
+
+export async function getAdminCustomerDetail(id: string) {
+  const response = await http.get<ApiResponse<AdminCustomerDetail>>(`/admin/customers/${id}`);
   return response.data;
 }
