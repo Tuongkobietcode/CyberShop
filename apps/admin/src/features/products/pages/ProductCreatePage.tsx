@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ImagePlus, PlusCircle, Star, Upload, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  isBlank,
+  isNonNegativeInteger,
+  isNonNegativeNumber,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 import {
   uploadAdminImages,
@@ -23,12 +29,14 @@ function Field({
   onChange,
   placeholder,
   className = "",
+  error = "",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  error?: string;
 }) {
   return (
     <label className={["block space-y-2", className].join(" ")}>
@@ -37,10 +45,63 @@ function Field({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none"
+        className={[
+          "h-12 w-full rounded-2xl border bg-[#f5f5f5] px-4 text-sm outline-none",
+          error ? "border-rose-300 bg-rose-50/70" : "border-black/10",
+        ].join(" ")}
+        aria-invalid={Boolean(error)}
       />
+      {error ? <span className="text-sm text-rose-600">{error}</span> : null}
     </label>
   );
+}
+
+function validateProductForm(
+  form: {
+    name: string;
+    sku: string;
+    price: string;
+    compareAtPrice: string;
+    stock: string;
+    categoryId: string;
+  },
+  imageCount: number
+): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(form.name)) {
+    errors.name = "Product name is required.";
+  }
+
+  if (isBlank(form.sku)) {
+    errors.sku = "SKU is required.";
+  }
+
+  if (isBlank(form.price)) {
+    errors.price = "Price is required.";
+  } else if (!isNonNegativeNumber(form.price)) {
+    errors.price = "Price must be a non-negative number.";
+  }
+
+  if (!isBlank(form.compareAtPrice) && !isNonNegativeNumber(form.compareAtPrice)) {
+    errors.compareAtPrice = "Discounted price must be a non-negative number.";
+  }
+
+  if (isBlank(form.stock)) {
+    errors.stock = "Stock quantity is required.";
+  } else if (!isNonNegativeInteger(form.stock)) {
+    errors.stock = "Stock quantity must be a non-negative integer.";
+  }
+
+  if (isBlank(form.categoryId)) {
+    errors.categoryId = "Choose a category.";
+  }
+
+  if (imageCount === 0) {
+    errors.images = "Upload at least one product image.";
+  }
+
+  return errors;
 }
 
 export default function ProductCreatePage() {
@@ -62,6 +123,8 @@ export default function ProductCreatePage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
 
   useEffect(() => {
     async function loadCategories() {
@@ -79,7 +142,15 @@ export default function ProductCreatePage() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    const nextErrors = validateProductForm(form, images.length);
+    setFieldErrors(nextErrors);
+
+    if (Object.values(nextErrors).some(Boolean)) {
+      return;
+    }
+
     setSubmitting(true);
+    setSubmitError("");
 
     try {
       await createAdminProduct({
@@ -99,6 +170,8 @@ export default function ProductCreatePage() {
         })),
       });
       navigate("/admin/products", { replace: true });
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to create product right now.");
     } finally {
       setSubmitting(false);
     }
@@ -117,6 +190,7 @@ export default function ProductCreatePage() {
     try {
       const uploadedAssets = await uploadAdminImages(selectedFiles, "products");
       setImages((current) => [...current, ...uploadedAssets]);
+      setFieldErrors((current) => ({ ...current, images: "" }));
     } catch (error) {
       setMediaError(error instanceof Error ? error.message : "Image upload failed");
     } finally {
@@ -191,30 +265,53 @@ export default function ProductCreatePage() {
             <Field
               label="Product Name"
               value={form.name}
-              onChange={(value) => setForm((current) => ({ ...current, name: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, name: value }));
+                setFieldErrors((current) => ({ ...current, name: "" }));
+                setSubmitError("");
+              }}
               className="md:col-span-2"
+              error={fieldErrors.name}
             />
             <Field
               label="SKU"
               value={form.sku}
-              onChange={(value) => setForm((current) => ({ ...current, sku: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, sku: value }));
+                setFieldErrors((current) => ({ ...current, sku: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.sku}
             />
             <Field
               label="Stock Quantity"
               value={form.stock}
-              onChange={(value) => setForm((current) => ({ ...current, stock: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, stock: value }));
+                setFieldErrors((current) => ({ ...current, stock: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.stock}
             />
             <Field
               label="Product Price"
               value={form.price}
-              onChange={(value) => setForm((current) => ({ ...current, price: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, price: value }));
+                setFieldErrors((current) => ({ ...current, price: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.price}
             />
             <Field
               label="Discounted Price"
               value={form.compareAtPrice}
-              onChange={(value) =>
-                setForm((current) => ({ ...current, compareAtPrice: value }))
-              }
+              onChange={(value) => {
+                setForm((current) => ({ ...current, compareAtPrice: value }));
+                setFieldErrors((current) => ({ ...current, compareAtPrice: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.compareAtPrice}
             />
 
             <label className="block space-y-2">
@@ -296,6 +393,7 @@ export default function ProductCreatePage() {
                 )}
               </div>
             </div>
+            {fieldErrors.images ? <p className="text-sm text-rose-600">{fieldErrors.images}</p> : null}
 
             {images.length ? (
               <div className="grid gap-3 sm:grid-cols-3">
@@ -343,15 +441,26 @@ export default function ProductCreatePage() {
                 {mediaError}
               </div>
             ) : null}
+            {submitError ? (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                {submitError}
+              </div>
+            ) : null}
 
             <label className="block space-y-2">
               <span className="text-sm font-medium text-black/58">Product Category</span>
               <select
                 value={form.categoryId}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, categoryId: event.target.value }))
-                }
-                className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none"
+                onChange={(event) => {
+                  setForm((current) => ({ ...current, categoryId: event.target.value }));
+                  setFieldErrors((current) => ({ ...current, categoryId: "" }));
+                  setSubmitError("");
+                }}
+                className={[
+                  "h-12 w-full rounded-2xl border bg-[#f5f5f5] px-4 text-sm outline-none",
+                  fieldErrors.categoryId ? "border-rose-300 bg-rose-50/70" : "border-black/10",
+                ].join(" ")}
+                aria-invalid={Boolean(fieldErrors.categoryId)}
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -359,6 +468,7 @@ export default function ProductCreatePage() {
                   </option>
                 ))}
               </select>
+              {fieldErrors.categoryId ? <span className="text-sm text-rose-600">{fieldErrors.categoryId}</span> : null}
             </label>
 
             <div className="grid grid-cols-3 gap-3">

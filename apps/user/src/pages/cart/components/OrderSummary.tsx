@@ -20,7 +20,7 @@ export default function OrderSummary({
       <div>
         <span className="cy-kicker">Order Summary</span>
         <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-(--text-primary)">Checkout snapshot</h2>
-        <p className="mt-3 text-sm leading-7 text-(--text-secondary)">
+        <p className="mt-3 text-[15px] leading-8 text-(--text-secondary)">
           Promo and loyalty inputs are kept visually lightweight here. The core signal is trust, transparency, and a clear path into checkout.
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <div className="mt-10 space-y-4 border-y border-(--line-soft) py-6 text-sm text-(--text-secondary)">
+      <div className="mt-10 space-y-4 border-y border-(--line-soft) py-6 text-[15px] text-(--text-secondary)">
         <div className="flex items-center justify-between">
           <span>Subtotal</span>
           <span className="font-mono text-(--text-primary)">{formatCurrencyVnd(subtotal)}</span>

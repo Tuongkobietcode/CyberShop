@@ -1,5 +1,10 @@
 import { Clock3, Headphones, Mail, MessageSquareText, PhoneCall, Send } from "lucide-react";
 import { useState } from "react";
+import {
+  isBlank,
+  isValidEmail,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import { submitContactInquiry } from "@/features/contact/contact.service";
 
@@ -39,6 +44,37 @@ const quickAnswers = [
   },
 ];
 
+function validateContactForm(
+  name: string,
+  email: string,
+  subject: string,
+  message: string
+): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(name)) {
+    errors.name = "Name is required.";
+  }
+
+  if (isBlank(email)) {
+    errors.email = "Email is required.";
+  } else if (!isValidEmail(email)) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (isBlank(subject)) {
+    errors.subject = "Subject is required.";
+  }
+
+  if (isBlank(message)) {
+    errors.message = "Message is required.";
+  } else if (message.trim().length < 10) {
+    errors.message = "Message should be at least 10 characters.";
+  }
+
+  return errors;
+}
+
 export default function ContactPage() {
   const [subject, setSubject] = useState("");
   const [name, setName] = useState("");
@@ -47,6 +83,12 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
+
+  function clearFieldError(field: string) {
+    setFieldErrors((current) => ({ ...current, [field]: "" }));
+    setError("");
+  }
 
   return (
     <div className="pb-24">
@@ -138,6 +180,13 @@ export default function ContactPage() {
                 event.preventDefault();
                 setError("");
                 setSubmitted(false);
+                const nextErrors = validateContactForm(name, email, subject, message);
+                setFieldErrors(nextErrors);
+
+                if (Object.values(nextErrors).some(Boolean)) {
+                  return;
+                }
+
                 setIsSubmitting(true);
 
                 try {
@@ -157,29 +206,73 @@ export default function ContactPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <input
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    clearFieldError("name");
+                  }}
                   placeholder="Your name"
-                  className="cy-input"
+                  className={[
+                    "cy-input",
+                    fieldErrors.name
+                      ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]"
+                      : "",
+                  ].join(" ")}
+                  aria-invalid={Boolean(fieldErrors.name)}
                 />
                 <input
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    clearFieldError("email");
+                  }}
                   placeholder="Email address"
-                  className="cy-input"
+                  className={[
+                    "cy-input",
+                    fieldErrors.email
+                      ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]"
+                      : "",
+                  ].join(" ")}
+                  aria-invalid={Boolean(fieldErrors.email)}
                 />
               </div>
+              {fieldErrors.name || fieldErrors.email ? (
+                <div className="grid gap-2 md:grid-cols-2">
+                  <div className="text-sm text-rose-700">{fieldErrors.name || ""}</div>
+                  <div className="text-sm text-rose-700">{fieldErrors.email || ""}</div>
+                </div>
+              ) : null}
               <input
                 value={subject}
-                onChange={(event) => setSubject(event.target.value)}
+                onChange={(event) => {
+                  setSubject(event.target.value);
+                  clearFieldError("subject");
+                }}
                 placeholder="Subject"
-                className="cy-input"
+                className={[
+                  "cy-input",
+                  fieldErrors.subject
+                    ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]"
+                    : "",
+                ].join(" ")}
+                aria-invalid={Boolean(fieldErrors.subject)}
               />
+              {fieldErrors.subject ? <div className="text-sm text-rose-700">{fieldErrors.subject}</div> : null}
               <textarea
                 value={message}
-                onChange={(event) => setMessage(event.target.value)}
+                onChange={(event) => {
+                  setMessage(event.target.value);
+                  clearFieldError("message");
+                }}
                 placeholder="Tell us what you need"
-                className="min-h-[200px] rounded-[24px] border border-(--line-soft) bg-white/84 px-4 py-4 text-sm leading-7 text-(--text-primary) outline-none transition placeholder:text-(--text-tertiary) focus:border-[rgba(0,113,227,0.26)] focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]"
+                className={[
+                  "min-h-[200px] rounded-[24px] border bg-white/84 px-4 py-4 text-sm leading-7 text-(--text-primary) outline-none transition placeholder:text-(--text-tertiary)",
+                  fieldErrors.message
+                    ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]"
+                    : "border-(--line-soft) focus:border-[rgba(0,113,227,0.26)] focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]",
+                ].join(" ")}
+                aria-invalid={Boolean(fieldErrors.message)}
               />
+              {fieldErrors.message ? <div className="text-sm text-rose-700">{fieldErrors.message}</div> : null}
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-sm text-(--text-secondary)">

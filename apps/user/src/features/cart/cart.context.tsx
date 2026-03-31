@@ -24,29 +24,42 @@ const CHECKOUT_STORAGE_KEY = "cybershop_user_checkout";
 const WISHLIST_STORAGE_KEY = "cybershop_user_wishlist";
 const DEFAULT_PAYMENT_METHOD: PaymentMethod = "vnpay";
 
-const shippingMethods: ShippingMethod[] = [
-  {
-    id: "free",
-    label: "Free",
-    description: "Standard delivery · 0 VND",
-    price: 0,
-    etaLabel: "17 Oct, 2023",
-  },
-  {
-    id: "express",
-    label: "Express",
-    description: "Fast delivery · 8,500 VND",
-    price: 8500,
-    etaLabel: "1 Oct, 2023",
-  },
-  {
-    id: "schedule",
-    label: "Schedule",
-    description: "Choose a delivery date · 29,000 VND",
-    price: 29000,
-    etaLabel: "Select Date",
-  },
-];
+function formatEtaDate(daysFromNow: number) {
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + daysFromNow);
+
+  return targetDate.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function buildShippingMethods(): ShippingMethod[] {
+  return [
+    {
+      id: "free",
+      label: "Free",
+      description: "Standard delivery / 0 VND",
+      price: 0,
+      etaLabel: formatEtaDate(4),
+    },
+    {
+      id: "express",
+      label: "Express",
+      description: "Fast delivery / 8,500 VND",
+      price: 8500,
+      etaLabel: formatEtaDate(1),
+    },
+    {
+      id: "schedule",
+      label: "Schedule",
+      description: "Choose a delivery date / 29,000 VND",
+      price: 29000,
+      etaLabel: "Select date",
+    },
+  ];
+}
 
 type CartNotification = {
   id: number;
@@ -146,6 +159,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [checkout, setCheckout] = useState<CheckoutState>(buildCheckoutState([]));
   const [notification, setNotification] = useState<CartNotification | null>(null);
+  const shippingMethods = useMemo(() => buildShippingMethods(), []);
 
   const cartKey = customer ? `${CART_STORAGE_KEY}:${customer.id}` : "";
   const wishlistKey = customer ? `${WISHLIST_STORAGE_KEY}:${customer.id}` : "";
@@ -487,3 +501,4 @@ export function useCart() {
 
   return context;
 }
+

@@ -85,6 +85,7 @@ async function buildProductFilter(query, options = {}) {
   const category = String(query.category || "").trim();
   const hasCategoryQuery = Boolean(category);
   const status = String(query.status || "").trim();
+  const statusValues = parseQueryValues(query.status);
   const featured = query.featured;
   const batteryCapacityValues = parseQueryValues(query.batteryCapacity);
   const screenTypeValues = parseQueryValues(query.screenType);
@@ -147,6 +148,8 @@ async function buildProductFilter(query, options = {}) {
         { status: "out_of_stock" },
         { stock: 0 },
       ];
+    } else if (statusValues.length > 1) {
+      filter.status = { $in: statusValues };
     } else {
       filter.status = status;
     }

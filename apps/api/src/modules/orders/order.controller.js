@@ -87,6 +87,7 @@ export const listAdminOrders = asyncHandler(async (req, res) => {
 
   const { page, limit, skip } = getPagination(req.query);
   const search = String(req.query.search || "").trim();
+  const paymentMethod = String(req.query.paymentMethod || "").trim();
   const orderStatus = String(req.query.orderStatus || "").trim();
   const orderStatusGroup = String(req.query.orderStatusGroup || "").trim();
   const paymentStatus = String(req.query.paymentStatus || "").trim();
@@ -100,6 +101,10 @@ export const listAdminOrders = asyncHandler(async (req, res) => {
       { customerEmail: { $regex: search, $options: "i" } },
       { customerPhone: { $regex: search, $options: "i" } },
     ];
+  }
+
+  if (paymentMethod) {
+    filter.paymentMethod = paymentMethod;
   }
 
   if (orderStatus) {
@@ -164,6 +169,15 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   if (nextPaymentStatus) {
     order.paymentStatus = nextPaymentStatus;
+  }
+
+  if (
+    order.paymentMethod === "cod" &&
+    order.orderStatus === "delivered" &&
+    order.paymentStatus === "pending"
+  ) {
+    order.paymentStatus = "paid";
+    order.paymentConfirmedAt = order.paymentConfirmedAt || new Date();
   }
 
   if (previousOrderStatus !== "cancelled" && order.orderStatus === "cancelled") {

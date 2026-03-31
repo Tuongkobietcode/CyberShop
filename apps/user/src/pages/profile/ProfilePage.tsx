@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  isBlank,
+  isValidEmail,
+  isValidPhone,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import { useAuth } from "@/features/auth/auth.context";
 import type { CheckoutAddress } from "@/features/cart/cart.types";
@@ -15,6 +21,32 @@ function formatDate(value: string | null) {
   });
 }
 
+function formatOrderState(orderStatus: string, paymentStatus: string) {
+  return `${orderStatus} / ${paymentStatus}`;
+}
+
+function validateProfileForm(name: string, email: string, phone: string): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(name)) {
+    errors.name = "Full name is required.";
+  }
+
+  if (isBlank(email)) {
+    errors.email = "Email is required.";
+  } else if (!isValidEmail(email)) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (isBlank(phone)) {
+    errors.phone = "Phone number is required.";
+  } else if (!isValidPhone(phone)) {
+    errors.phone = "Enter a valid phone number.";
+  }
+
+  return errors;
+}
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { customer, orders, signOut, updateProfile, saveAddress, deleteAddress } = useAuth();
@@ -24,6 +56,8 @@ export default function ProfilePage() {
     phone: customer?.phone || "",
   }));
   const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileFieldErrors, setProfileFieldErrors] = useState<ValidationErrors>({});
   const [editingAddress, setEditingAddress] = useState<CheckoutAddress | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
 
@@ -101,7 +135,7 @@ export default function ProfilePage() {
                 await signOut();
                 navigate("/sign-in", { replace: true });
               }}
-              className="cy-btn-secondary mt-8 inline-flex h-13 items-center justify-center px-6 text-sm"
+              className="cy-btn-secondary mt-8 inline-flex h-12 items-center justify-center px-6 text-sm"
             >
               Sign out
             </button>
@@ -123,19 +157,65 @@ export default function ProfilePage() {
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <Field label="Full name" value={form.name} onChange={(value) => setForm((current) => ({ ...current, name: value }))} />
-                <Field label="Phone" value={form.phone} onChange={(value) => setForm((current) => ({ ...current, phone: value }))} />
-                <Field label="Email" value={form.email} onChange={(value) => setForm((current) => ({ ...current, email: value }))} className="md:col-span-2" />
+                <Field
+                  label="Full name"
+                  value={form.name}
+                  onChange={(value) => {
+                    setForm((current) => ({ ...current, name: value }));
+                    setProfileFieldErrors((current) => ({ ...current, name: "" }));
+                    setProfileError("");
+                  }}
+                  error={profileFieldErrors.name}
+                />
+                <Field
+                  label="Phone"
+                  value={form.phone}
+                  onChange={(value) => {
+                    setForm((current) => ({ ...current, phone: value }));
+                    setProfileFieldErrors((current) => ({ ...current, phone: "" }));
+                    setProfileError("");
+                  }}
+                  error={profileFieldErrors.phone}
+                />
+                <Field
+                  label="Email"
+                  value={form.email}
+                  onChange={(value) => {
+                    setForm((current) => ({ ...current, email: value }));
+                    setProfileFieldErrors((current) => ({ ...current, email: "" }));
+                    setProfileError("");
+                  }}
+                  className="md:col-span-2"
+                  error={profileFieldErrors.email}
+                />
               </div>
+
+              {profileError ? (
+                <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {profileError}
+                </div>
+              ) : null}
 
               <div className="mt-6 flex justify-end">
                 <button
                   type="button"
                   disabled={savingProfile}
                   onClick={async () => {
+                    const nextErrors = validateProfileForm(form.name, form.email, form.phone);
+                    setProfileFieldErrors(nextErrors);
+
+                    if (Object.values(nextErrors).some(Boolean)) {
+                      return;
+                    }
+
                     setSavingProfile(true);
                     try {
                       await updateProfile(form);
+                      setProfileError("");
+                    } catch (error) {
+                      setProfileError(
+                        error instanceof Error ? error.message : "Unable to save profile right now."
+                      );
                     } finally {
                       setSavingProfile(false);
                     }
@@ -175,7 +255,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 addresses.map((address) => (
-                  <article key={address.id} className="rounded-2xl border border-(--line-soft) bg-white/[0.03] px-5 py-4">
+                  <article key={address.id} className="rounded-2xl border border-(--line-soft) bg-white px-5 py-4 shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex items-center gap-3">
@@ -265,14 +345,12 @@ export default function ProfilePage() {
             ) : (
               <div className="mt-6 space-y-4">
                 {orders.slice(0, 6).map((order) => (
-                  <article key={order.id} className="rounded-2xl border border-(--line-soft) bg-white/[0.03] px-5 py-4">
+                  <article key={order.id} className="rounded-2xl border border-(--line-soft) bg-white px-5 py-4 shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="font-mono text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{order.orderCode}</p>
                         <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-(--text-primary)">{order.items[0]?.name || "Order"}</h3>
-                        <p className="mt-2 text-sm text-(--text-secondary)">
-                          {order.orderStatus} Ã‚Â· {order.paymentStatus}
-                        </p>
+                        <p className="mt-2 text-sm font-medium text-(--text-secondary)">{formatOrderState(order.orderStatus, order.paymentStatus)}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-(--text-secondary)">{formatDate(order.createdAt)}</p>
@@ -306,16 +384,28 @@ function Field({
   value,
   onChange,
   className = "",
+  error = "",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  error?: string;
 }) {
   return (
     <label className={["block space-y-2", className].join(" ")}>
       <span className="text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{label}</span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="cy-input" />
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={[
+          "cy-input",
+          error ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]" : "",
+        ].join(" ")}
+        aria-invalid={Boolean(error)}
+      />
+      {error ? <span className="text-sm text-rose-700">{error}</span> : null}
     </label>
   );
 }
+

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import axios from "axios";
 import {
   ImagePlus,
   MoreHorizontal,
@@ -6,9 +7,15 @@ import {
   Search,
   Trash2,
   Upload,
-  XCircle,
+  X,
 } from "lucide-react";
 import { uploadAdminImages } from "@/features/uploads/api/uploads.api";
+import {
+  isBlank,
+  isNonNegativeInteger,
+  isValidSlug,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import { resolveAssetUrl } from "@/utils/assets";
 import {
   createAdminCategory,
@@ -25,10 +32,12 @@ function Field({
   label,
   value,
   onChange,
+  error = "",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  error?: string;
 }) {
   return (
     <label className="block space-y-2">
@@ -36,10 +45,41 @@ function Field({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none"
+        className={[
+          "h-12 w-full rounded-2xl border bg-[#f5f5f5] px-4 text-sm outline-none",
+          error ? "border-rose-300 bg-rose-50/70" : "border-black/10",
+        ].join(" ")}
+        aria-invalid={Boolean(error)}
       />
+      {error ? <span className="text-sm text-rose-600">{error}</span> : null}
     </label>
   );
+}
+
+function validateCategoryForm(form: {
+  name: string;
+  slug: string;
+  sortOrder: string;
+}): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(form.name)) {
+    errors.name = "Category name is required.";
+  }
+
+  if (isBlank(form.slug)) {
+    errors.slug = "Slug is required.";
+  } else if (!isValidSlug(form.slug)) {
+    errors.slug = "Use lowercase letters, numbers, and hyphens only.";
+  }
+
+  if (isBlank(form.sortOrder)) {
+    errors.sortOrder = "Sort order is required.";
+  } else if (!isNonNegativeInteger(form.sortOrder)) {
+    errors.sortOrder = "Sort order must be a non-negative integer.";
+  }
+
+  return errors;
 }
 
 export function CategoriesPage() {
@@ -50,6 +90,9 @@ export function CategoriesPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [mediaError, setMediaError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [feedback, setFeedback] = useState<{ tone: "success" | "error"; message: string } | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
   const [selectedId, setSelectedId] = useState("");
   const [form, setForm] = useState({
     name: "",
@@ -74,6 +117,11 @@ export function CategoriesPage() {
   useEffect(() => {
     void loadData();
   }, []);
+  useEffect(() => {
+    if (!feedback) return;
+    const timeoutId = window.setTimeout(() => setFeedback(null), 1500);
+    return () => window.clearTimeout(timeoutId);
+  }, [feedback]);
 
   const filteredCategories = useMemo(
     () =>
@@ -86,6 +134,9 @@ export function CategoriesPage() {
   function resetForm() {
     setSelectedId("");
     setMediaError("");
+    setSubmitError("");
+    setFeedback(null);
+    setFieldErrors({});
     setForm({
       name: "",
       slug: "",
@@ -99,6 +150,9 @@ export function CategoriesPage() {
   function handleSelect(category: AdminCategory) {
     setSelectedId(category.id);
     setMediaError("");
+    setSubmitError("");
+    setFeedback(null);
+    setFieldErrors({});
     setForm({
       name: category.name,
       slug: category.slug,
@@ -110,7 +164,15 @@ export function CategoriesPage() {
   }
 
   async function handleSubmit() {
+    const nextErrors = validateCategoryForm(form);
+    setFieldErrors(nextErrors);
+
+    if (Object.values(nextErrors).some(Boolean)) {
+      return;
+    }
+
     setSaving(true);
+    setSubmitError("");
 
     try {
       const payload = {
@@ -126,19 +188,46 @@ export function CategoriesPage() {
 
       resetForm();
       await loadData();
+      setFeedback({
+        tone: "success",
+        message: selectedId ? "Category updated successfully." : "Category created successfully.",
+      });
+    } catch (error) {
+      setSubmitError(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || "Unable to save category right now."
+          : error instanceof Error
+            ? error.message
+            : "Unable to save category right now."
+      );
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete(categoryId: string) {
-    await deleteAdminCategory(categoryId);
+    try {
+      const deletedCategory = await deleteAdminCategory(categoryId);
 
-    if (selectedId === categoryId) {
-      resetForm();
+      if (selectedId === categoryId) {
+        resetForm();
+      }
+
+      await loadData();
+      setFeedback({
+        tone: "success",
+        message: `${deletedCategory.name} is now hidden from the storefront.`,
+      });
+    } catch (error) {
+      setFeedback({
+        tone: "error",
+        message: axios.isAxiosError(error)
+          ? error.response?.data?.message || "Unable to disable category right now."
+          : error instanceof Error
+            ? error.message
+            : "Unable to disable category right now.",
+      });
     }
-
-    await loadData();
   }
 
   async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
@@ -227,6 +316,26 @@ export function CategoriesPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <section className={surface}>
+          {feedback ? (
+            <div
+              className={[
+                "mb-6 flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm font-medium",
+                feedback.tone === "success"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-rose-200 bg-rose-50 text-rose-600",
+              ].join(" ")}
+            >
+              <span>{feedback.message}</span>
+              <button
+                type="button"
+                onClick={() => setFeedback(null)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-current/15 text-current transition hover:bg-white/60"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-black/45">Category inventory</p>
@@ -313,7 +422,18 @@ export function CategoriesPage() {
                           <button
                             type="button"
                             onClick={() => handleDelete(category.id)}
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 text-rose-500 transition hover:bg-rose-500 hover:text-white"
+                            disabled={category.productCount > 0}
+                            title={
+                              category.productCount > 0
+                                ? "Archive or move live products before hiding this category."
+                                : "Hide this category from the storefront"
+                            }
+                            className={[
+                              "inline-flex h-10 w-10 items-center justify-center rounded-full border transition",
+                              category.productCount > 0
+                                ? "cursor-not-allowed border-black/8 text-black/25"
+                                : "border-rose-200 text-rose-500 hover:bg-rose-500 hover:text-white",
+                            ].join(" ")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -347,17 +467,32 @@ export function CategoriesPage() {
             <Field
               label="Category name"
               value={form.name}
-              onChange={(value) => setForm((current) => ({ ...current, name: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, name: value }));
+                setFieldErrors((current) => ({ ...current, name: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.name}
             />
             <Field
               label="Slug"
               value={form.slug}
-              onChange={(value) => setForm((current) => ({ ...current, slug: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, slug: value }));
+                setFieldErrors((current) => ({ ...current, slug: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.slug}
             />
             <Field
               label="Sort order"
               value={form.sortOrder}
-              onChange={(value) => setForm((current) => ({ ...current, sortOrder: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, sortOrder: value }));
+                setFieldErrors((current) => ({ ...current, sortOrder: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.sortOrder}
             />
             <label className="block space-y-2">
               <span className="text-sm font-medium text-black/58">Description</span>
@@ -422,7 +557,7 @@ export function CategoriesPage() {
                   onClick={() => setForm((current) => ({ ...current, image: "" }))}
                   className="inline-flex h-11 items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 text-sm font-semibold text-rose-500 transition hover:bg-rose-500 hover:text-white"
                 >
-                  <XCircle className="mr-2 h-4 w-4" />
+                  <X className="mr-2 h-4 w-4" />
                   Clear
                 </button>
               </div>
@@ -431,6 +566,11 @@ export function CategoriesPage() {
             {mediaError ? (
               <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
                 {mediaError}
+              </div>
+            ) : null}
+            {submitError ? (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                {submitError}
               </div>
             ) : null}
 

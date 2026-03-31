@@ -24,7 +24,7 @@ export default function CartPage() {
             {items.length === 0 ? (
               <div className="cy-panel px-8 py-16 text-center">
                 <p className="text-sm uppercase tracking-[0.24em] text-(--text-tertiary)">Cart is empty</p>
-                <p className="mx-auto mt-4 max-w-xl text-lg text-(--text-secondary)">
+                <p className="mx-auto mt-4 max-w-xl text-xl leading-9 text-(--text-secondary)">
                   Add a few devices to start your order. The checkout flow will unlock automatically once something is in the bag.
                 </p>
               </div>

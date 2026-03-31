@@ -158,11 +158,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const saveAddress = useCallback(async (payload: CustomerAddressPayload) => {
-    const response = await saveMyAddress(payload);
+    const normalizedId = String(payload.id || "").trim();
+    const shouldUpdateExistingAddress =
+      !!normalizedId && !!customer?.addresses.some((address) => address.id === normalizedId);
+
+    const response = await saveMyAddress({
+      ...payload,
+      id: shouldUpdateExistingAddress ? normalizedId : undefined,
+    });
     patchStoredCustomerAuth({ customer: response.customer });
     setCustomer(response.customer);
     return response.addressId;
-  }, []);
+  }, [customer]);
 
   const deleteAddress = useCallback(async (addressId: string) => {
     const profile = await deleteMyAddress(addressId);

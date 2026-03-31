@@ -1,4 +1,11 @@
+import axios from "axios";
 import { useState } from "react";
+import {
+  isBlank,
+  isValidEmail,
+  isValidPhone,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import type { CheckoutAddress } from "@/features/cart/cart.types";
 
 const emptyAddress: CheckoutAddress = {
@@ -22,20 +29,60 @@ function FormField({
   placeholder,
   onChange,
   className = "",
+  error = "",
+  type = "text",
 }: {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
   className?: string;
+  error?: string;
+  type?: string;
 }) {
   return (
-    <input
-      className={["cy-input", className].join(" ")}
-      placeholder={placeholder}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-    />
+    <div className={["space-y-2", className].join(" ")}>
+      <input
+        type={type}
+        className={[
+          "cy-input",
+          error ? "border-rose-300 bg-rose-50/70 focus:border-rose-300 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.12)]" : "",
+        ].join(" ")}
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={Boolean(error)}
+      />
+      {error ? <p className="text-sm text-rose-700">{error}</p> : null}
+    </div>
   );
+}
+
+function validateAddressForm(form: CheckoutAddress): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(form.fullName)) {
+    errors.fullName = "Full name is required.";
+  }
+
+  if (!isBlank(form.email) && !isValidEmail(form.email)) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (isBlank(form.phone)) {
+    errors.phone = "Phone number is required.";
+  } else if (!isValidPhone(form.phone)) {
+    errors.phone = "Enter a valid phone number.";
+  }
+
+  if (isBlank(form.addressLine1)) {
+    errors.addressLine1 = "Address line 1 is required.";
+  }
+
+  if (isBlank(form.city)) {
+    errors.city = "City is required.";
+  }
+
+  return errors;
 }
 
 export default function AddressForm({
@@ -51,11 +98,19 @@ export default function AddressForm({
     initialValue ||
       {
         ...emptyAddress,
-        id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}`,
+        id: "",
         isDefault: true,
       }
   );
   const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
+  const [submitError, setSubmitError] = useState("");
+
+  function updateField<K extends keyof CheckoutAddress>(key: K, value: CheckoutAddress[K]) {
+    setForm((current) => ({ ...current, [key]: value }));
+    setFieldErrors((current) => ({ ...current, [key]: "" }));
+    setSubmitError("");
+  }
 
   return (
     <div className="cy-panel p-6 sm:p-7">
@@ -64,30 +119,34 @@ export default function AddressForm({
           {initialValue ? "Edit address" : "New address"}
         </p>
         <h3 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-(--text-primary)">Recipient details</h3>
+        <p className="mt-3 text-sm text-(--text-secondary)">
+          Required to continue: Full name, Phone, Address line 1, and City.
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField value={form.fullName} onChange={(value) => setForm({ ...form, fullName: value })} placeholder="Full name" />
-        <FormField value={form.label} onChange={(value) => setForm({ ...form, label: value.toUpperCase() })} placeholder="Label (HOME / OFFICE)" />
-        <FormField value={form.email} onChange={(value) => setForm({ ...form, email: value })} placeholder="Email" />
-        <FormField value={form.phone} onChange={(value) => setForm({ ...form, phone: value })} placeholder="Phone" />
+        <FormField value={form.fullName} onChange={(value) => updateField("fullName", value)} placeholder="Full name" error={fieldErrors.fullName} />
+        <FormField value={form.label} onChange={(value) => updateField("label", value.toUpperCase())} placeholder="Label (HOME / OFFICE)" error={fieldErrors.label} />
+        <FormField value={form.email} onChange={(value) => updateField("email", value)} placeholder="Email" type="email" error={fieldErrors.email} />
+        <FormField value={form.phone} onChange={(value) => updateField("phone", value)} placeholder="Phone" error={fieldErrors.phone} />
         <FormField
           className="md:col-span-2"
           value={form.addressLine1}
-          onChange={(value) => setForm({ ...form, addressLine1: value })}
+          onChange={(value) => updateField("addressLine1", value)}
           placeholder="Address line 1"
+          error={fieldErrors.addressLine1}
         />
         <FormField
           className="md:col-span-2"
           value={form.addressLine2}
-          onChange={(value) => setForm({ ...form, addressLine2: value })}
+          onChange={(value) => updateField("addressLine2", value)}
           placeholder="Address line 2"
         />
-        <FormField value={form.ward} onChange={(value) => setForm({ ...form, ward: value })} placeholder="Ward" />
-        <FormField value={form.district} onChange={(value) => setForm({ ...form, district: value })} placeholder="District" />
-        <FormField value={form.city} onChange={(value) => setForm({ ...form, city: value })} placeholder="City" />
-        <FormField value={form.postalCode} onChange={(value) => setForm({ ...form, postalCode: value })} placeholder="Postal code" />
-        <FormField value={form.country} onChange={(value) => setForm({ ...form, country: value })} placeholder="Country" />
+        <FormField value={form.ward} onChange={(value) => updateField("ward", value)} placeholder="Ward" />
+        <FormField value={form.district} onChange={(value) => updateField("district", value)} placeholder="District" />
+        <FormField value={form.city} onChange={(value) => updateField("city", value)} placeholder="City" error={fieldErrors.city} />
+        <FormField value={form.postalCode} onChange={(value) => updateField("postalCode", value)} placeholder="Postal code" />
+        <FormField value={form.country} onChange={(value) => updateField("country", value)} placeholder="Country" />
       </div>
 
       <label className="mt-5 flex items-center gap-3 text-sm text-(--text-secondary)">
@@ -100,6 +159,8 @@ export default function AddressForm({
         Set as default address
       </label>
 
+      {submitError ? <p className="mt-5 text-sm text-rose-700">{submitError}</p> : null}
+
       <div className="mt-7 flex flex-wrap gap-4">
         <button type="button" onClick={onCancel} className="cy-btn-secondary h-12 px-6 text-sm">
           Cancel
@@ -108,9 +169,27 @@ export default function AddressForm({
           type="button"
           disabled={saving}
           onClick={async () => {
+            const nextErrors = validateAddressForm(form);
+            setFieldErrors(nextErrors);
+
+            if (Object.values(nextErrors).some(Boolean)) {
+              setSubmitError("Please complete the required fields before saving this address.");
+              return;
+            }
+
             setSaving(true);
             try {
               await onSave(form);
+              setSubmitError("");
+            } catch (error) {
+              const apiMessage =
+                axios.isAxiosError<{ message?: string }>(error)
+                  ? error.response?.data?.message
+                  : "";
+              setSubmitError(
+                apiMessage ||
+                  (error instanceof Error ? error.message : "Unable to save this address right now.")
+              );
             } finally {
               setSaving(false);
             }

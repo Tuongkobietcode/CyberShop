@@ -1,6 +1,12 @@
 import { ArrowRight, LockKeyhole, UserCircle2 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import {
+  isBlank,
+  isValidEmail,
+  isValidPhone,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import { useAuth } from "./auth.context";
 
 type AuthMode = "sign-in" | "sign-up";
@@ -11,6 +17,7 @@ type FieldProps = {
   value: string;
   placeholder: string;
   autoComplete?: string;
+  error?: string;
   onChange: (value: string) => void;
 };
 
@@ -20,6 +27,7 @@ function Field({
   value,
   placeholder,
   autoComplete,
+  error,
   onChange,
 }: FieldProps) {
   return (
@@ -31,16 +39,74 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${label}-error` : undefined}
         spellCheck={false}
-        className="w-full rounded-[1.65rem] border border-black/8 bg-white/95 px-5 py-4 text-[1.05rem] leading-7 text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-(--text-tertiary) hover:border-black/12 focus:border-[rgba(0,113,227,0.26)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]"
+        className={[
+          "w-full rounded-[1.65rem] border bg-white/95 px-5 py-4 text-[1.05rem] leading-7 text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-(--text-tertiary) hover:border-black/12 focus:border-[rgba(0,113,227,0.26)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]",
+          error ? "border-rose-300 bg-rose-50/70" : "border-black/8",
+        ].join(" ")}
         style={{
           color: "var(--text-primary)",
           WebkitTextFillColor: "var(--text-primary)",
           caretColor: "var(--text-primary)",
         }}
       />
+      {error ? (
+        <span id={`${label}-error`} className="text-sm text-rose-700">
+          {error}
+        </span>
+      ) : null}
     </label>
   );
+}
+
+function validateSignInForm(email: string, password: string): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(email)) {
+    errors.email = "Email is required.";
+  } else if (!isValidEmail(email)) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (isBlank(password)) {
+    errors.password = "Password is required.";
+  }
+
+  return errors;
+}
+
+function validateSignUpForm(
+  name: string,
+  email: string,
+  phone: string,
+  password: string,
+  confirmPassword: string
+): ValidationErrors {
+  const errors = validateSignInForm(email, password);
+
+  if (isBlank(name)) {
+    errors.name = "Full name is required.";
+  }
+
+  if (isBlank(phone)) {
+    errors.phone = "Phone number is required.";
+  } else if (!isValidPhone(phone)) {
+    errors.phone = "Enter a valid phone number.";
+  }
+
+  if (!isBlank(password) && password.trim().length < 6) {
+    errors.password = "Password must be at least 6 characters.";
+  }
+
+  if (isBlank(confirmPassword)) {
+    errors.confirmPassword = "Confirm your password.";
+  } else if (password !== confirmPassword) {
+    errors.confirmPassword = "Password confirmation does not match.";
+  }
+
+  return errors;
 }
 
 export default function AuthExperience({ mode }: { mode: AuthMode }) {
@@ -54,6 +120,7 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
 
   const redirectTarget = useMemo(() => searchParams.get("redirect") || "/home", [searchParams]);
   const registered = searchParams.get("registered") === "1";
@@ -67,16 +134,21 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
     setError("");
+    const nextErrors = isSignUp
+      ? validateSignUpForm(name, email, phone, password, confirmPassword)
+      : validateSignInForm(email, password);
+
+    setFieldErrors(nextErrors);
+
+    if (hasErrors(nextErrors)) {
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
       if (isSignUp) {
-        if (password !== confirmPassword) {
-          setError("Password confirmation does not match.");
-          return;
-        }
-
         await signUp({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
         const nextParams = new URLSearchParams();
         nextParams.set("registered", "1");
@@ -97,6 +169,10 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function hasErrors(errors: ValidationErrors) {
+    return Object.values(errors).some(Boolean);
   }
 
   return (
@@ -181,44 +257,64 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
                 <Field
                   label="Full name"
                   value={name}
-                  onChange={setName}
+                  onChange={(value) => {
+                    setName(value);
+                    setFieldErrors((current) => ({ ...current, name: "" }));
+                  }}
                   placeholder="Enter your full name"
                   autoComplete="name"
+                  error={fieldErrors.name}
                 />
               ) : null}
               <Field
                 label="Email"
                 type="email"
                 value={email}
-                onChange={setEmail}
+                onChange={(value) => {
+                  setEmail(value);
+                  setFieldErrors((current) => ({ ...current, email: "" }));
+                }}
                 placeholder="you@example.com"
                 autoComplete="email"
+                error={fieldErrors.email}
               />
               {isSignUp ? (
                 <Field
                   label="Phone"
                   value={phone}
-                  onChange={setPhone}
+                  onChange={(value) => {
+                    setPhone(value);
+                    setFieldErrors((current) => ({ ...current, phone: "" }));
+                  }}
                   placeholder="Your phone number"
                   autoComplete="tel"
+                  error={fieldErrors.phone}
                 />
               ) : null}
               <Field
                 label="Password"
                 type="password"
                 value={password}
-                onChange={setPassword}
+                onChange={(value) => {
+                  setPassword(value);
+                  setFieldErrors((current) => ({ ...current, password: "" }));
+                }}
                 placeholder="Enter your password"
                 autoComplete={isSignUp ? "new-password" : "current-password"}
+                error={fieldErrors.password}
               />
               {isSignUp ? (
                 <Field
                   label="Confirm password"
                   type="password"
                   value={confirmPassword}
-                  onChange={setConfirmPassword}
+                  onChange={(value) => {
+                    setConfirmPassword(value);
+                    setFieldErrors((current) => ({ ...current, confirmPassword: "" }));
+                  }}
                   placeholder="Repeat your password"
                   autoComplete="new-password"
+                  error={fieldErrors.confirmPassword}
                 />
               ) : null}
 

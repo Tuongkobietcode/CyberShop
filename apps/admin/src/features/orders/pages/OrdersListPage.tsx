@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Ban, CheckCheck, Truck, Search } from "lucide-react";
-import { formatCurrencyVnd } from '@shared/formatters/currency';
+import { Ban, CheckCheck, CircleDollarSign, Search, Truck } from "lucide-react";
+import { formatCurrencyVnd } from "@shared/formatters/currency";
 import { getAdminOrders, updateAdminOrderStatus, type AdminOrder } from "../api/orders.api";
 import { resolveAssetUrl } from "@/utils/assets";
 
@@ -8,6 +8,7 @@ const surface =
   "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
 
 type OrderTab = "all" | "completed" | "pending" | "cancelled";
+type PaymentMethodFilter = "all" | "vnpay" | "cod";
 
 function formatMoney(value: number) {
   return formatCurrencyVnd(value);
@@ -24,6 +25,7 @@ export default function OrdersListPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<OrderTab>("all");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState<PaymentMethodFilter>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -65,6 +67,7 @@ export default function OrdersListPage() {
           page,
           limit: 8,
           search,
+          ...(paymentMethodFilter !== "all" ? { paymentMethod: paymentMethodFilter } : {}),
           ...(getStatusGroup(tab) ? { orderStatusGroup: getStatusGroup(tab) } : {}),
         });
 
@@ -77,17 +80,18 @@ export default function OrdersListPage() {
     }
 
     void loadOrders();
-  }, [page, search, tab]);
+  }, [page, paymentMethodFilter, search, tab]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, tab]);
+  }, [paymentMethodFilter, search, tab]);
 
   async function refreshCurrentPage() {
     const response = await getAdminOrders({
       page,
       limit: 8,
       search,
+      ...(paymentMethodFilter !== "all" ? { paymentMethod: paymentMethodFilter } : {}),
       ...(getStatusGroup(tab) ? { orderStatusGroup: getStatusGroup(tab) } : {}),
     });
 
@@ -131,6 +135,16 @@ export default function OrdersListPage() {
     }
   }
 
+  async function handleDelivered(orderId: string) {
+    setUpdatingId(orderId);
+    try {
+      await updateAdminOrderStatus(orderId, { orderStatus: "delivered" });
+      await refreshCurrentPage();
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
   async function handleCancel(orderId: string) {
     setUpdatingId(orderId);
     try {
@@ -166,27 +180,49 @@ export default function OrdersListPage() {
 
       <section className={surface}>
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="inline-flex rounded-full bg-[#f5f5f5] p-1 text-sm">
-            {([
-              ["all", `All (${stats.total})`],
-              ["completed", "Completed"],
-              ["pending", "Pending"],
-              ["cancelled", "Cancelled"],
-            ] as const).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setTab(value)}
-                className={[
-                  "rounded-full px-4 py-2 font-medium transition",
-                  tab === value
-                    ? "bg-white text-black shadow-sm"
-                    : "text-black/45 hover:text-black",
-                ].join(" ")}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex flex-col gap-3">
+            <div className="inline-flex rounded-full bg-[#f5f5f5] p-1 text-sm">
+              {([
+                ["all", `All (${stats.total})`],
+                ["completed", "Completed"],
+                ["pending", "Pending"],
+                ["cancelled", "Cancelled"],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTab(value)}
+                  className={[
+                    "rounded-full px-4 py-2 font-medium transition",
+                    tab === value ? "bg-white text-black shadow-sm" : "text-black/45 hover:text-black",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="inline-flex rounded-full bg-[#f5f5f5] p-1 text-sm">
+              {([
+                ["all", "All payments"],
+                ["vnpay", "VNPay"],
+                ["cod", "COD"],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setPaymentMethodFilter(value)}
+                  className={[
+                    "rounded-full px-4 py-2 font-medium transition",
+                    paymentMethodFilter === value
+                      ? "bg-white text-black shadow-sm"
+                      : "text-black/45 hover:text-black",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <label className="flex h-12 min-w-[280px] items-center gap-3 rounded-2xl bg-[#f5f5f5] px-4 text-black/35">
@@ -230,6 +266,9 @@ export default function OrdersListPage() {
                     const leadItem = order.items[0];
                     const isCancelled = order.orderStatus === "cancelled";
                     const isDelivered = order.orderStatus === "delivered";
+                    const canConfirm = order.orderStatus === "pending";
+                    const canShip = order.orderStatus === "confirmed";
+                    const canDeliver = order.orderStatus === "shipping";
 
                     return (
                       <tr key={order.id} className="border-t border-black/6 align-top">
@@ -249,33 +288,30 @@ export default function OrdersListPage() {
                               ) : null}
                             </div>
                             <div>
-                              <p className="font-medium text-black">
-                                {leadItem?.name || "Order items"}
-                              </p>
-                              <p className="mt-1 text-sm text-black/42">
-                                {order.items.length} item(s)
-                              </p>
+                              <p className="font-medium text-black">{leadItem?.name || "Order items"}</p>
+                              <p className="mt-1 text-sm text-black/42">{order.items.length} item(s)</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-4 text-black/45">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="px-5 py-4 font-medium text-black">
-                          {formatMoney(order.totalAmount)}
-                        </td>
+                        <td className="px-5 py-4 font-medium text-black">{formatMoney(order.totalAmount)}</td>
                         <td className="px-5 py-4">
-                          <span className="inline-flex items-center gap-2 text-black/65">
-                            <span
-                              className={[
-                                "h-2 w-2 rounded-full",
-                                order.paymentStatus === "paid"
-                                  ? "bg-emerald-500"
-                                  : "bg-rose-500",
-                              ].join(" ")}
-                            />
-                            {order.paymentStatus}
-                          </span>
+                          <div className="space-y-2">
+                            <span className="inline-flex items-center gap-2 text-black/65">
+                              <span
+                                className={[
+                                  "h-2 w-2 rounded-full",
+                                  order.paymentStatus === "paid" ? "bg-emerald-500" : "bg-rose-500",
+                                ].join(" ")}
+                              />
+                              {order.paymentStatus}
+                            </span>
+                            <p className="text-xs uppercase tracking-[0.16em] text-black/35">
+                              {order.paymentMethod}
+                            </p>
+                          </div>
                         </td>
                         <td className="px-5 py-4">
                           <span className="inline-flex items-center gap-2 rounded-full bg-[#f7f7f8] px-3 py-2 text-sm font-medium text-black">
@@ -287,7 +323,7 @@ export default function OrdersListPage() {
                             <button
                               type="button"
                               onClick={() => void handleConfirm(order.id)}
-                              disabled={updatingId === order.id || isCancelled || isDelivered}
+                              disabled={updatingId === order.id || !canConfirm || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black transition hover:bg-black hover:text-white disabled:opacity-60"
                             >
                               <CheckCheck className="mr-2 h-4 w-4" />
@@ -296,11 +332,20 @@ export default function OrdersListPage() {
                             <button
                               type="button"
                               onClick={() => void handleShip(order.id)}
-                              disabled={updatingId === order.id || isCancelled || isDelivered}
+                              disabled={updatingId === order.id || !canShip || isCancelled || isDelivered}
                               className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-semibold text-white transition hover:bg-[#1f1f1f] disabled:opacity-60"
                             >
                               <Truck className="mr-2 h-4 w-4" />
                               Ship
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDelivered(order.id)}
+                              disabled={updatingId === order.id || !canDeliver || isCancelled || isDelivered}
+                              className="inline-flex h-10 items-center justify-center rounded-full border border-emerald-200 px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-600 hover:text-white disabled:opacity-60"
+                            >
+                              <CircleDollarSign className="mr-2 h-4 w-4" />
+                              Delivered
                             </button>
                             <button
                               type="button"
@@ -331,9 +376,7 @@ export default function OrdersListPage() {
           >
             Previous
           </button>
-          <p className="text-sm text-black/45">
-            Page {page} of {totalPages} · {totalRows} result(s)
-          </p>
+          <p className="text-sm text-black/45">{`Page ${page} of ${totalPages} · ${totalRows} result(s)`}</p>
           <button
             type="button"
             onClick={() => setPage((current) => Math.min(totalPages, current + 1))}

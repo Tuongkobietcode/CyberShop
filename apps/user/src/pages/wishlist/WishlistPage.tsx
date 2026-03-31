@@ -46,12 +46,12 @@ export default function WishlistPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <span className="cy-kicker">Saved products</span>
-            <h1 className="cy-display mt-5 max-w-[10ch]">Wishlist built for a second decision.</h1>
-            <p className="cy-copy mt-5 max-w-xl">
-              Devices saved for later stay in a darker, calmer space so the user can compare and return without visual clutter.
+            <h1 className="cy-display mt-5 max-w-[12ch]">Wishlist built for a clearer second look.</h1>
+            <p className="cy-copy mt-5 max-w-2xl">
+              Saved products stay in the same calm storefront language as the rest of the journey, so comparison feels consistent instead of switching into a separate dark mode.
             </p>
           </div>
-          <div className="inline-flex items-center gap-3 rounded-full border border-(--line-soft) bg-white/[0.04] px-4 py-3 text-sm font-medium text-(--text-primary)">
+          <div className="inline-flex items-center gap-3 rounded-full border border-(--line-soft) bg-white px-4 py-3 text-sm font-medium text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
             <Heart className="h-4 w-4 fill-(--accent) text-(--accent)" />
             {wishlist.length} saved item{wishlist.length === 1 ? "" : "s"}
           </div>
@@ -75,7 +75,7 @@ export default function WishlistPage() {
             {wishlist.map((item) => (
               <article
                 key={item.productId}
-                className="group overflow-hidden rounded-[28px] border border-(--line-soft) bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-6 shadow-[0_18px_60px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1 hover:border-[rgba(143,185,255,0.2)]"
+                className="group overflow-hidden rounded-[28px] border border-(--line-soft) bg-[linear-gradient(180deg,#ffffff_0%,#f7f9fc_100%)] p-6 shadow-[0_18px_42px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:border-[rgba(143,185,255,0.2)] hover:shadow-[0_22px_48px_rgba(15,23,42,0.1)]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(143,185,255,0.2)] bg-[rgba(143,185,255,0.14)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-(--accent)">
@@ -85,34 +85,34 @@ export default function WishlistPage() {
                   <button
                     type="button"
                     onClick={() => toggleWishlist(toCatalogProduct(item))}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full text-(--text-secondary) transition hover:bg-white/[0.06] hover:text-(--text-primary)"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full text-(--text-secondary) transition hover:bg-black/[0.04] hover:text-(--text-primary)"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
 
                 <Link to={`/products/${item.slug}`} className="block">
-                  <div className="relative mt-4 flex h-[220px] items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#0f141c,#0b0f15)] p-6">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.1),transparent_30%)]" />
+                  <div className="relative mt-4 flex h-[220px] items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#ffffff_0%,#eef5fd_100%)] p-6">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.16),transparent_34%)]" />
                     <img src={resolveAssetUrl(item.image)} alt={item.name} className="relative z-10 max-h-full object-contain transition duration-300 group-hover:scale-105" />
                   </div>
                   <p className="mt-6 text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{item.categoryName}</p>
-                  <h2 className="mt-3 text-[1.45rem] font-semibold leading-8 tracking-[-0.03em] text-(--text-primary)">{item.name}</h2>
-                  <p className="mt-4 font-mono text-[2.1rem] font-semibold tracking-[-0.05em] text-(--text-primary)">{formatCurrencyVnd(item.price)}</p>
+                  <h2 className="mt-3 text-[1.9rem] font-semibold leading-[1.02] tracking-[-0.05em] text-(--text-primary)">{item.name}</h2>
+                  <p className="mt-4 text-[2.35rem] font-semibold tracking-[-0.06em] text-(--text-primary)">{formatCurrencyVnd(item.price)}</p>
                 </Link>
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => addItem(toCatalogProduct(item))}
-                    className="cy-btn-primary inline-flex h-13 flex-1 items-center justify-center gap-3 px-5 text-sm"
+                    className="cy-btn-primary inline-flex h-12 flex-1 items-center justify-center gap-3 px-5 text-sm"
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Add to cart
                   </button>
                   <Link
                     to={`/products/${item.slug}`}
-                    className="cy-btn-secondary inline-flex h-13 flex-1 items-center justify-center px-5 text-sm"
+                    className="cy-btn-secondary inline-flex h-12 flex-1 items-center justify-center px-5 text-sm"
                   >
                     View
                   </Link>

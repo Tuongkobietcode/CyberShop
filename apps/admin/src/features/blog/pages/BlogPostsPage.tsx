@@ -11,6 +11,11 @@ import {
   XCircle,
 } from "lucide-react";
 import { uploadAdminImages } from "@/features/uploads/api/uploads.api";
+import {
+  isBlank,
+  isValidSlug,
+  type ValidationErrors,
+} from "@shared/validation/forms";
 import { resolveAssetUrl } from "@/utils/assets";
 import {
   createAdminBlogPost,
@@ -32,10 +37,12 @@ function Field({
   label,
   value,
   onChange,
+  error = "",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  error?: string;
 }) {
   return (
     <label className="block space-y-2">
@@ -43,8 +50,13 @@ function Field({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none"
+        className={[
+          "h-12 w-full rounded-2xl border bg-[#f5f5f5] px-4 text-sm outline-none",
+          error ? "border-rose-300 bg-rose-50/70" : "border-black/10",
+        ].join(" ")}
+        aria-invalid={Boolean(error)}
       />
+      {error ? <span className="text-sm text-rose-600">{error}</span> : null}
     </label>
   );
 }
@@ -54,6 +66,56 @@ function createEmptySection(): BlogSectionForm {
     heading: "",
     body: "",
   };
+}
+
+function validateBlogForm(
+  form: {
+    title: string;
+    slug: string;
+    category: string;
+    excerpt: string;
+    image: string;
+    authorName: string;
+  },
+  sections: BlogSectionForm[]
+): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (isBlank(form.title)) {
+    errors.title = "Title is required.";
+  }
+
+  if (isBlank(form.slug)) {
+    errors.slug = "Slug is required.";
+  } else if (!isValidSlug(form.slug)) {
+    errors.slug = "Use lowercase letters, numbers, and hyphens only.";
+  }
+
+  if (isBlank(form.category)) {
+    errors.category = "Category is required.";
+  }
+
+  if (isBlank(form.excerpt)) {
+    errors.excerpt = "Excerpt is required.";
+  }
+
+  if (isBlank(form.authorName)) {
+    errors.authorName = "Author is required.";
+  }
+
+  if (isBlank(form.image)) {
+    errors.image = "Cover image is required.";
+  }
+
+  const hasSectionContent = sections.some(
+    (section) => !isBlank(section.heading) && !isBlank(section.body)
+  );
+
+  if (!hasSectionContent) {
+    errors.sections = "Add at least one section with a heading and body.";
+  }
+
+  return errors;
 }
 
 export default function BlogPostsPage() {
@@ -67,6 +129,8 @@ export default function BlogPostsPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [mediaError, setMediaError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
   const [selectedId, setSelectedId] = useState("");
   const [form, setForm] = useState({
     title: "",
@@ -117,6 +181,8 @@ export default function BlogPostsPage() {
   function resetForm() {
     setSelectedId("");
     setMediaError("");
+    setSubmitError("");
+    setFieldErrors({});
     setForm({
       title: "",
       slug: "",
@@ -134,6 +200,8 @@ export default function BlogPostsPage() {
   function handleSelect(post: AdminBlogPost) {
     setSelectedId(post.id);
     setMediaError("");
+    setSubmitError("");
+    setFieldErrors({});
     setForm({
       title: post.title,
       slug: post.slug,
@@ -168,6 +236,7 @@ export default function BlogPostsPage() {
     try {
       const [uploadedImage] = await uploadAdminImages([file], "blog");
       setForm((current) => ({ ...current, image: uploadedImage?.url || "" }));
+      setFieldErrors((current) => ({ ...current, image: "" }));
     } catch (error) {
       setMediaError(error instanceof Error ? error.message : "Cover upload failed");
     } finally {
@@ -218,7 +287,15 @@ export default function BlogPostsPage() {
   }
 
   async function handleSave() {
+    const nextErrors = validateBlogForm(form, sections);
+    setFieldErrors(nextErrors);
+
+    if (Object.values(nextErrors).some(Boolean)) {
+      return;
+    }
+
     setSaving(true);
+    setSubmitError("");
 
     try {
       const payload = buildPayload();
@@ -231,6 +308,8 @@ export default function BlogPostsPage() {
 
       resetForm();
       await loadPosts();
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to save article right now.");
     } finally {
       setSaving(false);
     }
@@ -423,30 +502,53 @@ export default function BlogPostsPage() {
             <Field
               label="Title"
               value={form.title}
-              onChange={(value) => setForm((current) => ({ ...current, title: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, title: value }));
+                setFieldErrors((current) => ({ ...current, title: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.title}
             />
             <Field
               label="Slug"
               value={form.slug}
-              onChange={(value) => setForm((current) => ({ ...current, slug: value }))}
+              onChange={(value) => {
+                setForm((current) => ({ ...current, slug: value }));
+                setFieldErrors((current) => ({ ...current, slug: "" }));
+                setSubmitError("");
+              }}
+              error={fieldErrors.slug}
             />
             <div className="grid gap-4 md:grid-cols-2">
               <Field
                 label="Category"
                 value={form.category}
-                onChange={(value) => setForm((current) => ({ ...current, category: value }))}
+                onChange={(value) => {
+                  setForm((current) => ({ ...current, category: value }));
+                  setFieldErrors((current) => ({ ...current, category: "" }));
+                  setSubmitError("");
+                }}
+                error={fieldErrors.category}
               />
               <Field
                 label="Read time"
                 value={form.readTime}
-                onChange={(value) => setForm((current) => ({ ...current, readTime: value }))}
+                onChange={(value) => {
+                  setForm((current) => ({ ...current, readTime: value }));
+                  setSubmitError("");
+                }}
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <Field
                 label="Author"
                 value={form.authorName}
-                onChange={(value) => setForm((current) => ({ ...current, authorName: value }))}
+                onChange={(value) => {
+                  setForm((current) => ({ ...current, authorName: value }));
+                  setFieldErrors((current) => ({ ...current, authorName: "" }));
+                  setSubmitError("");
+                }}
+                error={fieldErrors.authorName}
               />
               <label className="block space-y-2">
                 <span className="text-sm font-medium text-black/58">Status</span>
@@ -481,10 +583,19 @@ export default function BlogPostsPage() {
               <textarea
                 value={form.excerpt}
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, excerpt: event.target.value }))
+                  {
+                    setForm((current) => ({ ...current, excerpt: event.target.value }));
+                    setFieldErrors((current) => ({ ...current, excerpt: "" }));
+                    setSubmitError("");
+                  }
                 }
-                className="min-h-24 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 py-3 text-sm outline-none"
+                className={[
+                  "min-h-24 w-full rounded-2xl border bg-[#f5f5f5] px-4 py-3 text-sm outline-none",
+                  fieldErrors.excerpt ? "border-rose-300 bg-rose-50/70" : "border-black/10",
+                ].join(" ")}
+                aria-invalid={Boolean(fieldErrors.excerpt)}
               />
+              {fieldErrors.excerpt ? <span className="text-sm text-rose-600">{fieldErrors.excerpt}</span> : null}
             </label>
 
             <div className="rounded-[24px] border border-dashed border-black/12 bg-[#f7f7f8] p-4">
@@ -533,10 +644,16 @@ export default function BlogPostsPage() {
                 </button>
               </div>
             </div>
+            {fieldErrors.image ? <div className="text-sm text-rose-600">{fieldErrors.image}</div> : null}
 
             {mediaError ? (
               <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
                 {mediaError}
+              </div>
+            ) : null}
+            {submitError ? (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                {submitError}
               </div>
             ) : null}
 
@@ -573,13 +690,21 @@ export default function BlogPostsPage() {
                     <Field
                       label="Section heading"
                       value={section.heading}
-                      onChange={(value) => updateSection(index, { heading: value })}
+                      onChange={(value) => {
+                        updateSection(index, { heading: value });
+                        setFieldErrors((current) => ({ ...current, sections: "" }));
+                        setSubmitError("");
+                      }}
                     />
                     <label className="block space-y-2">
                       <span className="text-sm font-medium text-black/58">Section body</span>
                       <textarea
                         value={section.body}
-                        onChange={(event) => updateSection(index, { body: event.target.value })}
+                        onChange={(event) => {
+                          updateSection(index, { body: event.target.value });
+                          setFieldErrors((current) => ({ ...current, sections: "" }));
+                          setSubmitError("");
+                        }}
                         className="min-h-28 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 py-3 text-sm outline-none"
                       />
                     </label>
@@ -587,6 +712,7 @@ export default function BlogPostsPage() {
                 </div>
               ))}
             </div>
+            {fieldErrors.sections ? <div className="text-sm text-rose-600">{fieldErrors.sections}</div> : null}
 
             <div className="flex gap-3 pt-2">
               <button

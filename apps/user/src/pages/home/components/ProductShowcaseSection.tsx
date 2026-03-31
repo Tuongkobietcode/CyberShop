@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
+import { Star } from "lucide-react";
 import { buildCatalogCategoryPath } from "@/features/catalog/category-links";
 import { resolveAssetUrl } from "@/utils/assets";
 import { formatCurrencyVnd } from "@/utils/format";
@@ -91,7 +92,7 @@ const archiveCards = [
     image: "/assets/images/iphone-17-pro.png",
     to: buildCatalogCategoryPath("iphone"),
     imageClassName:
-      "mx-auto h-[248px] w-full max-w-[236px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[268px] sm:max-w-[254px]",
+      "mx-auto h-[208px] w-full max-w-[224px] object-contain object-bottom transition duration-500 group-hover:scale-[1.04] sm:h-[224px] sm:max-w-[242px]",
   },
   {
     eyebrow: "New",
@@ -101,7 +102,7 @@ const archiveCards = [
     image: "/assets/images/iphone-17.png",
     to: buildCatalogCategoryPath("iphone"),
     imageClassName:
-      "mx-auto h-[244px] w-full max-w-[232px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[264px] sm:max-w-[250px]",
+      "mx-auto h-[206px] w-full max-w-[220px] object-contain object-bottom transition duration-500 group-hover:scale-[1.04] sm:h-[222px] sm:max-w-[238px]",
   },
   {
     eyebrow: "New",
@@ -111,7 +112,7 @@ const archiveCards = [
     image: "/assets/images/iphone-17e.png",
     to: buildCatalogCategoryPath("iphone"),
     imageClassName:
-      "mx-auto h-[240px] w-full max-w-[228px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[260px] sm:max-w-[246px]",
+      "mx-auto h-[202px] w-full max-w-[216px] object-contain object-bottom transition duration-500 group-hover:scale-[1.04] sm:h-[218px] sm:max-w-[234px]",
   },
   {
     eyebrow: "New",
@@ -121,7 +122,7 @@ const archiveCards = [
     image: "/assets/images/iphone-16.png",
     to: buildCatalogCategoryPath("iphone"),
     imageClassName:
-      "mx-auto h-[240px] w-full max-w-[228px] object-contain transition duration-500 group-hover:scale-[1.04] sm:h-[260px] sm:max-w-[246px]",
+      "mx-auto h-[202px] w-full max-w-[216px] object-contain object-bottom transition duration-500 group-hover:scale-[1.04] sm:h-[218px] sm:max-w-[234px]",
   },
   {
     eyebrow: "Audio",
@@ -248,7 +249,7 @@ function ArchiveCard({
       className="group relative flex h-[368px] flex-col overflow-hidden rounded-[28px] border border-black/7 bg-[linear-gradient(180deg,#ffffff_0%,#f6f6f8_100%)] p-5 shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sm:h-[394px] sm:p-6"
     >
       <div className="relative flex h-full flex-1 flex-col">
-        <div className="flex h-[176px] items-end justify-center overflow-hidden px-2 sm:h-[196px]">
+        <div className="flex h-[216px] items-end justify-center overflow-hidden px-2 sm:h-[230px]">
           <img
             src={resolveAssetUrl(image)}
             alt={title}
@@ -292,9 +293,9 @@ function TestimonialCard({
 }) {
   return (
     <article className="rounded-[28px] border border-black/6 bg-white/82 p-5 shadow-[0_14px_36px_rgba(15,23,42,0.06)]">
-      <div className="flex gap-1 text-[11px] tracking-[0.18em] text-[#bf4800]">
+      <div className="flex gap-1 text-[#bf4800]">
         {Array.from({ length: 5 }).map((_, index) => (
-          <span key={index}>â˜…</span>
+          <Star key={index} className="h-3.5 w-3.5 fill-current" />
         ))}
       </div>
       <p className="mt-4 text-sm leading-7 text-(--text-secondary)">{quote}</p>
@@ -429,3 +430,4 @@ export default function ProductShowcaseSection() {
     </>
   );
 }
+

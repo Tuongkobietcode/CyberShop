@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CirclePlus } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useCart } from "@/features/cart/cart.context";
@@ -18,6 +18,12 @@ export default function AddressPage() {
     [checkout.addresses, checkout.selectedAddressId]
   );
 
+  useEffect(() => {
+    if (checkout.addresses.length === 0) {
+      setShowForm(true);
+    }
+  }, [checkout.addresses.length]);
+
   if (items.length === 0) {
     return <Navigate to="/cart" replace />;
   }
@@ -28,7 +34,7 @@ export default function AddressPage() {
         <div className="max-w-3xl">
           <p className="text-sm uppercase tracking-[0.22em] text-(--text-tertiary)">Recipient selection</p>
           <p className="mt-4 text-base leading-8 text-(--text-secondary)">
-            Choose a saved address or add a new one before the shipping options appear. The selected address defines ETA and tax context.
+            Choose a saved address or add a new one before the shipping options appear. New customer accounts start here because the first address defines delivery timing and tax context.
           </p>
         </div>
 
@@ -77,14 +83,21 @@ export default function AddressPage() {
           <button type="button" onClick={() => navigate("/cart")} className="cy-btn-secondary h-14 min-w-[200px]">
             Back
           </button>
-          <button
-            type="button"
-            disabled={!selectedAddress}
-            onClick={() => navigate("/checkout/shipping")}
-            className="cy-btn-primary h-14 min-w-[220px] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Continue to shipping
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              type="button"
+              disabled={!selectedAddress}
+              onClick={() => navigate("/checkout/shipping")}
+              className="cy-btn-primary h-14 min-w-[220px] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Continue to shipping
+            </button>
+            {!selectedAddress ? (
+              <p className="text-sm text-(--text-tertiary)">
+                Save and select one delivery address before shipping options unlock.
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
     </CheckoutShell>
