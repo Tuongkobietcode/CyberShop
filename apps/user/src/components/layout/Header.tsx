@@ -69,7 +69,7 @@ export default function Header() {
         <div className="flex min-h-[64px] items-center gap-4">
           <Link
             to="/home"
-            className="shrink-0 text-[1rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)]"
+            className="shrink-0 text-[1rem] font-semibold tracking-[-0.06em] text-(--text-primary)"
           >
             CyberShop
           </Link>
@@ -82,8 +82,8 @@ export default function Header() {
                 className={[
                   "text-[0.78rem] font-medium tracking-[0.01em] transition",
                   isNavActive(item.to)
-                    ? "text-[var(--text-primary)]"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+                    ? "text-(--text-primary)"
+                    : "text-(--text-secondary) hover:text-(--text-primary)",
                 ].join(" ")}
               >
                 {item.label}
@@ -94,7 +94,7 @@ export default function Header() {
           <div className="ml-auto hidden items-center gap-3 lg:flex">
             <form
               onSubmit={handleSearchSubmit}
-              className="flex h-10 w-[240px] items-center gap-2 rounded-full border border-black/7 bg-white/80 px-3 text-[var(--text-tertiary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-black/10"
+              className="flex h-10 w-[240px] items-center gap-2 rounded-full border border-black/7 bg-white/80 px-3 text-(--text-tertiary) shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-black/10"
             >
               <Search className="h-4 w-4" />
               <input
@@ -102,13 +102,13 @@ export default function Header() {
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
                 placeholder="Search products"
-                className="w-full border-0 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
+                className="w-full border-0 bg-transparent text-sm text-(--text-primary) outline-none placeholder:text-(--text-tertiary)"
               />
             </form>
 
             <Link
               to={isAuthenticated ? "/wishlist" : "/sign-in?redirect=%2Fwishlist"}
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-[var(--text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-(--text-secondary) shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
             >
               <Heart
                 className={[
@@ -125,11 +125,11 @@ export default function Header() {
 
             <Link
               to={isAuthenticated ? "/cart" : "/sign-in?redirect=%2Fcart"}
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-[var(--text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-(--text-secondary) shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
               {itemCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-(--accent) px-1 text-[10px] font-semibold text-white">
                   {itemCount}
                 </span>
               ) : null}
@@ -137,7 +137,7 @@ export default function Header() {
 
             <Link
               to={isAuthenticated ? "/profile" : "/sign-in"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-[var(--text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-(--text-secondary) shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:bg-white"
             >
               <User className="h-[18px] w-[18px]" />
             </Link>
@@ -146,17 +146,17 @@ export default function Header() {
           <div className="ml-auto flex items-center gap-2 lg:hidden">
             <Link
               to="/products"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-[var(--text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-(--text-secondary) shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
             >
               <Search className="h-[18px] w-[18px]" />
             </Link>
             <Link
               to={isAuthenticated ? "/cart" : "/sign-in?redirect=%2Fcart"}
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-[var(--text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/7 bg-white/80 text-(--text-secondary) shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
               {itemCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-(--accent) px-1 text-[10px] font-semibold text-white">
                   {itemCount}
                 </span>
               ) : null}
@@ -172,8 +172,8 @@ export default function Header() {
               className={[
                 "shrink-0 text-[0.78rem] font-medium tracking-[0.01em] transition",
                 isNavActive(item.to)
-                  ? "text-[var(--text-primary)]"
-                  : "text-[var(--text-secondary)]",
+                  ? "text-(--text-primary)"
+                  : "text-(--text-secondary)",
               ].join(" ")}
             >
               {item.label}

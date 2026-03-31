@@ -26,6 +26,26 @@ const TITLE_BY_PATH: Record<string, string> = {
   [PATHS.dev.adminRole]: "Admin role",
 };
 
+const DESCRIPTION_BY_PATH: Record<string, string> = {
+  [PATHS.dashboard]: "Monitor sales, orders, categories, and recent storefront activity.",
+  [PATHS.orders]: "Review fulfilment state, payment progress, and customer delivery flow.",
+  [PATHS.customers]: "Track customer profiles, registration state, and recent account activity.",
+  [PATHS.categories]: "Maintain catalog grouping, category imagery, and shared storefront structure.",
+  [PATHS.blog]: "Publish journal posts, update covers, and keep editorial content in sync.",
+  [PATHS.transactions]: "Inspect payment health, transaction totals, and order-level settlement status.",
+  [PATHS.contactInbox]: "Review support inquiries, update status, and follow up on customer issues.",
+  [PATHS.addProduct]: "Create products, upload media, and assign category, stock, and pricing data.",
+  [PATHS.adminRole]: "Manage internal roles and keep backoffice access aligned with project scope.",
+
+  [PATHS.dev.dashboard]: "Monitor sales, orders, categories, and recent storefront activity.",
+  [PATHS.dev.orders]: "Review fulfilment state, payment progress, and customer delivery flow.",
+  [PATHS.dev.customers]: "Track customer profiles, registration state, and recent account activity.",
+  [PATHS.dev.categories]: "Maintain catalog grouping, category imagery, and shared storefront structure.",
+  [PATHS.dev.transactions]: "Inspect payment health, transaction totals, and order-level settlement status.",
+  [PATHS.dev.addProduct]: "Create products, upload media, and assign category, stock, and pricing data.",
+  [PATHS.dev.adminRole]: "Manage internal roles and keep backoffice access aligned with project scope.",
+};
+
 type Props = {
   theme: AdminTheme;
   onToggleTheme: () => void;
@@ -34,6 +54,9 @@ type Props = {
 export function Topbar({ theme, onToggleTheme }: Props) {
   const location = useLocation();
   const title = TITLE_BY_PATH[location.pathname] ?? "Dashboard";
+  const description =
+    DESCRIPTION_BY_PATH[location.pathname] ??
+    "Manage storefront operations, catalog data, and daily backoffice workflows.";
   const isDark = theme === "dark";
 
   return (
@@ -55,6 +78,9 @@ export function Topbar({ theme, onToggleTheme }: Props) {
         >
           {title}
         </h1>
+        <p className={["mt-2 max-w-[42rem] text-sm leading-6", isDark ? "text-slate-400" : "text-slate-500"].join(" ")}>
+          {description}
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:min-w-[620px] xl:justify-end">

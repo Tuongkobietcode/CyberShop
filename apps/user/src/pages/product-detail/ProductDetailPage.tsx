@@ -167,13 +167,13 @@ function RelatedProducts({ products }: { products: CatalogProduct[] }) {
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <p className="cy-kicker">Related products</p>
-          <h2 className="mt-3 text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+          <h2 className="mt-3 text-[2rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
             More hardware in the same visual lane.
           </h2>
         </div>
         <Link
           to="/products"
-          className="text-sm font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          className="text-sm font-semibold text-(--text-secondary) transition hover:text-(--text-primary)"
         >
           View catalog
         </Link>
@@ -259,7 +259,7 @@ export default function ProductDetailPage() {
   const includedServices = useMemo(() => (product ? getIncludedServices(product) : []), [product]);
 
   if (!product) {
-    return <div className="px-4 py-16 text-center text-sm text-[var(--text-secondary)]">Loading product...</div>;
+    return <div className="px-4 py-16 text-center text-sm text-(--text-secondary)">Loading product...</div>;
   }
 
   const categoryLabel = getDisplayCategoryName(product.category?.name);
@@ -291,8 +291,8 @@ export default function ProductDetailPage() {
       />
 
       <div className="cy-shell space-y-16 pt-10">
-        <section className="grid gap-10 lg:min-h-[calc(100vh-11rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,520px)] lg:items-start">
-          <div className="lg:sticky lg:top-28">
+        <section className="grid gap-10 xl:min-h-[calc(100vh-11rem)] xl:grid-cols-[minmax(0,1.05fr)_minmax(420px,520px)] xl:items-start">
+          <div className="xl:sticky xl:top-28">
             <ProductGallery
               items={gallery}
               name={product.name}
@@ -319,10 +319,10 @@ export default function ProductDetailPage() {
             <div className="rounded-[30px] border border-black/6 bg-white/82 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.05)]">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--text-tertiary)">
                     Buy flow
                   </p>
-                  <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  <p className="mt-2 text-sm text-(--text-secondary)">
                     Choose quantity and continue with the selected configuration.
                   </p>
                 </div>

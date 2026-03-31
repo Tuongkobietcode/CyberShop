@@ -49,33 +49,33 @@ export default function ProductInfo({
   return (
     <div className="space-y-6">
       <p className="cy-kicker">{product.category?.name || "Apple hardware"}</p>
-      <h1 className="text-[2.4rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)] sm:text-[3.2rem] xl:text-[4rem]">
+      <h1 className="text-[2.4rem] font-semibold tracking-[-0.06em] text-(--text-primary) sm:text-[3.2rem] xl:text-[4rem]">
         {product.name}
       </h1>
 
       <div className="rounded-[30px] border border-black/6 bg-white/82 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--text-tertiary)">
               Selected configuration
             </p>
-            <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+            <p className="mt-2 text-[1.05rem] font-medium text-(--text-primary)">
               {selectedConfiguration}
             </p>
           </div>
           <div className="text-right">
-            <span className="block font-mono text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-[2.35rem]">
+            <span className="block font-mono text-[2rem] font-semibold tracking-[-0.04em] text-(--text-primary) sm:text-[2.35rem]">
               {formatCurrencyVnd(displayPrice)}
             </span>
             {product.compareAtPrice ? (
-              <span className="mt-1 block font-mono text-sm text-[var(--text-tertiary)] line-through">
+              <span className="mt-1 block font-mono text-sm text-(--text-tertiary) line-through">
                 {formatCurrencyVnd(product.compareAtPrice)}
               </span>
             ) : null}
           </div>
         </div>
 
-        <p className="mt-5 max-w-[48ch] text-[15px] leading-7 text-[var(--text-secondary)]">
+        <p className="mt-5 max-w-[48ch] text-[15px] leading-7 text-(--text-secondary)">
           {product.description}
         </p>
 
@@ -112,36 +112,36 @@ export default function ProductInfo({
         {quickSpecs.map((item) => (
           <div
             key={item.label}
-            className="rounded-[24px] border border-[var(--line-soft)] bg-white/82 px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]"
+            className="rounded-[24px] border border-(--line-soft) bg-white/82 px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]"
           >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-(--text-tertiary)">
               {item.label}
             </p>
-            <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{item.value}</p>
+            <p className="mt-2 text-sm font-medium text-(--text-primary)">{item.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
-          <Truck className="h-5 w-5 text-[var(--accent)]" />
+        <div className="flex items-center gap-3 rounded-[24px] border border-(--line-soft) bg-white/82 p-4 text-sm text-(--text-secondary)">
+          <Truck className="h-5 w-5 text-(--accent)" />
           <div>
             <p>Fast delivery</p>
-            <p className="font-medium text-[var(--text-primary)]">1-2 business days</p>
+            <p className="font-medium text-(--text-primary)">1-2 business days</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
-          <ShieldCheck className="h-5 w-5 text-[var(--accent)]" />
+        <div className="flex items-center gap-3 rounded-[24px] border border-(--line-soft) bg-white/82 p-4 text-sm text-(--text-secondary)">
+          <ShieldCheck className="h-5 w-5 text-(--accent)" />
           <div>
             <p>Warranty</p>
-            <p className="font-medium text-[var(--text-primary)]">Official 12 months</p>
+            <p className="font-medium text-(--text-primary)">Official 12 months</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/82 p-4 text-sm text-[var(--text-secondary)]">
-          <Sparkles className="h-5 w-5 text-[var(--accent)]" />
+        <div className="flex items-center gap-3 rounded-[24px] border border-(--line-soft) bg-white/82 p-4 text-sm text-(--text-secondary)">
+          <Sparkles className="h-5 w-5 text-(--accent)" />
           <div>
             <p>Condition</p>
-            <p className="font-medium text-[var(--text-primary)]">Premium finish</p>
+            <p className="font-medium text-(--text-primary)">Premium finish</p>
           </div>
         </div>
       </div>

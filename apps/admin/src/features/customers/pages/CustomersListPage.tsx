@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Mail, Phone, ShieldCheck } from "lucide-react";
+import { formatCurrencyVnd } from '@shared/formatters/currency';
 import { Link } from "react-router-dom";
 import { getAdminCustomers, type AdminCustomer } from "../api/customers.api";
 import { PATHS } from "@/app/router/paths";
@@ -8,7 +9,7 @@ const surface =
   "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
 
 function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+  return formatCurrencyVnd(value);
 }
 
 function formatDate(value: string | null) {

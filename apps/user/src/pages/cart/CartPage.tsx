@@ -23,21 +23,21 @@ export default function CartPage() {
 
             {items.length === 0 ? (
               <div className="cy-panel px-8 py-16 text-center">
-                <p className="text-sm uppercase tracking-[0.24em] text-[var(--text-tertiary)]">Cart is empty</p>
-                <p className="mx-auto mt-4 max-w-xl text-lg text-[var(--text-secondary)]">
+                <p className="text-sm uppercase tracking-[0.24em] text-(--text-tertiary)">Cart is empty</p>
+                <p className="mx-auto mt-4 max-w-xl text-lg text-(--text-secondary)">
                   Add a few devices to start your order. The checkout flow will unlock automatically once something is in the bag.
                 </p>
               </div>
             ) : (
               <div className="cy-panel overflow-hidden p-5 sm:p-7">
-                <div className="mb-6 flex items-center justify-between gap-4 border-b border-[var(--line-soft)] pb-5">
+                <div className="mb-6 flex items-center justify-between gap-4 border-b border-(--line-soft) pb-5">
                   <div>
-                    <p className="text-sm uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Active order</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">
+                    <p className="text-sm uppercase tracking-[0.22em] text-(--text-tertiary)">Active order</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-(--text-primary)">
                       {items.length} {items.length === 1 ? "device" : "devices"} ready
                     </p>
                   </div>
-                  <div className="rounded-full border border-[var(--line-soft)] bg-white/[0.03] px-4 py-2 text-sm text-[var(--text-secondary)]">
+                  <div className="rounded-full border border-(--line-soft) bg-white/[0.03] px-4 py-2 text-sm text-(--text-secondary)">
                     Tax and shipping calculated live
                   </div>
                 </div>

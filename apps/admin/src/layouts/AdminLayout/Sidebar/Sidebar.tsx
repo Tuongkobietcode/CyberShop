@@ -1,4 +1,4 @@
-﻿import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { NAV_GROUPS } from "./nav.config";
 import { NavItemRow } from "./SidebarItem";
@@ -18,7 +18,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, theme }: Props) {
   return (
     <div
       className={[
-        "sticky top-4 flex h-[calc(100vh-32px)] flex-col rounded-3xl border p-4 transition-colors duration-300",
+        "flex h-auto flex-col rounded-3xl border p-4 transition-colors duration-300 lg:sticky lg:top-4 lg:h-[calc(100vh-32px)]",
         isDark
           ? "border-slate-800 bg-[#111827] text-slate-100"
           : "border-slate-200 bg-white text-slate-900",

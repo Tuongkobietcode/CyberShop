@@ -245,10 +245,10 @@ function ArchiveCard({
   return (
     <Link
       to={to}
-      className="group relative flex h-[388px] flex-col overflow-hidden rounded-[28px] border border-black/7 bg-[linear-gradient(180deg,#ffffff_0%,#f6f6f8_100%)] p-5 shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sm:h-[410px] sm:p-6"
+      className="group relative flex h-[368px] flex-col overflow-hidden rounded-[28px] border border-black/7 bg-[linear-gradient(180deg,#ffffff_0%,#f6f6f8_100%)] p-5 shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sm:h-[394px] sm:p-6"
     >
       <div className="relative flex h-full flex-1 flex-col">
-        <div className="flex h-[196px] items-end justify-center overflow-hidden px-2 sm:h-[208px]">
+        <div className="flex h-[176px] items-end justify-center overflow-hidden px-2 sm:h-[196px]">
           <img
             src={resolveAssetUrl(image)}
             alt={title}
@@ -263,7 +263,7 @@ function ArchiveCard({
           <h3 className="mt-3 max-w-[12ch] text-[1.3rem] font-semibold leading-[1.04] tracking-[-0.045em] text-[#1d1d1f] sm:text-[1.44rem]">
             {title}
           </h3>
-          <p className="mt-2 max-w-[28ch] text-[14px] leading-6 text-[var(--text-secondary)] line-clamp-2">
+          <p className="mt-2 max-w-[28ch] text-[14px] leading-6 text-(--text-secondary) line-clamp-2">
             {copy}
           </p>
 
@@ -294,13 +294,13 @@ function TestimonialCard({
     <article className="rounded-[28px] border border-black/6 bg-white/82 p-5 shadow-[0_14px_36px_rgba(15,23,42,0.06)]">
       <div className="flex gap-1 text-[11px] tracking-[0.18em] text-[#bf4800]">
         {Array.from({ length: 5 }).map((_, index) => (
-          <span key={index}>★</span>
+          <span key={index}>â˜…</span>
         ))}
       </div>
-      <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">{quote}</p>
+      <p className="mt-4 text-sm leading-7 text-(--text-secondary)">{quote}</p>
       <div className="mt-6">
         <p className="text-sm font-medium text-[#1d1d1f]">{name}</p>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-(--text-tertiary)">
           {role}
         </p>
       </div>
@@ -409,7 +409,7 @@ export default function ProductShowcaseSection() {
               <h2 className="mx-auto mt-4 max-w-[11ch] text-[2.5rem] font-semibold leading-[0.96] tracking-[-0.07em] text-[#1d1d1f] sm:text-[3.8rem]">
                 Never a generic storefront.
               </h2>
-              <p className="mx-auto mt-5 max-w-[40ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+              <p className="mx-auto mt-5 max-w-[40ch] text-[15px] leading-7 text-(--text-secondary) sm:text-base">
                 Browse launch alerts, restock notes, and the cleaner side of
                 premium electronics retail without the usual visual noise.
               </p>

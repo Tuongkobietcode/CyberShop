@@ -58,23 +58,23 @@ export default function AddToCartSection({
       <div
         className={[
           "inline-flex h-14 items-center rounded-2xl border px-3 shadow-[0_12px_30px_rgba(15,23,42,0.04)]",
-          isOutOfStock ? "border-[var(--line-soft)] bg-white/68" : "border-[var(--line-soft)] bg-white/82",
+          isOutOfStock ? "border-(--line-soft) bg-white/68" : "border-(--line-soft) bg-white/82",
         ].join(" ")}
       >
         <button
           type="button"
           onClick={onDecrease}
           disabled={isOutOfStock}
-          className="h-10 w-10 text-xl text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:text-[var(--text-tertiary)]"
+          className="h-10 w-10 text-xl text-(--text-secondary) disabled:cursor-not-allowed disabled:text-(--text-tertiary)"
         >
           -
         </button>
-        <span className="w-12 text-center text-lg font-medium text-[var(--text-primary)]">{quantity}</span>
+        <span className="w-12 text-center text-lg font-medium text-(--text-primary)">{quantity}</span>
         <button
           type="button"
           onClick={onIncrease}
           disabled={isOutOfStock || quantity >= maxQuantity}
-          className="h-10 w-10 text-xl text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:text-[var(--text-tertiary)]"
+          className="h-10 w-10 text-xl text-(--text-secondary) disabled:cursor-not-allowed disabled:text-(--text-tertiary)"
         >
           +
         </button>
@@ -87,7 +87,7 @@ export default function AddToCartSection({
           "inline-flex h-14 items-center justify-center gap-3 rounded-2xl border px-8 text-[15px] font-medium transition duration-300",
           isWishlisted
             ? "border-rose-300/40 bg-rose-50 text-rose-600 shadow-[0_18px_42px_rgba(244,63,94,0.12)]"
-            : "border-[var(--line-soft)] bg-white/82 text-[var(--text-primary)] hover:bg-white",
+            : "border-(--line-soft) bg-white/82 text-(--text-primary) hover:bg-white",
           isWishlistAnimated ? "scale-[1.02]" : "",
         ].join(" ")}
       >
@@ -102,7 +102,7 @@ export default function AddToCartSection({
         className={[
           "relative inline-flex h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl px-8 text-[15px] font-medium transition duration-300",
           isOutOfStock
-            ? "cursor-not-allowed border border-[var(--line-soft)] bg-white/68 text-[var(--text-tertiary)] shadow-none"
+            ? "cursor-not-allowed border border-(--line-soft) bg-white/68 text-(--text-tertiary) shadow-none"
             : isAdded
               ? "bg-emerald-300 text-[#102014] shadow-[0_18px_42px_rgba(74,222,128,0.16)]"
               : "bg-[#1d1d1f] text-white shadow-[0_18px_42px_rgba(29,29,31,0.14)] hover:bg-black",

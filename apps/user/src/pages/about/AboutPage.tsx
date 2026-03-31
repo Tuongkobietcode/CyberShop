@@ -42,10 +42,10 @@ export default function AboutPage() {
         <section className="grid gap-10 lg:grid-cols-[0.94fr_1.06fr] lg:items-end">
           <div className="max-w-[620px]">
             <p className="cy-kicker">About Cyber</p>
-            <h1 className="mt-4 text-[3rem] font-semibold leading-[0.9] tracking-[-0.08em] text-[var(--text-primary)] sm:text-[4.6rem]">
+            <h1 className="mt-4 text-[3rem] font-semibold leading-[0.9] tracking-[-0.08em] text-(--text-primary) sm:text-[4.6rem]">
               A storefront rebuilt around the product.
             </h1>
-            <p className="mt-6 max-w-[40ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+            <p className="mt-6 max-w-[40ch] text-[15px] leading-7 text-(--text-secondary) sm:text-base">
               Cyber is an Apple-focused storefront concept shaped by retail restraint:
               fewer distractions, larger product framing, and a clearer relationship
               between discovery, support, and checkout.
@@ -57,7 +57,7 @@ export default function AboutPage() {
               <Link
                 key={family.label}
                 to={family.to}
-                className="rounded-[22px] border border-black/6 bg-white/82 px-5 py-5 text-sm text-[var(--text-secondary)] shadow-[0_12px_30px_rgba(15,23,42,0.05)] transition hover:-translate-y-[1px] hover:border-black/10 hover:bg-white hover:text-[var(--text-primary)]"
+                className="rounded-[22px] border border-black/6 bg-white/82 px-5 py-5 text-sm text-(--text-secondary) shadow-[0_12px_30px_rgba(15,23,42,0.05)] transition hover:-translate-y-[1px] hover:border-black/10 hover:bg-white hover:text-(--text-primary)"
               >
                 {family.label}
               </Link>
@@ -73,7 +73,7 @@ export default function AboutPage() {
               alt="Apple product lineup"
               className="absolute bottom-[-8%] right-[-8%] w-[860px] max-w-none object-contain opacity-[0.96]"
             />
-            <div className="absolute left-6 top-6 rounded-full border border-black/6 bg-white/84 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-[var(--text-secondary)] shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+            <div className="absolute left-6 top-6 rounded-full border border-black/6 bg-white/84 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-(--text-secondary) shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
               Retail concept
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function AboutPage() {
           <div className="space-y-6">
             <div className="cy-panel p-6">
               <p className="cy-kicker">Why it feels calmer</p>
-              <p className="mt-4 text-[1.7rem] font-semibold leading-[1.04] tracking-[-0.05em] text-[var(--text-primary)]">
+              <p className="mt-4 text-[1.7rem] font-semibold leading-[1.04] tracking-[-0.05em] text-(--text-primary)">
                 The interface is asked to support desire, not compete for attention.
               </p>
             </div>
@@ -91,14 +91,14 @@ export default function AboutPage() {
                 return (
                   <article key={item.title} className="cy-panel p-6">
                     <div className="flex items-start gap-4">
-                      <div className="rounded-2xl border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-3 text-[var(--accent)]">
+                      <div className="rounded-2xl border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-3 text-(--accent)">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h2 className="text-[1.2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+                        <h2 className="text-[1.2rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
                           {item.title}
                         </h2>
-                        <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
+                        <p className="mt-2 text-sm leading-7 text-(--text-secondary)">
                           {item.copy}
                         </p>
                       </div>
@@ -113,10 +113,10 @@ export default function AboutPage() {
         <section className="grid gap-10 lg:grid-cols-[0.84fr_1.16fr]">
           <div className="max-w-[560px]">
             <p className="cy-kicker">Store principles</p>
-            <h2 className="mt-4 text-[2.4rem] font-semibold leading-[0.94] tracking-[-0.06em] text-[var(--text-primary)] sm:text-[3.1rem]">
+            <h2 className="mt-4 text-[2.4rem] font-semibold leading-[0.94] tracking-[-0.06em] text-(--text-primary) sm:text-[3.1rem]">
               Every major screen should help you decide faster.
             </h2>
-            <p className="mt-5 text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+            <p className="mt-5 text-[15px] leading-7 text-(--text-secondary) sm:text-base">
               Product images are large, category paths are direct, support is visible,
               and the buying flow is compressed into fewer moments of uncertainty.
             </p>
@@ -141,13 +141,13 @@ export default function AboutPage() {
               },
             ].map((item) => (
               <article key={item.id} className="cy-panel p-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-(--text-tertiary)">
                   {item.id}
                 </p>
-                <h3 className="mt-5 text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+                <h3 className="mt-5 text-[1.35rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
                   {item.title}
                 </h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">{item.copy}</p>
+                <p className="mt-3 text-sm leading-7 text-(--text-secondary)">{item.copy}</p>
               </article>
             ))}
           </div>
@@ -156,7 +156,7 @@ export default function AboutPage() {
         <section className="cy-panel grid gap-8 px-6 py-10 sm:px-8 lg:grid-cols-[1fr_auto] lg:items-center lg:px-10">
           <div className="max-w-[620px]">
             <p className="cy-kicker">Continue exploring</p>
-            <h2 className="mt-4 text-[2.3rem] font-semibold leading-[0.94] tracking-[-0.06em] text-[var(--text-primary)] sm:text-[3rem]">
+            <h2 className="mt-4 text-[2.3rem] font-semibold leading-[0.94] tracking-[-0.06em] text-(--text-primary) sm:text-[3rem]">
               Browse the catalog, or go straight to support.
             </h2>
           </div>

@@ -12,7 +12,7 @@ const featuredTheme = {
   aura:
     "bg-[radial-gradient(circle_at_18%_16%,rgba(163,196,229,0.2),transparent_24%),radial-gradient(circle_at_84%_78%,rgba(255,214,196,0.16),transparent_24%),radial-gradient(circle_at_50%_100%,rgba(255,255,255,0.85),transparent_42%)]",
   panel: "border-white/60 bg-white/72 shadow-[0_12px_40px_rgba(162,189,220,0.18)]",
-  cta: "border-[rgba(17,24,39,0.12)] bg-[rgba(255,255,255,0.78)] text-[var(--text-primary)] hover:border-[rgba(17,24,39,0.18)] hover:bg-white",
+  cta: "border-[rgba(17,24,39,0.12)] bg-[rgba(255,255,255,0.78)] text-(--text-primary) hover:border-[rgba(17,24,39,0.18)] hover:bg-white",
 };
 
 const blogCardThemes = [
@@ -112,7 +112,7 @@ export default function BlogPage() {
     return (
       <div className="pb-24">
         <Breadcrumb items={[{ label: "Home", to: "/home" }, { label: "Blog" }]} />
-        <div className="cy-shell pt-10 text-sm text-[var(--text-secondary)]">
+        <div className="cy-shell pt-10 text-sm text-(--text-secondary)">
           No journal posts are available yet.
         </div>
       </div>
@@ -126,23 +126,23 @@ export default function BlogPage() {
       <div className="cy-shell space-y-12 pt-10">
         <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <article className="cy-panel px-8 py-9">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--line-soft)] bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.22em] text-[var(--text-secondary)]">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--accent)]" />
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-(--line-soft) bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.22em] text-(--text-secondary)">
+              <Sparkles className="h-3.5 w-3.5 text-(--accent)" />
               Editorial
             </div>
-            <h1 className="mt-5 text-[3rem] font-semibold leading-[0.92] tracking-[-0.08em] text-[var(--text-primary)] sm:text-[4.8rem]">
+            <h1 className="mt-5 text-[2.4rem] font-semibold leading-[0.94] tracking-[-0.08em] text-(--text-primary) sm:text-[3.5rem] lg:text-[4.8rem]">
               Notes on devices,
-              <span className="block text-[var(--text-secondary)]">
+              <span className="block text-(--text-secondary)">
                 design, and shopping behavior.
               </span>
             </h1>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+            <p className="mt-5 max-w-xl text-sm leading-7 text-(--text-secondary)">
               These posts are written to feel consistent with the store: clear, compact, and
               product-aware. Recent themes are influenced by broader industry movement around
               embedded AI, AI PCs, connected living, and more usable support experiences.
             </p>
-            <div className="mt-8 inline-flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-              <CalendarDays className="h-4 w-4 text-[var(--accent)]" />
+            <div className="mt-8 inline-flex items-center gap-3 text-sm text-(--text-secondary)">
+              <CalendarDays className="h-4 w-4 text-(--accent)" />
               Updated on {featured.date}
             </div>
           </article>
@@ -154,18 +154,18 @@ export default function BlogPage() {
             <img
               src={resolveAssetUrl(featured.image)}
               alt={featured.title}
-              className="relative z-10 mx-auto h-[260px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.12)]"
+              className="relative z-10 mx-auto h-[220px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.12)] sm:h-[260px] lg:h-[300px]"
             />
             <div
               className={`relative z-10 mt-6 rounded-[28px] border p-5 backdrop-blur ${featuredTheme.panel}`}
             >
-              <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+              <p className="text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">
                 {featured.category}
               </p>
-              <h2 className="mt-3 text-[2rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-primary)]">
+              <h2 className="mt-3 text-[2rem] font-semibold leading-tight tracking-[-0.05em] text-(--text-primary)">
                 {featured.title}
               </h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+              <p className="mt-4 text-sm leading-7 text-(--text-secondary)">
                 {featured.excerpt}
               </p>
               <Link
@@ -193,25 +193,25 @@ export default function BlogPage() {
                   <img
                     src={resolveAssetUrl(post.image)}
                     alt={post.title}
-                    className="relative z-10 mx-auto h-[200px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.1)] transition duration-500 group-hover:scale-105"
+                    className="relative z-10 mx-auto h-[180px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.1)] transition duration-500 group-hover:scale-105 sm:h-[200px]"
                   />
                 </div>
                 <div className="space-y-4 p-6">
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+                    <p className="text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">
                       {post.category}
                     </p>
-                    <p className="text-xs text-[var(--text-tertiary)]">{post.date}</p>
+                    <p className="text-xs text-(--text-tertiary)">{post.date}</p>
                   </div>
-                  <h2 className="text-[1.55rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--text-primary)]">
+                  <h2 className="text-[1.55rem] font-semibold leading-tight tracking-[-0.04em] text-(--text-primary)">
                     {post.title}
                   </h2>
-                  <p className="text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="text-sm leading-7 text-(--text-secondary)">
                     {post.excerpt}
                   </p>
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="inline-flex items-center gap-3 rounded-full border border-[rgba(17,24,39,0.12)] bg-white/55 px-5 py-3 text-sm font-semibold text-[var(--text-primary)] transition hover:border-[rgba(17,24,39,0.18)] hover:bg-white/78"
+                    className="inline-flex items-center gap-3 rounded-full border border-[rgba(17,24,39,0.12)] bg-white/55 px-5 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-[rgba(17,24,39,0.18)] hover:bg-white/78"
                   >
                     Read more
                     <ArrowRight className="h-4 w-4" />

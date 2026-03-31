@@ -22,7 +22,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "iPhone 17 Pro Max",
     subtitle: "A18 Pro. Camera-first. Titanium-sharp.",
-    copy: "From 38.990.000 đ or 1.624.583 đ/mo. for 24 mo.",
+    copy: "From 38.990.000 VND or 1.624.583 VND/mo. for 24 mo.",
     price: 38990000,
     image: "/assets/images/iphone-17-promax.png",
     to: "/products/iphone-17-pro-max",
@@ -35,7 +35,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "iPad Pro 13-inch",
     subtitle: "Ultra Retina XDR. M5. Pencil-first.",
-    copy: "From 34.990.000 đ or 1.457.916 đ/mo. for 24 mo.",
+    copy: "From 34.990.000 VND or 1.457.916 VND/mo. for 24 mo.",
     price: 34990000,
     image: "/assets/images/ipad-pro-13-inch.png",
     to: "/products/ipad-pro-13-inch",
@@ -48,7 +48,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "Apple Watch Series 11",
     subtitle: "The most personal health surface.",
-    copy: "From 11.490.000 đ or 478.750 đ/mo. for 24 mo.",
+    copy: "From 11.490.000 VND or 478.750 VND/mo. for 24 mo.",
     price: 11490000,
     image: "/assets/images/apple-watch-series-11.png",
     to: "/products/apple-watch-series-11",
@@ -61,7 +61,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "iPhone 17",
     subtitle: "Everyday flagship. Clean silhouette.",
-    copy: "From 25.990.000 đ or 1.082.916 đ/mo. for 24 mo.",
+    copy: "From 25.990.000 VND or 1.082.916 VND/mo. for 24 mo.",
     price: 25990000,
     image: "/assets/images/iphone-17.png",
     to: "/products/iphone-17",
@@ -74,7 +74,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "AirPods Pro 3",
     subtitle: "Adaptive Audio with quieter edges.",
-    copy: "From 6.490.000 đ or 270.416 đ/mo. for 24 mo.",
+    copy: "From 6.490.000 VND or 270.416 VND/mo. for 24 mo.",
     price: 6490000,
     image: "/assets/images/airpods-pro-3.png",
     to: "/products/airpods-pro-3",
@@ -87,7 +87,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "Apple Vision Pro",
     subtitle: "Spatial computing, kept impossibly quiet.",
-    copy: "From 89.990.000 đ or 3.749.583 đ/mo. for 24 mo.",
+    copy: "From 89.990.000 VND or 3.749.583 VND/mo. for 24 mo.",
     price: 89990000,
     image: "/assets/images/apple-vision-pro.png",
     to: "/products/apple-vision-pro",
@@ -101,7 +101,7 @@ const curatedItems: CarouselItem[] = [
     eyebrow: "New",
     title: "MacBook Pro 14-inch",
     subtitle: "Portable pro power for heavier sessions.",
-    copy: "From 46.990.000 đ or 1.957.916 đ/mo. for 24 mo.",
+    copy: "From 46.990.000 VND or 1.957.916 VND/mo. for 24 mo.",
     price: 46990000,
     image: "/assets/images/macbook-pro-14-inch.png",
     to: "/products/macbook-pro-14-inch",
@@ -216,10 +216,10 @@ export default function FeaturedCategorySection() {
               The latest.
               <span className="text-[rgba(29,29,31,0.46)]">
                 {" "}
-                Take a look at what’s new, right now.
+                Take a look at what's new, right now.
               </span>
             </h2>
-            <p className="mt-4 max-w-[48ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+            <p className="mt-4 max-w-[48ch] text-[15px] leading-7 text-(--text-secondary) sm:text-base">
               A tighter edit of the products worth opening first, staged as
               full cards instead of another dense strip.
             </p>
@@ -227,7 +227,7 @@ export default function FeaturedCategorySection() {
 
           <Link
             to="/products"
-            className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+            className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-(--text-secondary) transition hover:text-(--text-primary)"
           >
             View complete archive
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/8 bg-white text-base shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
@@ -246,7 +246,7 @@ export default function FeaturedCategorySection() {
             aria-label="Previous featured products"
             onClick={() => nudgeCarousel(-1)}
             className={[
-              "absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-[var(--text-primary)] shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
+              "absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-(--text-primary) shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
               isHovered
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0",
@@ -260,7 +260,7 @@ export default function FeaturedCategorySection() {
             aria-label="Next featured products"
             onClick={() => nudgeCarousel(1)}
             className={[
-              "absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-[var(--text-primary)] shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
+              "absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-black/8 bg-[rgba(255,255,255,0.82)] text-(--text-primary) shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300",
               isHovered
                 ? "pointer-events-auto opacity-100"
                 : "pointer-events-none opacity-0",
@@ -277,14 +277,14 @@ export default function FeaturedCategorySection() {
                   ref={index === 0 ? firstCardRef : null}
                   to={item.to}
                   className={[
-                      "group/card relative w-[400px] shrink-0 overflow-hidden rounded-[28px] border border-black/7 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_16px_36px_rgba(15,23,42,0.12)] sm:p-5",
+                      "group/card relative w-[300px] shrink-0 overflow-hidden rounded-[28px] border border-black/7 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-[3px] hover:shadow-[0_16px_36px_rgba(15,23,42,0.12)] sm:w-[340px] sm:p-5 xl:w-[400px]",
                     item.cardClassName ?? "bg-white",
                     item.textClassName ?? "text-[#1d1d1f]",
                   ].join(" ")}
                 >
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.78),transparent_36%)] opacity-0 transition duration-500 group-hover/card:opacity-100" />
 
-                    <div className="relative flex h-[500px] flex-col">
+                    <div className="relative flex h-[420px] flex-col sm:h-[460px] xl:h-[500px]">
                     <div className="space-y-3">
                       <p
                         className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${item.textClassName ? "text-white/80" : "text-[#bf4800]"}`}
@@ -303,7 +303,7 @@ export default function FeaturedCategorySection() {
                       </p>
                       {item.copy ? (
                         <p
-                          className={`max-w-[28ch] text-[14px] leading-6 ${item.textClassName ? "text-white/70" : "text-[var(--text-secondary)]"}`}
+                          className={`max-w-[28ch] text-[14px] leading-6 ${item.textClassName ? "text-white/70" : "text-(--text-secondary)"}`}
                         >
                           {item.copy}
                         </p>

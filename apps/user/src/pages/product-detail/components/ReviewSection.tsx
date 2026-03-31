@@ -15,16 +15,16 @@ function RatingStars({ value }: { value: number }) {
 export default function ReviewSection({ reviews }: { reviews: ProductReview[] }) {
   return (
     <section className="space-y-8">
-      <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+      <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
         Reviews
       </h2>
 
       <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
         <div className="cy-panel p-6 text-center">
-          <p className="font-mono text-[3rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)]">
+          <p className="font-mono text-[3rem] font-semibold tracking-[-0.06em] text-(--text-primary)">
             4.8
           </p>
-          <p className="mt-2 text-sm text-[var(--text-tertiary)]">of 125 reviews</p>
+          <p className="mt-2 text-sm text-(--text-tertiary)">of 125 reviews</p>
           <div className="mt-4 flex justify-center">
             <RatingStars value={5} />
           </div>
@@ -40,7 +40,7 @@ export default function ReviewSection({ reviews }: { reviews: ProductReview[] })
           ].map(([label, width]) => (
             <div
               key={label as string}
-              className="grid grid-cols-[140px_minmax(0,1fr)_40px] items-center gap-4 text-sm text-[var(--text-secondary)]"
+              className="grid grid-cols-[140px_minmax(0,1fr)_40px] items-center gap-4 text-sm text-(--text-secondary)"
             >
               <span>{label}</span>
               <div className="h-1 rounded-full bg-black/8">
@@ -62,16 +62,16 @@ export default function ReviewSection({ reviews }: { reviews: ProductReview[] })
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-[1.05rem] font-semibold text-[var(--text-primary)]">
+                    <h3 className="text-[1.05rem] font-semibold text-(--text-primary)">
                       {review.author}
                     </h3>
                     <div className="mt-2">
                       <RatingStars value={review.rating} />
                     </div>
                   </div>
-                  <p className="text-sm text-[var(--text-tertiary)]">{review.date}</p>
+                  <p className="text-sm text-(--text-tertiary)">{review.date}</p>
                 </div>
-                <p className="mt-4 text-[15px] leading-7 text-[var(--text-secondary)]">
+                <p className="mt-4 text-[15px] leading-7 text-(--text-secondary)">
                   {review.content}
                 </p>
                 {review.photos?.length ? (

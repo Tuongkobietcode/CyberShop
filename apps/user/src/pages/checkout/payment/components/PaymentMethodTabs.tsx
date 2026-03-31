@@ -23,11 +23,11 @@ export default function PaymentMethodTabs({
             "rounded-[24px] border px-5 py-5 text-left transition",
             value === tab.id
               ? "border-[rgba(143,185,255,0.4)] bg-[linear-gradient(180deg,rgba(143,185,255,0.16),rgba(255,255,255,0.03))]"
-              : "border-[var(--line-soft)] bg-white/[0.03] hover:border-[rgba(255,255,255,0.18)]",
+              : "border-(--line-soft) bg-white/[0.03] hover:border-[rgba(255,255,255,0.18)]",
           ].join(" ")}
         >
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{tab.helper}</p>
-          <p className="mt-2 text-xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{tab.label}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">{tab.helper}</p>
+          <p className="mt-2 text-xl font-semibold tracking-[-0.05em] text-(--text-primary)">{tab.label}</p>
         </button>
       ))}
     </div>

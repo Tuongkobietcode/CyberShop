@@ -311,27 +311,27 @@ export default function ProductsPage() {
         <div className="space-y-8">
           <div className="cy-panel p-5">
             <p className="cy-kicker">Catalog state</p>
-            <p className="mt-2 text-[1.05rem] text-[var(--text-secondary)]">
+            <p className="mt-2 text-[1.05rem] text-(--text-secondary)">
               Selected products:{" "}
-              <span className="font-semibold text-[var(--text-primary)]">
+              <span className="font-semibold text-(--text-primary)">
                 {visibleProducts.length}
               </span>
             </p>
           </div>
 
           {isProductsLoading && products.length === 0 ? (
-            <div className="cy-panel rounded-[28px] border-dashed px-6 py-20 text-center text-sm text-[var(--text-secondary)]">
+            <div className="cy-panel rounded-[28px] border-dashed px-6 py-20 text-center text-sm text-(--text-secondary)">
               Loading products...
             </div>
           ) : !visibleProducts.length ? (
             <div className="cy-panel px-6 py-16 text-center">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-(--text-tertiary)">
                 Catalog state
               </p>
-              <h3 className="mt-4 text-[1.9rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">
+              <h3 className="mt-4 text-[1.9rem] font-semibold tracking-[-0.05em] text-(--text-primary)">
                 No products match the current view.
               </h3>
-              <p className="mx-auto mt-4 max-w-[42ch] text-sm leading-7 text-[var(--text-secondary)] sm:text-base">
+              <p className="mx-auto mt-4 max-w-[42ch] text-sm leading-7 text-(--text-secondary) sm:text-base">
                 This usually means the active category, search query, or selected
                 filters narrowed the catalog down to zero results.
               </p>
@@ -360,11 +360,11 @@ export default function ProductsPage() {
             />
           )}
 
-          <div className="flex items-center justify-center gap-3 pt-4 text-sm text-[var(--text-secondary)]">
+          <div className="flex items-center justify-center gap-3 pt-4 text-sm text-(--text-secondary)">
             <button
               type="button"
               onClick={() => setPage((current) => Math.max(1, current - 1))}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line-soft)] bg-white/82 transition hover:border-[var(--line-strong)] hover:bg-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-(--line-soft) bg-white/82 transition hover:border-(--line-strong) hover:bg-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -378,15 +378,15 @@ export default function ProductsPage() {
                   className={[
                     "h-10 min-w-10 rounded-xl px-3",
                     page === pageNumber
-                      ? "bg-[var(--accent)] text-white"
-                      : "border border-[var(--line-soft)] bg-white/82 text-[var(--text-secondary)] hover:border-[var(--line-strong)] hover:bg-white",
+                      ? "bg-(--accent) text-white"
+                      : "border border-(--line-soft) bg-white/82 text-(--text-secondary) hover:border-(--line-strong) hover:bg-white",
                   ].join(" ")}
                 >
                   {pageNumber}
                 </button>
               );
             })}
-            {totalPages > 4 ? <span className="px-1 text-[var(--text-tertiary)]">....</span> : null}
+            {totalPages > 4 ? <span className="px-1 text-(--text-tertiary)">....</span> : null}
             {totalPages > 4 ? (
               <button
                 type="button"
@@ -394,8 +394,8 @@ export default function ProductsPage() {
                 className={[
                   "h-10 min-w-10 rounded-xl px-3",
                   page === totalPages
-                    ? "bg-[var(--accent)] text-white"
-                    : "border border-[var(--line-soft)] bg-white/82 text-[var(--text-secondary)] hover:border-[var(--line-strong)] hover:bg-white",
+                    ? "bg-(--accent) text-white"
+                    : "border border-(--line-soft) bg-white/82 text-(--text-secondary) hover:border-(--line-strong) hover:bg-white",
                 ].join(" ")}
               >
                 {totalPages}
@@ -404,7 +404,7 @@ export default function ProductsPage() {
             <button
               type="button"
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line-soft)] bg-white/82 transition hover:border-[var(--line-strong)] hover:bg-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-(--line-soft) bg-white/82 transition hover:border-(--line-strong) hover:bg-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

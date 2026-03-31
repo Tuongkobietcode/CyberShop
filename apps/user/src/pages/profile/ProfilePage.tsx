@@ -67,31 +67,31 @@ export default function ProfilePage() {
         <section className="grid gap-6 lg:grid-cols-[0.84fr_1.16fr]">
           <article className="cy-panel p-8">
             <div className="flex items-center gap-4">
-              <div className="flex h-18 w-18 items-center justify-center rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-2xl font-semibold text-[var(--accent)]">
+              <div className="flex h-18 w-18 items-center justify-center rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-2xl font-semibold text-(--accent)">
                 {customer.name.slice(0, 1).toUpperCase()}
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Customer profile</p>
-                <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{customer.name}</h1>
+                <p className="text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">Customer profile</p>
+                <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">{customer.name}</h1>
               </div>
             </div>
 
-            <dl className="mt-8 space-y-5 text-[15px] text-[var(--text-secondary)]">
-              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
+            <dl className="mt-8 space-y-5 text-[15px] text-(--text-secondary)">
+              <div className="flex items-start justify-between gap-6 border-b border-(--line-soft) pb-4">
                 <dt>Email</dt>
-                <dd className="text-right font-medium text-[var(--text-primary)]">{customer.email}</dd>
+                <dd className="text-right font-medium text-(--text-primary)">{customer.email}</dd>
               </div>
-              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
+              <div className="flex items-start justify-between gap-6 border-b border-(--line-soft) pb-4">
                 <dt>Phone</dt>
-                <dd className="text-right font-medium text-[var(--text-primary)]">{customer.phone}</dd>
+                <dd className="text-right font-medium text-(--text-primary)">{customer.phone}</dd>
               </div>
-              <div className="flex items-start justify-between gap-6 border-b border-[var(--line-soft)] pb-4">
+              <div className="flex items-start justify-between gap-6 border-b border-(--line-soft) pb-4">
                 <dt>Joined</dt>
-                <dd className="text-right font-medium text-[var(--text-primary)]">{formatDate(customer.createdAt)}</dd>
+                <dd className="text-right font-medium text-(--text-primary)">{formatDate(customer.createdAt)}</dd>
               </div>
               <div className="flex items-start justify-between gap-6">
                 <dt>Last login</dt>
-                <dd className="text-right font-medium text-[var(--text-primary)]">{formatDate(customer.lastLoginAt)}</dd>
+                <dd className="text-right font-medium text-(--text-primary)">{formatDate(customer.lastLoginAt)}</dd>
               </div>
             </dl>
 
@@ -117,8 +117,8 @@ export default function ProfilePage() {
             <article className="cy-panel p-8">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Account</p>
-                  <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Edit your details</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Account</p>
+                  <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Edit your details</h2>
                 </div>
               </div>
 
@@ -153,8 +153,8 @@ export default function ProfilePage() {
           <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Addresses</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Delivery book</h2>
+                <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Addresses</p>
+                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Delivery book</h2>
               </div>
               <button
                 type="button"
@@ -170,28 +170,28 @@ export default function ProfilePage() {
 
             <div className="mt-6 space-y-4">
               {addresses.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-[var(--line-soft)] px-6 py-12 text-center text-sm text-[var(--text-secondary)]">
+                <div className="rounded-2xl border border-dashed border-(--line-soft) px-6 py-12 text-center text-sm text-(--text-secondary)">
                   You have not saved any address yet.
                 </div>
               ) : (
                 addresses.map((address) => (
-                  <article key={address.id} className="rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-5 py-4">
+                  <article key={address.id} className="rounded-2xl border border-(--line-soft) bg-white/[0.03] px-5 py-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{address.fullName}</h3>
+                          <h3 className="text-lg font-semibold text-(--text-primary)">{address.fullName}</h3>
                           <span
                             className={[
                               "rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em]",
                               address.isDefault
-                                ? "border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-[var(--accent)]"
-                                : "border border-[var(--line-soft)] bg-white/[0.04] text-[var(--text-secondary)]",
+                                ? "border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.14)] text-(--accent)"
+                                : "border border-(--line-soft) bg-white/[0.04] text-(--text-secondary)",
                             ].join(" ")}
                           >
                             {address.label}
                           </span>
                         </div>
-                        <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+                        <p className="mt-3 text-sm leading-7 text-(--text-secondary)">
                           {address.addressLine1}
                           {address.addressLine2 ? `, ${address.addressLine2}` : ""}
                           {address.ward ? `, ${address.ward}` : ""}
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                           {`, ${address.city}, ${address.country}`}
                           {address.postalCode ? ` ${address.postalCode}` : ""}
                         </p>
-                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{address.phone}</p>
+                        <p className="mt-2 text-sm font-medium text-(--text-primary)">{address.phone}</p>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -250,33 +250,33 @@ export default function ProfilePage() {
           <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Recent orders</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Your latest purchases</h2>
+                <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Recent orders</p>
+                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Your latest purchases</h2>
               </div>
-              <Link to="/products" className="text-sm font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]">
+              <Link to="/products" className="text-sm font-semibold text-(--text-secondary) transition hover:text-(--text-primary)">
                 Continue shopping
               </Link>
             </div>
 
             {orders.length === 0 ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-[var(--line-soft)] px-6 py-14 text-center text-sm text-[var(--text-secondary)]">
+              <div className="mt-6 rounded-2xl border border-dashed border-(--line-soft) px-6 py-14 text-center text-sm text-(--text-secondary)">
                 No orders yet. Your first successful checkout will show up here.
               </div>
             ) : (
               <div className="mt-6 space-y-4">
                 {orders.slice(0, 6).map((order) => (
-                  <article key={order.id} className="rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-5 py-4">
+                  <article key={order.id} className="rounded-2xl border border-(--line-soft) bg-white/[0.03] px-5 py-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{order.orderCode}</p>
-                        <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">{order.items[0]?.name || "Order"}</h3>
-                        <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                          {order.orderStatus} · {order.paymentStatus}
+                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{order.orderCode}</p>
+                        <h3 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-(--text-primary)">{order.items[0]?.name || "Order"}</h3>
+                        <p className="mt-2 text-sm text-(--text-secondary)">
+                          {order.orderStatus} Ã‚Â· {order.paymentStatus}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-[var(--text-secondary)]">{formatDate(order.createdAt)}</p>
-                        <p className="mt-1 font-mono text-lg font-semibold text-[var(--text-primary)]">{formatCurrencyVnd(order.totalAmount)}</p>
+                        <p className="text-sm text-(--text-secondary)">{formatDate(order.createdAt)}</p>
+                        <p className="mt-1 font-mono text-lg font-semibold text-(--text-primary)">{formatCurrencyVnd(order.totalAmount)}</p>
                       </div>
                     </div>
                   </article>
@@ -293,8 +293,8 @@ export default function ProfilePage() {
 function StatCard({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <article className="cy-panel p-7">
-      <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{label}</p>
-      <p className={["mt-4 text-[2.3rem] font-semibold tracking-[-0.06em] text-[var(--text-primary)]", mono ? "font-mono text-[1.8rem]" : ""].join(" ")}>
+      <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">{label}</p>
+      <p className={["mt-4 text-[2.3rem] font-semibold tracking-[-0.06em] text-(--text-primary)", mono ? "font-mono text-[1.8rem]" : ""].join(" ")}>
         {value}
       </p>
     </article>
@@ -314,7 +314,7 @@ function Field({
 }) {
   return (
     <label className={["block space-y-2", className].join(" ")}>
-      <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{label}</span>
+      <span className="text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{label}</span>
       <input value={value} onChange={(event) => onChange(event.target.value)} className="cy-input" />
     </label>
   );

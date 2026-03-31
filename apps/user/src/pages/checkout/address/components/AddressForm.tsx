@@ -60,10 +60,10 @@ export default function AddressForm({
   return (
     <div className="cy-panel p-6 sm:p-7">
       <div className="mb-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+        <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">
           {initialValue ? "Edit address" : "New address"}
         </p>
-        <h3 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">Recipient details</h3>
+        <h3 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-(--text-primary)">Recipient details</h3>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -90,12 +90,12 @@ export default function AddressForm({
         <FormField value={form.country} onChange={(value) => setForm({ ...form, country: value })} placeholder="Country" />
       </div>
 
-      <label className="mt-5 flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+      <label className="mt-5 flex items-center gap-3 text-sm text-(--text-secondary)">
         <input
           type="checkbox"
           checked={form.isDefault}
           onChange={(event) => setForm({ ...form, isDefault: event.target.checked })}
-          className="h-4 w-4 accent-[var(--accent)]"
+          className="h-4 w-4 accent-(--accent)"
         />
         Set as default address
       </label>

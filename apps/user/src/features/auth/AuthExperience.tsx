@@ -24,7 +24,7 @@ function Field({
 }: FieldProps) {
   return (
     <label className="block space-y-2">
-      <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{label}</span>
+      <span className="text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">{label}</span>
       <input
         type={type}
         value={value}
@@ -32,7 +32,7 @@ function Field({
         placeholder={placeholder}
         autoComplete={autoComplete}
         spellCheck={false}
-        className="w-full rounded-[1.65rem] border border-black/8 bg-white/95 px-5 py-4 text-[1.05rem] leading-7 text-[var(--text-primary)] shadow-[0_10px_28px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-[var(--text-tertiary)] hover:border-black/12 focus:border-[rgba(0,113,227,0.26)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]"
+        className="w-full rounded-[1.65rem] border border-black/8 bg-white/95 px-5 py-4 text-[1.05rem] leading-7 text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-(--text-tertiary) hover:border-black/12 focus:border-[rgba(0,113,227,0.26)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,113,227,0.08)]"
         style={{
           color: "var(--text-primary)",
           WebkitTextFillColor: "var(--text-primary)",
@@ -100,7 +100,7 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)]">
+    <div className="relative min-h-screen overflow-hidden bg-(--bg-base) text-(--text-primary)">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,185,255,0.18),transparent_30%),radial-gradient(circle_at_14%_18%,rgba(255,255,255,0.82),transparent_24%),radial-gradient(circle_at_80%_74%,rgba(143,185,255,0.1),transparent_28%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.8),transparent_66%)]" />
       <div className="absolute inset-y-0 left-1/2 hidden w-px bg-[linear-gradient(180deg,transparent,rgba(17,24,39,0.08),transparent)] lg:block" />
@@ -112,26 +112,26 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
             <div className="absolute bottom-[-16%] right-[-10%] h-[280px] w-[280px] rounded-full border border-black/5" />
 
             <div className="relative flex h-full flex-col justify-between gap-14">
-              <div className="inline-flex w-fit items-center gap-3 rounded-full border border-black/6 bg-white/82 px-4 py-2 text-sm text-[var(--text-secondary)] shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
-                <LockKeyhole className="h-4 w-4 text-[var(--accent)]" />
+              <div className="inline-flex w-fit items-center gap-3 rounded-full border border-black/6 bg-white/82 px-4 py-2 text-sm text-(--text-secondary) shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
+                <LockKeyhole className="h-4 w-4 text-(--accent)" />
                 Customer access
               </div>
 
               <div className="max-w-[320px] space-y-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-tertiary)]">Cyber account</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-(--text-tertiary)">Cyber account</p>
                 <div className="space-y-3">
-                  <h1 className="text-[2.5rem] font-semibold leading-none tracking-[-0.08em] text-[var(--text-primary)] sm:text-[3.3rem]">
+                  <h1 className="text-[2.5rem] font-semibold leading-none tracking-[-0.08em] text-(--text-primary) sm:text-[3.3rem]">
                     {isSignUp ? "Join the" : "Continue to"}
                   </h1>
                   <Link
                     to="/home"
-                    className="inline-flex items-center gap-3 text-[2.8rem] font-semibold tracking-[-0.1em] text-[var(--text-primary)] transition hover:translate-x-1 sm:text-[3.8rem]"
+                    className="inline-flex items-center gap-3 text-[2.8rem] font-semibold tracking-[-0.1em] text-(--text-primary) transition hover:translate-x-1 sm:text-[3.8rem]"
                   >
                     Cyber store
-                    <ArrowRight className="h-7 w-7 text-[var(--accent)] sm:h-9 sm:w-9" />
+                    <ArrowRight className="h-7 w-7 text-(--accent) sm:h-9 sm:w-9" />
                   </Link>
                 </div>
-                <p className="max-w-[320px] text-[0.98rem] leading-8 text-[var(--text-secondary)]">
+                <p className="max-w-[320px] text-[0.98rem] leading-8 text-(--text-secondary)">
                   {isSignUp
                     ? "Create a customer account to keep your saved products, preserve the cart, and move through checkout without losing momentum."
                     : "Sign in to restore your wishlist, saved addresses, and active purchase flow across the storefront."}
@@ -157,13 +157,13 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
         <div className={["flex items-center", isSignUp ? "lg:order-1" : ""].join(" ")}>
           <div className="cy-panel w-full p-7 sm:p-9">
             <div className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">
+              <p className="text-xs uppercase tracking-[0.24em] text-(--text-tertiary)">
                 {isSignUp ? "Create account" : "Sign in"}
               </p>
-              <h2 className="text-[2.3rem] font-semibold tracking-[-0.07em] text-[var(--text-primary)] sm:text-[3rem]">
+              <h2 className="text-[2.3rem] font-semibold tracking-[-0.07em] text-(--text-primary) sm:text-[3rem]">
                 {isSignUp ? "Become a customer" : "Continue to your account"}
               </h2>
-              <p className="max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+              <p className="max-w-xl text-sm leading-7 text-(--text-secondary)">
                 {isSignUp
                   ? "Register once to keep your saved products, cart, and future orders in one place."
                   : "Use your account to continue with wishlist, cart, and checkout."}
@@ -231,7 +231,7 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex h-14 w-full items-center justify-center rounded-full bg-[var(--text-primary)] px-6 text-base font-semibold text-white shadow-[0_14px_32px_rgba(29,29,31,0.18)] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-14 w-full items-center justify-center rounded-full bg-(--text-primary) px-6 text-base font-semibold text-white shadow-[0_14px_32px_rgba(29,29,31,0.18)] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
                 aria-label={isSignUp ? "Create customer account" : "Sign in"}
                 aria-busy={submitting}
                 style={{
@@ -249,11 +249,11 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
               </button>
             </form>
 
-            <div className="mt-6 flex flex-col gap-3 rounded-[28px] border border-black/6 bg-white/78 p-5 text-sm text-[var(--text-secondary)] shadow-[0_12px_34px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-6 flex flex-col gap-3 rounded-[28px] border border-black/6 bg-white/78 p-5 text-sm text-(--text-secondary) shadow-[0_12px_34px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between">
               <div>{isSignUp ? "Already registered?" : "No customer account yet?"}</div>
               <Link
                 to={isSignUp ? `/sign-in${searchParams.toString() ? `?${searchParams.toString()}` : ""}` : `/sign-up${searchParams.toString() ? `?${searchParams.toString()}` : ""}`}
-                className="font-semibold text-[var(--text-primary)] transition hover:text-[var(--accent)]"
+                className="font-semibold text-(--text-primary) transition hover:text-(--accent)"
               >
                 {isSignUp ? "Sign in here" : "Create one now"}
               </Link>
@@ -268,11 +268,11 @@ export default function AuthExperience({ mode }: { mode: AuthMode }) {
 function FeatureCard({ icon, title, copy }: { icon: ReactNode; title: string; copy: string }) {
   return (
     <div className="rounded-[24px] border border-black/6 bg-white/84 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.05)] backdrop-blur-sm">
-      <div className="inline-flex rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-2 text-[var(--accent)]">
+      <div className="inline-flex rounded-full border border-[rgba(143,185,255,0.24)] bg-[rgba(143,185,255,0.12)] p-2 text-(--accent)">
         {icon}
       </div>
-      <h3 className="mt-4 text-lg font-semibold tracking-[-0.04em] text-[var(--text-primary)]">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{copy}</p>
+      <h3 className="mt-4 text-lg font-semibold tracking-[-0.04em] text-(--text-primary)">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-(--text-secondary)">{copy}</p>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import ProductShowcaseSection from "./components/ProductShowcaseSection";
 
 export default function HomePage() {
   return (
-    <div className="relative overflow-hidden bg-[#fbfbfd] text-[var(--text-primary)]">
+    <div className="relative overflow-hidden bg-[#fbfbfd] text-(--text-primary)">
       <HeroSection />
       <StoreIntroSection />
       <FeaturedCategorySection />

@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, MoreHorizontal, Package2, ReceiptText, UsersRound } from "lucide-react";
+import { formatCurrencyVnd } from "@shared/formatters/currency";
 import { resolveAssetUrl } from "@/utils/assets";
 import { getDashboardSummary } from "../api/dashboard.api";
 import type { DashboardSummary } from "../types";
@@ -8,7 +9,7 @@ import { getAdminProducts } from "@/features/products/api/products.api";
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 
 function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+  return formatCurrencyVnd(value);
 }
 
 function formatCompact(value: number) {
@@ -24,39 +25,56 @@ export default function DashboardPage() {
   const [products, setProducts] = useState<Array<{ id: string; name: string; image: string; price: number }>>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string; image: string }>>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
       setLoading(true);
+      setError("");
       try {
-        const [nextSummary, productsResponse, categoriesResponse] = await Promise.all([
+        const [summaryResult, productsResult, categoriesResult] = await Promise.allSettled([
           getDashboardSummary(),
           getAdminProducts({ limit: 8 }),
           getAdminCategories({ limit: 6 }),
         ]);
 
-        setSummary(nextSummary);
-        setProducts(
-          productsResponse.data.slice(0, 5).map((item) => ({
-            id: item.id,
-            name: item.name,
-            image: item.image,
-            price: item.price,
-          }))
-        );
-        setCategories(
-          categoriesResponse.data.slice(0, 4).map((item) => ({
-            id: item.id,
-            name: item.name,
-            image: item.image,
-          }))
-        );
+        if (summaryResult.status === "fulfilled") {
+          setSummary(summaryResult.value);
+        } else {
+          setSummary(null);
+          setError("Dashboard summary is temporarily unavailable. Check API health or try again.");
+        }
+
+        if (productsResult.status === "fulfilled") {
+          setProducts(
+            productsResult.value.data.slice(0, 5).map((item) => ({
+              id: item.id,
+              name: item.name,
+              image: item.image,
+              price: item.price,
+            }))
+          );
+        } else {
+          setProducts([]);
+        }
+
+        if (categoriesResult.status === "fulfilled") {
+          setCategories(
+            categoriesResult.value.data.slice(0, 4).map((item) => ({
+              id: item.id,
+              name: item.name,
+              image: item.image,
+            }))
+          );
+        } else {
+          setCategories([]);
+        }
       } finally {
         setLoading(false);
       }
     }
 
-    load();
+    void load();
   }, []);
 
   const overviewCards = useMemo(() => {
@@ -84,13 +102,64 @@ export default function DashboardPage() {
   }, [summary]);
 
   const revenueMax = Math.max(...(summary?.recentRevenue.map((item) => item.revenue) || [1]));
+  const operationsMix = useMemo(() => {
+    if (!summary) return [];
+
+    const processedOrders = Math.max(summary.overview.totalOrders - summary.overview.pendingOrders, 0);
+
+    return [
+      {
+        label: "Processed orders",
+        value: processedOrders,
+        color: "#111111",
+      },
+      {
+        label: "Pending orders",
+        value: summary.overview.pendingOrders,
+        color: "#f59e0b",
+      },
+      {
+        label: "Cancelled orders",
+        value: summary.overview.cancelledOrders,
+        color: "#f43f5e",
+      },
+      {
+        label: "New customers (30d)",
+        value: summary.overview.newCustomersLast30Days,
+        color: "#0ea5e9",
+      },
+    ];
+  }, [summary]);
+  const operationsMax = Math.max(...operationsMix.map((item) => item.value), 1);
+  const operationsTotal = Math.max(
+    operationsMix.reduce((sum, item) => sum + item.value, 0),
+    1
+  );
+  const operationsDonut = useMemo(() => {
+    if (operationsMix.length === 0) return "";
+
+    let cursor = 0;
+
+    return operationsMix
+      .map((item) => {
+        const start = cursor;
+        const slice = (item.value / operationsTotal) * 100;
+        cursor += slice;
+        return `${item.color} ${start}% ${cursor}%`;
+      })
+      .join(", ");
+  }, [operationsMix, operationsTotal]);
 
   if (loading) {
     return <div className="rounded-3xl border border-dashed border-slate-200 px-6 py-12 text-center text-sm text-slate-500">Loading dashboard...</div>;
   }
 
   if (!summary) {
-    return <div className="rounded-3xl border border-rose-200 bg-rose-50 px-6 py-12 text-center text-sm text-rose-600">Dashboard data is unavailable.</div>;
+    return (
+      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-6 py-12 text-center text-sm text-rose-600">
+        {error || "Dashboard data is unavailable."}
+      </div>
+    );
   }
 
   return (
@@ -135,20 +204,101 @@ export default function DashboardPage() {
             <Metric label="Revenue" value={formatMoney(summary.overview.totalRevenue)} icon={<ArrowRight className="h-4 w-4" />} />
           </div>
 
-          <div className="mt-10 grid h-[300px] grid-cols-6 items-end gap-4 rounded-[24px] bg-[#f7f7f8] px-5 pb-6 pt-10">
-            {summary.recentRevenue.slice(0, 6).map((point) => {
-              const height = Math.max(18, Math.round((point.revenue / revenueMax) * 220));
-              return (
-                <div key={point._id} className="flex h-full flex-col justify-end gap-3">
-                  <div className="flex-1 rounded-t-[22px] bg-[linear-gradient(180deg,rgba(17,17,17,0.12),rgba(17,17,17,0.02))] p-[1px]">
-                    <div className="flex h-full items-end rounded-t-[21px] bg-white/70 px-2 pb-2">
-                      <div className="w-full rounded-[16px] bg-[linear-gradient(180deg,#111,#4b5563)]" style={{ height }} />
+          <div className="mt-10 rounded-[24px] bg-[#f7f7f8] px-5 pb-6 pt-10">
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-black/35">Revenue trend</p>
+                <p className="mt-2 text-sm text-black/45">Paid revenue over recent recorded days</p>
+              </div>
+              <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/55">
+                7 day view
+              </span>
+            </div>
+
+            {summary.recentRevenue.length === 0 ? (
+              <div className="flex h-[300px] flex-col items-center justify-center rounded-[20px] border border-dashed border-black/10 bg-white/65 px-6 text-center">
+                <p className="text-sm font-semibold text-black">No revenue points yet</p>
+                <p className="mt-2 max-w-[24rem] text-sm leading-6 text-black/45">
+                  Complete a paid order to populate the weekly revenue chart and make this
+                  analytics block meaningful.
+                </p>
+              </div>
+            ) : (
+              <div className="grid h-[300px] grid-cols-6 items-end gap-4">
+                {summary.recentRevenue.slice(0, 6).map((point) => {
+                  const height = Math.max(18, Math.round((point.revenue / revenueMax) * 220));
+                  return (
+                    <div key={point._id} className="flex h-full flex-col justify-end gap-3">
+                      <div className="flex-1 rounded-t-[22px] bg-[linear-gradient(180deg,rgba(17,17,17,0.12),rgba(17,17,17,0.02))] p-[1px]">
+                        <div className="flex h-full items-end rounded-t-[21px] bg-white/70 px-2 pb-2">
+                          <div className="w-full rounded-[16px] bg-[linear-gradient(180deg,#111,#4b5563)]" style={{ height }} />
+                        </div>
+                      </div>
+                      <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-black/35">{point._id}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 rounded-[24px] bg-[#f7f7f8] px-5 pb-6 pt-8">
+            <div className="mb-6">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-black/35">Operations mix</p>
+              <p className="mt-2 text-sm text-black/45">Live snapshot built from dashboard overview totals</p>
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr] xl:items-center">
+              <div className="flex flex-col items-center justify-center rounded-[20px] border border-black/8 bg-white/75 px-6 py-8">
+                <div
+                  className="relative h-52 w-52 rounded-full"
+                  style={{
+                    background: `conic-gradient(${operationsDonut})`,
+                  }}
+                >
+                  <div className="absolute inset-[22px] flex items-center justify-center rounded-full bg-[#f7f7f8]">
+                    <div className="text-center">
+                      <p className="text-xs uppercase tracking-[0.18em] text-black/35">Tracked</p>
+                      <p className="mt-2 text-[1.8rem] font-semibold tracking-[-0.05em] text-black">
+                        {operationsTotal.toLocaleString("en-US")}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-black/35">{point._id}</p>
                 </div>
-              );
-            })}
+              </div>
+
+              <div className="space-y-5">
+                {operationsMix.map((item) => {
+                  const width = Math.max(10, Math.round((item.value / operationsMax) * 100));
+
+                  return (
+                    <div key={item.label} className="space-y-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
+                          <p className="text-sm font-medium text-black">{item.label}</p>
+                        </div>
+                        <p className="text-sm font-semibold text-black">{item.value.toLocaleString("en-US")}</p>
+                      </div>
+                      <div className="h-3 overflow-hidden rounded-full bg-white">
+                        <div className="h-full rounded-full" style={{ width: `${width}%`, backgroundColor: item.color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[18px] border border-black/8 bg-white px-4 py-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/35">Total revenue</p>
+                    <p className="mt-3 text-lg font-semibold text-black">{formatMoney(summary.overview.totalRevenue)}</p>
+                  </div>
+                  <div className="rounded-[18px] border border-black/8 bg-white px-4 py-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/35">Total customers</p>
+                    <p className="mt-3 text-lg font-semibold text-black">{summary.overview.totalCustomers.toLocaleString("en-US")}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

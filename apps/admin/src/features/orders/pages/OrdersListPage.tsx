@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Ban, CheckCheck, Truck, Search } from "lucide-react";
+import { formatCurrencyVnd } from '@shared/formatters/currency';
 import { getAdminOrders, updateAdminOrderStatus, type AdminOrder } from "../api/orders.api";
 import { resolveAssetUrl } from "@/utils/assets";
 
@@ -9,7 +10,7 @@ const surface =
 type OrderTab = "all" | "completed" | "pending" | "cancelled";
 
 function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+  return formatCurrencyVnd(value);
 }
 
 function getStatusGroup(tab: OrderTab) {

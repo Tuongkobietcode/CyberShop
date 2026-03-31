@@ -2,13 +2,14 @@ import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { StatusPill } from "@/components/data-display/StatusPill";
 import type { CustomerRow } from "@/features/customers/types";
 import { MessageSquare, Trash2 } from "lucide-react";
+import { formatCurrencyVnd } from '@shared/formatters/currency';
 
 type Props = {
   rows: CustomerRow[];
 };
 
 function formatMoney(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return formatCurrencyVnd(n);
 }
 
 export function CustomersTable({ rows }: Props) {

@@ -26,8 +26,8 @@ export default function AddressPage() {
     <CheckoutShell currentStep={1} title="Delivery address">
       <div className="space-y-6">
         <div className="max-w-3xl">
-          <p className="text-sm uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Recipient selection</p>
-          <p className="mt-4 text-base leading-8 text-[var(--text-secondary)]">
+          <p className="text-sm uppercase tracking-[0.22em] text-(--text-tertiary)">Recipient selection</p>
+          <p className="mt-4 text-base leading-8 text-(--text-secondary)">
             Choose a saved address or add a new one before the shipping options appear. The selected address defines ETA and tax context.
           </p>
         </div>
@@ -65,11 +65,11 @@ export default function AddressPage() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="cy-panel flex w-full flex-col items-center justify-center gap-3 border-dashed px-6 py-10 text-[var(--text-primary)] transition hover:border-[rgba(143,185,255,0.32)]"
+            className="cy-panel flex w-full flex-col items-center justify-center gap-3 border-dashed px-6 py-10 text-(--text-primary) transition hover:border-[rgba(143,185,255,0.32)]"
           >
-            <CirclePlus className="h-8 w-8 text-[var(--accent)]" />
+            <CirclePlus className="h-8 w-8 text-(--accent)" />
             <span className="text-lg font-semibold tracking-[-0.04em]">Add new address</span>
-            <span className="text-sm text-[var(--text-secondary)]">Create a new destination for this order.</span>
+            <span className="text-sm text-(--text-secondary)">Create a new destination for this order.</span>
           </button>
         )}
 

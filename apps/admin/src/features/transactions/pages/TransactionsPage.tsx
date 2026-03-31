@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import { formatCurrencyVnd } from '@shared/formatters/currency';
 import { getAdminOrders, type AdminOrder } from "@/features/orders/api/orders.api";
 
 const surface =
@@ -8,7 +9,7 @@ const surface =
 type TransactionTab = "all" | "completed" | "pending" | "failed";
 
 function formatMoney(value: number) {
-  return `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+  return formatCurrencyVnd(value);
 }
 
 function getPaymentGroup(tab: TransactionTab) {

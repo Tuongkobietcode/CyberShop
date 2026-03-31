@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ImagePlus, MoreHorizontal, Pencil, PlusCircle, Search, Star, Trash2, Upload, XCircle } from "lucide-react";
+import { formatCurrencyVnd } from '@shared/formatters/currency';
 import { getAdminCategories } from "@/features/categories/api/categories.api";
 import { uploadAdminImages, type UploadedImageAsset } from "@/features/uploads/api/uploads.api";
 import { resolveAssetUrl } from "@/utils/assets";
 import { adjustAdminProductInventory, deleteAdminProduct, getAdminProducts, updateAdminProduct, type AdminProduct } from "../api/products.api";
 
 const surface = "rounded-[28px] border border-black/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]";
-const fmt = (value: number) => `$${Math.round(value / 16000).toLocaleString("en-US")}`;
+const fmt = (value: number) => formatCurrencyVnd(value);
 
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return <label className="block space-y-2"><span className="text-sm font-medium text-black/58">{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} className="h-12 w-full rounded-2xl border border-black/10 bg-[#f5f5f5] px-4 text-sm outline-none" /></label>;

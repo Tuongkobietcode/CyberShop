@@ -35,10 +35,10 @@ export default function VariantSelector({
     <div className="space-y-5">
       {showFinishSelector ? (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--text-tertiary)">
             Color
           </p>
-          <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+          <p className="mt-2 text-[1.05rem] font-medium text-(--text-primary)">
             Pick your favourite color.
           </p>
           <div className="mt-4 flex items-center gap-3">
@@ -51,7 +51,7 @@ export default function VariantSelector({
                 className={[
                   "h-11 w-11 rounded-full border-2 transition",
                   selectedFinish === finish.value
-                    ? "border-[var(--text-primary)] scale-105 shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
+                    ? "border-(--text-primary) scale-105 shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
                     : "border-white/0 hover:border-black/12",
                 ].join(" ")}
                 style={{ backgroundColor: finish.swatch }}
@@ -63,10 +63,10 @@ export default function VariantSelector({
 
       {showCapacitySelector ? (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--text-tertiary)">
             Storage
           </p>
-          <p className="mt-2 text-[1.05rem] font-medium text-[var(--text-primary)]">
+          <p className="mt-2 text-[1.05rem] font-medium text-(--text-primary)">
             Pick the capacity that fits your setup.
           </p>
           <div className="mt-4 grid grid-cols-2 gap-3">
@@ -78,12 +78,12 @@ export default function VariantSelector({
                 className={[
                   "rounded-[22px] border px-4 py-4 text-left transition",
                   selectedCapacity === capacity.value
-                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] shadow-[0_12px_28px_rgba(14,165,233,0.1)]"
-                    : "border-[var(--line-soft)] bg-white/82 text-[var(--text-secondary)] hover:border-[var(--line-strong)] hover:text-[var(--text-primary)]",
+                    ? "border-(--accent) bg-(--accent-soft) text-(--text-primary) shadow-[0_12px_28px_rgba(14,165,233,0.1)]"
+                    : "border-(--line-soft) bg-white/82 text-(--text-secondary) hover:border-(--line-strong) hover:text-(--text-primary)",
                 ].join(" ")}
               >
                 <span className="block text-[1.1rem] font-medium">{capacity.label}</span>
-                <span className="mt-1 block text-sm text-[var(--text-secondary)]">
+                <span className="mt-1 block text-sm text-(--text-secondary)">
                   {formatCurrencyVnd(capacity.price)}
                 </span>
               </button>

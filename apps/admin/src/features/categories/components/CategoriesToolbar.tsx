@@ -49,7 +49,7 @@ export function CategoriesToolbar({
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex h-11 min-w-70 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3">
+          <div className="flex h-11 min-w-[280px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 sm:min-w-[320px]">
             <input
               value={search}
               onChange={(e) => onSearch(e.target.value)}

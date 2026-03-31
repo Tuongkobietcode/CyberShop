@@ -22,8 +22,8 @@ export default function CheckoutShell({
         <div className="mb-10 grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-end">
           <div className="space-y-4">
             <span className="cy-kicker">Checkout Flow</span>
-            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-[var(--text-primary)] sm:text-5xl">{title}</h1>
-            <p className="max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-(--text-primary) sm:text-5xl">{title}</h1>
+            <p className="max-w-xl text-sm leading-7 text-(--text-secondary)">
               Every step is designed to feel calm, clear, and trustworthy. Progress stays visible and the total context remains easy to scan.
             </p>
           </div>
@@ -41,7 +41,7 @@ export default function CheckoutShell({
                     "rounded-[28px] border px-5 py-5 transition",
                     isActive
                       ? "border-[rgba(143,185,255,0.4)] bg-[linear-gradient(180deg,rgba(143,185,255,0.16),rgba(255,255,255,0.03))] shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
-                      : "border-[var(--line-soft)] bg-white/[0.03]",
+                      : "border-(--line-soft) bg-white/[0.03]",
                   ].join(" ")}
                 >
                   <div className="flex items-center justify-between">
@@ -49,16 +49,16 @@ export default function CheckoutShell({
                       className={[
                         "inline-flex h-11 w-11 items-center justify-center rounded-2xl border",
                         isActive || isPast
-                          ? "border-[rgba(143,185,255,0.36)] bg-[rgba(143,185,255,0.12)] text-[var(--text-primary)]"
-                          : "border-[var(--line-soft)] text-[var(--text-secondary)]",
+                          ? "border-[rgba(143,185,255,0.36)] bg-[rgba(143,185,255,0.12)] text-(--text-primary)"
+                          : "border-(--line-soft) text-(--text-secondary)",
                       ].join(" ")}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">0{step.id}</span>
+                    <span className="font-mono text-xs uppercase tracking-[0.18em] text-(--text-tertiary)">0{step.id}</span>
                   </div>
-                  <p className="mt-5 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{step.helper}</p>
-                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">{step.label}</p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">{step.helper}</p>
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-(--text-primary)">{step.label}</p>
                 </div>
               );
             })}

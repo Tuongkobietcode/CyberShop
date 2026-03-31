@@ -19,19 +19,19 @@ export default function OrderSummary({
 
       <div>
         <span className="cy-kicker">Order Summary</span>
-        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-[var(--text-primary)]">Checkout snapshot</h2>
-        <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-(--text-primary)">Checkout snapshot</h2>
+        <p className="mt-3 text-sm leading-7 text-(--text-secondary)">
           Promo and loyalty inputs are kept visually lightweight here. The core signal is trust, transparency, and a clear path into checkout.
         </p>
       </div>
 
       <div className="mt-8 space-y-4">
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Promo code</p>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Promo code</p>
           <input className="cy-input" placeholder="Enter code" />
         </div>
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Loyalty card</p>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Loyalty card</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <input className="cy-input flex-1" placeholder="Your member number" />
             <button type="button" className="cy-btn-secondary h-14 px-5 text-sm">
@@ -41,36 +41,36 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <div className="mt-10 space-y-4 border-y border-[var(--line-soft)] py-6 text-sm text-[var(--text-secondary)]">
+      <div className="mt-10 space-y-4 border-y border-(--line-soft) py-6 text-sm text-(--text-secondary)">
         <div className="flex items-center justify-between">
           <span>Subtotal</span>
-          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(subtotal)}</span>
+          <span className="font-mono text-(--text-primary)">{formatCurrencyVnd(subtotal)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Estimated tax</span>
-          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(tax)}</span>
+          <span className="font-mono text-(--text-primary)">{formatCurrencyVnd(tax)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Shipping & handling</span>
-          <span className="font-mono text-[var(--text-primary)]">{formatCurrencyVnd(shippingFee)}</span>
+          <span className="font-mono text-(--text-primary)">{formatCurrencyVnd(shippingFee)}</span>
         </div>
-        <div className="flex items-center justify-between pt-4 text-base font-semibold text-[var(--text-primary)]">
+        <div className="flex items-center justify-between pt-4 text-base font-semibold text-(--text-primary)">
           <span>Total</span>
           <span className="font-mono text-2xl tracking-[-0.05em]">{formatCurrencyVnd(total)}</span>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 text-sm text-[var(--text-secondary)]">
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
-          <ShieldCheck className="h-4 w-4 text-[var(--accent)]" />
+      <div className="mt-6 grid gap-3 text-sm text-(--text-secondary)">
+        <div className="flex items-center gap-3 rounded-2xl border border-(--line-soft) bg-white/[0.03] px-4 py-3">
+          <ShieldCheck className="h-4 w-4 text-(--accent)" />
           Secure checkout and protected payment handoff
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
-          <Truck className="h-4 w-4 text-[var(--accent)]" />
+        <div className="flex items-center gap-3 rounded-2xl border border-(--line-soft) bg-white/[0.03] px-4 py-3">
+          <Truck className="h-4 w-4 text-(--accent)" />
           Shipping ETA will be confirmed before payment
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--line-soft)] bg-white/[0.03] px-4 py-3">
-          <Sparkles className="h-4 w-4 text-[var(--accent)]" />
+        <div className="flex items-center gap-3 rounded-2xl border border-(--line-soft) bg-white/[0.03] px-4 py-3">
+          <Sparkles className="h-4 w-4 text-(--accent)" />
           Inventory is reserved only when the next steps begin
         </div>
       </div>

@@ -154,22 +154,22 @@ export default function BlogDetailPage() {
             <div className="flex flex-col justify-center">
               <Link
                 to="/blog"
-                className="inline-flex w-fit items-center gap-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                className="inline-flex w-fit items-center gap-2 text-sm font-medium text-(--text-secondary) transition hover:text-(--text-primary)"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to blog
               </Link>
-              <p className="mt-6 text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+              <p className="mt-6 text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">
                 {post.category}
               </p>
-              <h1 className="mt-4 text-[2.8rem] font-semibold leading-[0.94] tracking-[-0.07em] text-[var(--text-primary)] sm:text-[4.2rem]">
+              <h1 className="mt-4 text-[2.3rem] font-semibold leading-[0.96] tracking-[-0.07em] text-(--text-primary) sm:text-[3.2rem] lg:text-[4.2rem]">
                 {post.title}
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-[var(--text-secondary)]">
+              <p className="mt-5 max-w-xl text-base leading-7 text-(--text-secondary)">
                 {post.excerpt}
               </p>
-              <div className="mt-7 inline-flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-                <CalendarDays className="h-4 w-4 text-[var(--accent)]" />
+              <div className="mt-7 inline-flex items-center gap-3 text-sm text-(--text-secondary)">
+                <CalendarDays className="h-4 w-4 text-(--accent)" />
                 {post.date} · {post.readTime}
               </div>
             </div>
@@ -178,18 +178,18 @@ export default function BlogDetailPage() {
               <img
                 src={resolveAssetUrl(post.image)}
                 alt={post.title}
-                className="relative z-10 mx-auto h-[320px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.12)]"
+                className="relative z-10 mx-auto h-[240px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.12)] sm:h-[280px] lg:h-[320px]"
               />
             </div>
           </div>
         </article>
 
         <section className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <aside className={`rounded-[30px] border p-8 text-[var(--text-primary)] ${theme.note}`}>
-            <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">
+          <aside className={`rounded-[30px] border p-8 text-(--text-primary) ${theme.note}`}>
+            <p className="text-xs uppercase tracking-[0.24em] text-(--text-tertiary)">
               Editorial note
             </p>
-            <p className="mt-5 text-sm leading-7 text-[var(--text-secondary)]">
+            <p className="mt-5 text-sm leading-7 text-(--text-secondary)">
               These posts are not news reports. They are short editorial reads about how device
               trends affect product selection, storefront experience, and customer expectations.
             </p>
@@ -199,14 +199,14 @@ export default function BlogDetailPage() {
             <div className="space-y-10">
               {post.sections.map((section) => (
                 <section key={section.heading}>
-                  <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-primary)]">
+                  <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">
                     {section.heading}
                   </h2>
                   <div className="mt-4 space-y-4">
                     {section.body.map((paragraph) => (
                       <p
                         key={paragraph}
-                        className="text-base leading-8 text-[var(--text-secondary)]"
+                        className="text-base leading-8 text-(--text-secondary)"
                       >
                         {paragraph}
                       </p>
@@ -219,7 +219,7 @@ export default function BlogDetailPage() {
         </section>
 
         <section className="space-y-6">
-          <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+          <h2 className="text-[2rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
             More from the journal
           </h2>
           <div className="grid gap-5 md:grid-cols-3">
@@ -238,22 +238,22 @@ export default function BlogDetailPage() {
                     <img
                       src={resolveAssetUrl(item.image)}
                       alt={item.title}
-                      className="relative z-10 mx-auto h-[180px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.1)]"
+                      className="relative z-10 mx-auto h-[160px] object-contain drop-shadow-[0_18px_28px_rgba(122,146,176,0.1)] sm:h-[180px]"
                     />
                   </div>
                   <div className="space-y-4 p-6">
-                    <p className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+                    <p className="text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">
                       {item.category}
                     </p>
-                    <h3 className="text-xl font-semibold leading-tight tracking-[-0.04em] text-[var(--text-primary)]">
+                    <h3 className="text-xl font-semibold leading-tight tracking-[-0.04em] text-(--text-primary)">
                       {item.title}
                     </h3>
-                    <p className="text-sm leading-7 text-[var(--text-secondary)]">
+                    <p className="text-sm leading-7 text-(--text-secondary)">
                       {item.excerpt}
                     </p>
                     <Link
                       to={`/blog/${item.slug}`}
-                      className="inline-flex items-center gap-3 rounded-full border border-[rgba(17,24,39,0.12)] bg-white/55 px-5 py-3 text-sm font-semibold text-[var(--text-primary)] transition hover:border-[rgba(17,24,39,0.18)] hover:bg-white/78"
+                      className="inline-flex items-center gap-3 rounded-full border border-[rgba(17,24,39,0.12)] bg-white/55 px-5 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-[rgba(17,24,39,0.18)] hover:bg-white/78"
                     >
                       Read article
                     </Link>

@@ -39,11 +39,11 @@ export default function AdminLayout() {
       ].join(" ")}
     >
       <div className="p-4">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start">
           <aside
             className={[
-              "shrink-0 transition-all duration-300",
-              collapsed ? "w-23" : "w-70",
+              "w-full transition-all duration-300 lg:shrink-0",
+              collapsed ? "lg:w-24" : "lg:w-72",
             ].join(" ")}
           >
             <Sidebar

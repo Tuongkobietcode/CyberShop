@@ -43,7 +43,7 @@ const storeCategories = [
 
 export default function StoreIntroSection() {
   return (
-    <section className="pb-10 pt-30">
+    <section className="pb-10 pt-12 sm:pt-14 lg:pt-16">
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
         <div className="flex flex-col gap-8 pb-8 sm:gap-10 sm:pb-12">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -60,13 +60,13 @@ export default function StoreIntroSection() {
               <div className="mt-4 space-y-2 text-sm text-[rgba(29,29,31,0.62)]">
                 <Link
                   to="/contact"
-                  className="block font-medium text-[var(--accent)] transition hover:text-[var(--accent-strong)]"
+                  className="block font-medium text-(--accent) transition hover:text-(--accent-strong)"
                 >
                   Connect with CyberShop
                 </Link>
                 <Link
                   to="/products"
-                  className="block font-medium text-[var(--accent)] transition hover:text-[var(--accent-strong)]"
+                  className="block font-medium text-(--accent) transition hover:text-(--accent-strong)"
                 >
                   Explore the catalog
                 </Link>

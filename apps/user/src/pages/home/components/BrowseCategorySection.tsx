@@ -41,8 +41,8 @@ const rightContainerVariants = {
   hidden: {},
   visible: {
     transition: {
-      delayChildren: 1,
-      staggerChildren: 0.5,
+      delayChildren: 0.12,
+      staggerChildren: 0.12,
     },
   },
 };
@@ -59,14 +59,14 @@ const rightItemVariants = {
 export default function BrowseCategorySection() {
   return (
     <motion.section
-      className="relative py-16 sm:py-24"
+      className="relative py-14 sm:py-20"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.4 }}
     >
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_minmax(720px,1fr)] lg:items-center lg:justify-between">
-          <motion.div className="relative flex min-h-[320px] flex-col justify-end sm:min-h-[360px]" variants={leftVariants}>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1fr)] lg:items-start lg:gap-x-12">
+          <motion.div className="relative flex min-h-0 flex-col justify-start" variants={leftVariants}>
             <div className="relative z-20 max-w-[340px] sm:max-w-[430px]">
               <p className="cy-kicker">The architecture of a setup</p>
               <h2 className="mt-4 text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.07em] text-[#1d1d1f] sm:text-[3.8rem]">
@@ -75,7 +75,7 @@ export default function BrowseCategorySection() {
                   one strong object.
                 </span>
               </h2>
-              <p className="mt-5 max-w-[34ch] text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base">
+              <p className="mt-5 max-w-[34ch] text-[15px] leading-7 text-(--text-secondary) sm:text-base">
                 Premium electronics do not need louder layouts. They need a
                 clearer hierarchy, stronger staging, and room for materials to
                 read correctly inside lighter, calmer surfaces.
@@ -91,15 +91,10 @@ export default function BrowseCategorySection() {
               <motion.div
                 key={item.id}
                 variants={rightItemVariants}
-                className={[
-                  "grid items-start gap-4 rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.88)] px-5 py-4 shadow-[0_10px_26px_rgba(15,23,42,0.05)] transition-transform sm:grid-cols-[52px_minmax(0,1fr)] sm:px-6 sm:py-4",
-                  item.id === "01" || item.id === "03"
-                    ? "lg:-translate-x-[50px]"
-                    : "",
-                ].join(" ")}
+                className="grid items-start gap-4 rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.88)] px-5 py-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)] transition-transform sm:grid-cols-[52px_minmax(0,1fr)] sm:px-6 sm:py-5"
               >
                 <div className="relative">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-[rgba(245,245,247,0.9)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-[rgba(245,245,247,0.9)] text-[11px] font-semibold uppercase tracking-[0.18em] text-(--text-secondary)">
                     {item.id}
                   </span>
                 </div>
@@ -108,14 +103,18 @@ export default function BrowseCategorySection() {
                   <h3 className="text-[1.3rem] font-semibold tracking-[-0.04em] text-[#1d1d1f] sm:text-[1.55rem]">
                     {item.title}
                   </h3>
-                  <p className="mt-2 max-w-[46ch] text-[14px] leading-6 text-[var(--text-secondary)]">
+                  <p className="mt-2 max-w-[46ch] text-[14px] leading-6 text-(--text-secondary)">
                     {item.copy}
                   </p>
                   <Link
                     to={item.to}
-                    className="mt-4 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:text-[var(--accent)]"
+                    className="mt-4 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.18em] text-(--text-primary) transition hover:text-(--accent)"
                   >
-                    Open category
+                    {item.id === "01"
+                      ? "Explore iPhone"
+                      : item.id === "02"
+                        ? "Explore audio"
+                        : "Explore Mac"}
                     <span className="h-px w-7 bg-current" />
                   </Link>
                 </div>

@@ -61,13 +61,13 @@ function ProductCardContent({
           "absolute right-5 top-5 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white/88 shadow-[0_8px_20px_rgba(15,23,42,0.06)] backdrop-blur transition focus:outline-none",
           isWishlisted
             ? "border-rose-300/40 bg-rose-50 text-rose-500 shadow-[0_12px_30px_rgba(244,63,94,0.12)]"
-            : "border-black/8 text-[var(--text-tertiary)] hover:border-black/12 hover:text-[var(--text-primary)]",
+            : "border-black/8 text-(--text-tertiary) hover:border-black/12 hover:text-(--text-primary)",
         ].join(" ")}
       >
         <Heart
           className={[
             "h-4 w-4",
-            isWishlisted ? "text-rose-500" : "text-[var(--text-tertiary)]",
+            isWishlisted ? "text-rose-500" : "text-(--text-tertiary)",
           ].join(" ")}
           fill={isWishlisted ? "currentColor" : "none"}
         />
@@ -86,24 +86,24 @@ function ProductCardContent({
 
         <div className="space-y-5 p-2 pt-6">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-(--text-tertiary)">
               {product.category?.name || "Apple hardware"}
             </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-(--text-tertiary)">
               {product.category?.name || "Catalog"}
             </p>
           </div>
 
           <div>
-            <h3 className="text-[1.15rem] font-semibold leading-6 tracking-[-0.04em] text-[var(--text-primary)]">
+            <h3 className="text-[1.15rem] font-semibold leading-6 tracking-[-0.04em] text-(--text-primary)">
               {product.name}
             </h3>
-            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
+            <p className="mt-2 text-sm leading-6 text-(--text-secondary)">{description}</p>
           </div>
 
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-1">
-              <span className="block text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+              <span className="block text-[1.35rem] font-semibold tracking-[-0.04em] text-(--text-primary)">
                 {formatCurrencyVnd(product.price)}
               </span>
               <span
@@ -117,7 +117,7 @@ function ProductCardContent({
             </div>
 
             {product.compareAtPrice ? (
-              <span className="font-mono text-sm text-[var(--text-tertiary)] line-through">
+              <span className="font-mono text-sm text-(--text-tertiary) line-through">
                 {formatCurrencyVnd(product.compareAtPrice)}
               </span>
             ) : null}
@@ -126,7 +126,7 @@ function ProductCardContent({
       </Link>
 
       <div className="mt-5 flex items-center justify-between border-t border-black/6 pt-4">
-        <span className="text-sm font-medium text-[var(--text-secondary)]">
+        <span className="text-sm font-medium text-(--text-secondary)">
           {isOutOfStock ? "View details" : "Explore product"}
         </span>
         <Link

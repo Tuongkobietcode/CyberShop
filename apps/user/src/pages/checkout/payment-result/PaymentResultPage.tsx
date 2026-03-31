@@ -175,10 +175,10 @@ export default function PaymentResultPage() {
 
           <div className="mt-6 grid gap-10 xl:grid-cols-[minmax(0,1fr)_380px]">
             <div>
-              <h1 className="max-w-[14ch] text-5xl font-semibold tracking-[-0.08em] text-[var(--text-primary)] sm:text-6xl">
+              <h1 className="max-w-[14ch] text-5xl font-semibold tracking-[-0.08em] text-(--text-primary) sm:text-6xl">
                 {headline}
               </h1>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-[var(--text-secondary)]">{description}</p>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-(--text-secondary)">{description}</p>
 
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link to="/profile" className="cy-btn-primary inline-flex h-14 items-center justify-center px-6">
@@ -195,7 +195,7 @@ export default function PaymentResultPage() {
               </div>
             </div>
 
-            <div className="rounded-[32px] border border-[var(--line-soft)] bg-white/[0.03] p-6">
+            <div className="rounded-[32px] border border-(--line-soft) bg-white/[0.03] p-6">
               <div className="space-y-5">
                 <Meta label="Txn Ref" value={txnRef || "N/A"} />
                 <Meta label="Order code" value={order?.orderCode || orderCode || "Pending"} />
@@ -205,8 +205,8 @@ export default function PaymentResultPage() {
             </div>
           </div>
 
-          <div className="mt-10 flex items-center gap-3 rounded-[24px] border border-[var(--line-soft)] bg-white/[0.03] px-5 py-4 text-sm text-[var(--text-secondary)]">
-            <ArrowRight className="h-4 w-4 text-[var(--accent)]" />
+          <div className="mt-10 flex items-center gap-3 rounded-[24px] border border-(--line-soft) bg-white/[0.03] px-5 py-4 text-sm text-(--text-secondary)">
+            <ArrowRight className="h-4 w-4 text-(--accent)" />
             Orders and payment state stay synchronized through the backend status endpoint, even after the hosted VNPay redirect returns.
           </div>
         </article>
@@ -218,8 +218,8 @@ export default function PaymentResultPage() {
 function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{label}</p>
-      <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">{value}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">{label}</p>
+      <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-(--text-primary)">{value}</p>
     </div>
   );
 }

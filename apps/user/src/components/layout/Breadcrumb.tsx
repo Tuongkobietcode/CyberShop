@@ -9,7 +9,7 @@ export type BreadcrumbItem = {
 export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
     <div className="border-b border-black/6 bg-[rgba(255,255,255,0.72)] backdrop-blur-xl">
-      <div className="cy-shell flex items-center gap-3 py-5 text-sm text-[var(--text-tertiary)]">
+      <div className="cy-shell flex items-center gap-3 py-5 text-sm text-(--text-tertiary)">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
@@ -17,7 +17,7 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
               {item.to && !isLast ? (
                 <Link
                   to={item.to}
-                  className="transition hover:text-[var(--text-primary)]"
+                  className="transition hover:text-(--text-primary)"
                 >
                   {item.label}
                 </Link>
@@ -25,7 +25,7 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
                 <span
                   className={
                     isLast
-                      ? "font-semibold text-[var(--text-primary)]"
+                      ? "font-semibold text-(--text-primary)"
                       : ""
                   }
                 >
@@ -33,7 +33,7 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
                 </span>
               )}
               {!isLast ? (
-                <ChevronRight className="h-[15px] w-[15px] text-[var(--text-tertiary)]" />
+                <ChevronRight className="h-[15px] w-[15px] text-(--text-tertiary)" />
               ) : null}
             </div>
           );

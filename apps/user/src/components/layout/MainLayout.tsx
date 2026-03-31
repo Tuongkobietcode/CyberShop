@@ -39,7 +39,7 @@ export default function MainLayout() {
   }, [clearNotification, notification]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary)">
       <div
         className={[
           "fixed inset-x-0 top-0 z-[70] h-[3px] origin-left bg-[linear-gradient(90deg,rgba(0,113,227,0.18),rgba(0,113,227,0.82),rgba(0,113,227,0.12))] shadow-[0_8px_22px_rgba(0,113,227,0.22)] transition-transform duration-500",
@@ -92,7 +92,7 @@ export default function MainLayout() {
               )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-[var(--text-primary)]">
+            <p className="text-sm font-semibold text-(--text-primary)">
               {notification?.type === "wishlist"
                 ? notification.action === "added"
                   ? "Saved to wishlist"
@@ -103,7 +103,7 @@ export default function MainLayout() {
                     ? "Inventory limit reached"
                 : "Added to cart"}
             </p>
-            <p className="mt-1 text-sm leading-5 text-[var(--text-secondary)]">
+            <p className="mt-1 text-sm leading-5 text-(--text-secondary)">
               {notification
                 ? notification.type === "wishlist"
                   ? notification.name
@@ -115,7 +115,7 @@ export default function MainLayout() {
                 : ""}
             </p>
           </div>
-          <div className="rounded-full bg-black/[0.035] p-2 text-[var(--text-tertiary)]">
+          <div className="rounded-full bg-black/[0.035] p-2 text-(--text-tertiary)">
             {notification?.type === "wishlist" ? (
               <Heart className="h-4 w-4" fill="currentColor" />
             ) : notification?.type === "order" ? (
