@@ -43,10 +43,13 @@ export default function PaymentPage() {
         <div className="cy-panel p-7 sm:p-8">
           <div className="max-w-2xl">
             <span className="cy-kicker">Payment Method</span>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-(--text-primary) sm:text-4xl">
-              Complete the order with a calm, secure finish.
+            <h2 className="mt-4 text-[2.3rem] font-semibold leading-[0.95] tracking-[-0.07em] text-[#1d1d1f] sm:text-[2.95rem]">
+              Complete the order
+              <span className="block text-[rgba(29,29,31,0.46)]">
+                with a calm, secure finish.
+              </span>
             </h2>
-            <p className="mt-4 text-base leading-8 text-(--text-secondary)">
+            <p className="mt-4 text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
               VNPay stays the primary handoff for online payment, while cash on delivery remains available for orders that do not need an immediate gateway redirect.
             </p>
           </div>

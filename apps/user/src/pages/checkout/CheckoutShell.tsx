@@ -22,8 +22,13 @@ export default function CheckoutShell({
         <div className="mb-10 grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-end">
           <div className="space-y-4">
             <span className="cy-kicker">Checkout Flow</span>
-            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-(--text-primary) sm:text-5xl">{title}</h1>
-            <p className="max-w-xl text-sm leading-7 text-(--text-secondary)">
+            <h1 className="text-[2.65rem] font-semibold leading-[0.94] tracking-[-0.075em] text-[#1d1d1f] sm:text-[3.35rem] lg:text-[4rem]">
+              {title}
+              <span className="block text-[rgba(29,29,31,0.46)]">
+                Keep the next step calm and easy to read.
+              </span>
+            </h1>
+            <p className="max-w-2xl text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
               Every step is designed to feel calm, clear, and trustworthy. Progress stays visible and the total context remains easy to scan.
             </p>
           </div>

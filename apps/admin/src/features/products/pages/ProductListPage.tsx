@@ -601,7 +601,7 @@ export default function ProductListPage() {
           subtitle={modalProductSummary ? `Updating ${modalProductSummary.name}` : "Updating catalog entry"}
           onClose={() => resetEditState()}
         >
-          <div className="max-h-[85vh] overflow-y-auto px-6 py-6">
+          <div className="px-6 py-6">
             <input
               ref={fileInputRef}
               type="file"

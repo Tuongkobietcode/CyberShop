@@ -31,6 +31,14 @@ export default function PaymentResultPage() {
   const orderCode = searchParams.get("orderCode");
   const initialResult = searchParams.get("result");
 
+  async function safeRefreshProfile() {
+    try {
+      await refreshProfile();
+    } catch {
+      // Payment result should stay readable even if profile refresh lags behind.
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
     let timeoutId = 0;
@@ -42,7 +50,7 @@ export default function PaymentResultPage() {
 
       didHandleSuccess.current = true;
       clearCart();
-      await refreshProfile();
+      await safeRefreshProfile();
     }
 
     async function loadStatus(attempt = 0) {
@@ -68,7 +76,7 @@ export default function PaymentResultPage() {
 
         if (next.order.paymentStatus === "failed") {
           setTone("failed");
-          await refreshProfile();
+          await safeRefreshProfile();
           return;
         }
 

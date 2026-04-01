@@ -106,11 +106,16 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.22em] text-(--text-tertiary)">Customer profile</p>
-                <h1 className="mt-2 text-[2.2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">{customer.name}</h1>
+                <h1 className="mt-2 text-[2.4rem] font-semibold leading-[0.95] tracking-[-0.07em] text-[#1d1d1f] sm:text-[2.9rem]">
+                  {customer.name}
+                  <span className="block text-[rgba(29,29,31,0.46)]">
+                    Account and order overview.
+                  </span>
+                </h1>
               </div>
             </div>
 
-            <dl className="mt-8 space-y-5 text-[15px] text-(--text-secondary)">
+            <dl className="mt-8 space-y-5 text-[15px] text-[#6e6e73]">
               <div className="flex items-start justify-between gap-6 border-b border-(--line-soft) pb-4">
                 <dt>Email</dt>
                 <dd className="text-right font-medium text-(--text-primary)">{customer.email}</dd>
@@ -152,7 +157,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Account</p>
-                  <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Edit your details</h2>
+                  <h2 className="mt-2 text-[2.15rem] font-semibold tracking-[-0.065em] text-[#1d1d1f]">Edit your details</h2>
                 </div>
               </div>
 
@@ -232,10 +237,10 @@ export default function ProfilePage() {
         <section className="grid gap-6 lg:grid-cols-[0.94fr_1.06fr]">
           <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Addresses</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Delivery book</h2>
-              </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Addresses</p>
+                  <h2 className="mt-2 text-[2.15rem] font-semibold tracking-[-0.065em] text-[#1d1d1f]">Delivery book</h2>
+                </div>
               <button
                 type="button"
                 onClick={() => {
@@ -271,7 +276,7 @@ export default function ProfilePage() {
                             {address.label}
                           </span>
                         </div>
-                        <p className="mt-3 text-sm leading-7 text-(--text-secondary)">
+                        <p className="mt-3 text-[15px] leading-7 text-[#6e6e73]">
                           {address.addressLine1}
                           {address.addressLine2 ? `, ${address.addressLine2}` : ""}
                           {address.ward ? `, ${address.ward}` : ""}
@@ -329,10 +334,10 @@ export default function ProfilePage() {
 
           <article className="cy-panel p-8">
             <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Recent orders</p>
-                <h2 className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-(--text-primary)">Your latest purchases</h2>
-              </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-(--text-tertiary)">Recent orders</p>
+                  <h2 className="mt-2 text-[2.15rem] font-semibold tracking-[-0.065em] text-[#1d1d1f]">Your latest purchases</h2>
+                </div>
               <Link to="/products" className="text-sm font-semibold text-(--text-secondary) transition hover:text-(--text-primary)">
                 Continue shopping
               </Link>

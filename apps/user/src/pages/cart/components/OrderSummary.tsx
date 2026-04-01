@@ -19,8 +19,10 @@ export default function OrderSummary({
 
       <div>
         <span className="cy-kicker">Order Summary</span>
-        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-(--text-primary)">Checkout snapshot</h2>
-        <p className="mt-3 text-[15px] leading-8 text-(--text-secondary)">
+        <h2 className="mt-4 text-[2.15rem] font-semibold tracking-[-0.065em] text-[#1d1d1f] sm:text-[2.45rem]">
+          Checkout snapshot
+        </h2>
+        <p className="mt-3 text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
           Promo and loyalty inputs are kept visually lightweight here. The core signal is trust, transparency, and a clear path into checkout.
         </p>
       </div>

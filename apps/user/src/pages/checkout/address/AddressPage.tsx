@@ -33,7 +33,7 @@ export default function AddressPage() {
       <div className="space-y-6">
         <div className="max-w-3xl">
           <p className="text-sm uppercase tracking-[0.22em] text-(--text-tertiary)">Recipient selection</p>
-          <p className="mt-4 text-base leading-8 text-(--text-secondary)">
+          <p className="mt-4 text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
             Choose a saved address or add a new one before the shipping options appear. New customer accounts start here because the first address defines delivery timing and tax context.
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function AddressPage() {
           >
             <CirclePlus className="h-8 w-8 text-(--accent)" />
             <span className="text-lg font-semibold tracking-[-0.04em]">Add new address</span>
-            <span className="text-sm text-(--text-secondary)">Create a new destination for this order.</span>
+            <span className="text-[15px] text-[#6e6e73]">Create a new destination for this order.</span>
           </button>
         )}
 

@@ -16,7 +16,7 @@ export default function ShippingPage() {
       <div className="space-y-6">
         <div className="max-w-3xl">
           <p className="text-sm uppercase tracking-[0.22em] text-(--text-tertiary)">Delivery speed</p>
-          <p className="mt-4 text-base leading-8 text-(--text-secondary)">
+          <p className="mt-4 text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
             Pick the delivery rhythm that fits the order. ETA, surface treatment, and motion language stay consistent with the darker storefront.
           </p>
         </div>

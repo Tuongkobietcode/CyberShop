@@ -77,7 +77,8 @@ function mergeBlogPosts(primary: BlogPost[], fallback: BlogPost[]) {
 }
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>(fallbackBlogPosts);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -90,11 +91,18 @@ export default function BlogPage() {
           return;
         }
 
-        if (apiPosts.length) {
-          setPosts(mergeBlogPosts(apiPosts, fallbackBlogPosts));
-        }
+        setPosts(apiPosts.length ? mergeBlogPosts(apiPosts, fallbackBlogPosts) : fallbackBlogPosts);
       } catch {
+        if (!active) {
+          return;
+        }
+
         // Keep editorial fallback data when the API has not been populated yet.
+        setPosts(fallbackBlogPosts);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
@@ -107,6 +115,56 @@ export default function BlogPage() {
 
   const featured = posts[0];
   const rest = useMemo(() => posts.slice(1), [posts]);
+
+  if (loading) {
+    return (
+      <div className="pb-24">
+        <Breadcrumb items={[{ label: "Home", to: "/home" }, { label: "Blog" }]} />
+
+        <div className="cy-shell space-y-12 pt-10">
+          <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            <article className="cy-panel animate-pulse px-8 py-9">
+              <div className="h-10 w-32 rounded-full bg-black/5" />
+              <div className="mt-6 h-16 max-w-xl rounded-[28px] bg-black/6 sm:h-24" />
+              <div className="mt-5 h-20 max-w-2xl rounded-[28px] bg-black/4" />
+            </article>
+
+            <article className={`relative overflow-hidden rounded-[34px] border p-6 ${featuredTheme.shell}`}>
+              <div className={`absolute inset-0 ${featuredTheme.aura}`} />
+              <div className="relative z-10 mx-auto h-[220px] rounded-[28px] bg-white/65 sm:h-[260px] lg:h-[300px]" />
+              <div className={`relative z-10 mt-6 rounded-[28px] border p-5 backdrop-blur ${featuredTheme.panel}`}>
+                <div className="h-4 w-28 rounded-full bg-black/5" />
+                <div className="mt-4 h-14 rounded-[24px] bg-black/6" />
+                <div className="mt-4 h-20 rounded-[24px] bg-black/4" />
+              </div>
+            </article>
+          </section>
+
+          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => {
+              const theme = blogCardThemes[index % blogCardThemes.length];
+              return (
+                <article
+                  key={`blog-skeleton-${index}`}
+                  className={`overflow-hidden rounded-[30px] border animate-pulse ${theme.shell}`}
+                >
+                  <div className={`relative overflow-hidden p-8 ${theme.media}`}>
+                    <div className={`absolute inset-0 ${theme.aura}`} />
+                    <div className="relative z-10 mx-auto h-[180px] rounded-[24px] bg-white/70 sm:h-[200px]" />
+                  </div>
+                  <div className="space-y-4 p-6">
+                    <div className="h-4 w-20 rounded-full bg-black/5" />
+                    <div className="h-10 rounded-[18px] bg-black/6" />
+                    <div className="h-16 rounded-[18px] bg-black/4" />
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   if (!featured) {
     return (

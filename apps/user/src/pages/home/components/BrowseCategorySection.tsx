@@ -67,7 +67,7 @@ export default function BrowseCategorySection() {
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 lg:px-8 2xl:px-10">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1fr)] lg:items-start lg:gap-x-12">
           <motion.div className="relative flex min-h-0 flex-col justify-start" variants={leftVariants}>
-            <div className="relative z-20 max-w-[340px] sm:max-w-[430px]">
+            <div className="relative z-20 mt-30 max-w-[340px] sm:max-w-[430px]">
               <p className="cy-kicker">The architecture of a setup</p>
               <h2 className="mt-4 text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.07em] text-[#1d1d1f] sm:text-[3.8rem]">
                 Build around

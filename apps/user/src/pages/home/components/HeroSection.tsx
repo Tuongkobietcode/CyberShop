@@ -24,8 +24,8 @@ export default function HeroSection() {
                 Studio archive
               </div>
 
-              <h1 className="mt-6 max-w-[8ch] text-[3.2rem] font-semibold leading-[0.9] tracking-[-0.1em] text-[#1d1d1f] sm:text-[4.4rem] lg:text-[5.4rem] xl:text-[6.2rem] 2xl:text-[6.9rem]">
-                Flagship
+              <h1 className="mt-30 max-w-[8ch] text-[3.2rem] font-semibold leading-[0.9] tracking-[-0.1em] text-[#1d1d1f] sm:text-[4.4rem] lg:text-[5.4rem] xl:text-[6.2rem] 2xl:text-[6.9rem]">
+                Flagship  
                 <span className="block font-light text-[rgba(29,29,31,0.56)]">hardware.</span>
               </h1>
 
@@ -58,7 +58,7 @@ export default function HeroSection() {
               <img
                 src={resolveAssetUrl("/assets/images/iphone-17-pro.png")}
                 alt="iPhone 17 Pro hero"
-                className="absolute bottom-[-8px] left-1/2 z-[1] w-[320px] max-w-none -translate-x-1/2 object-contain drop-shadow-[0_35px_70px_rgba(15,23,42,0.18)] sm:bottom-[-14px] sm:w-[420px] lg:bottom-[-24px] lg:w-[560px] xl:w-[640px]"
+                className="absolute bottom-[-8px] left-1/2 z-[1] w-[320px] max-w-none -translate-x-1/2 object-contain drop-shadow-[0_35px_70px_rgba(15,23,42,0.18)] sm:bottom-[-14px] sm:w-[420px] lg:bottom-[-24px] lg:w-[560px] xl:bottom-[-100px] xl:w-[1500px]"
               />
             </div>
           </div>

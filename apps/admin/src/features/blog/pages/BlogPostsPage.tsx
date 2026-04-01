@@ -525,7 +525,7 @@ export default function BlogPostsPage() {
           subtitle={modalPostSummary ? `Updating ${modalPostSummary.title}` : "Prepare a journal update"}
           onClose={() => resetModalState()}
         >
-          <div className="max-h-[85vh] overflow-y-auto px-6 py-6">
+          <div className="px-6 py-6">
             <input
               ref={fileInputRef}
               type="file"

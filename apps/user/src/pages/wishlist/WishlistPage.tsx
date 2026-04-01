@@ -44,14 +44,19 @@ export default function WishlistPage() {
 
       <div className="cy-shell pt-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
+          <div className="max-w-4xl">
             <span className="cy-kicker">Saved products</span>
-            <h1 className="cy-display mt-5 max-w-[12ch]">Wishlist built for a clearer second look.</h1>
-            <p className="cy-copy mt-5 max-w-2xl">
+            <h1 className="mt-5 max-w-[13ch] text-[2.65rem] font-semibold leading-[0.94] tracking-[-0.075em] text-[#1d1d1f] sm:text-[3.35rem] lg:text-[4rem]">
+              Wishlist built
+              <span className="block text-[rgba(29,29,31,0.46)]">
+                for a clearer second look.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-4xl text-[1.08rem] leading-9 text-[#6e6e73] sm:text-[1.22rem]">
               Saved products stay in the same calm storefront language as the rest of the journey, so comparison feels consistent instead of switching into a separate dark mode.
             </p>
           </div>
-          <div className="inline-flex items-center gap-3 rounded-full border border-(--line-soft) bg-white px-4 py-3 text-sm font-medium text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+          <div className="inline-flex items-center gap-3 rounded-full border border-(--line-soft) bg-white px-5 py-3 text-[15px] font-medium text-(--text-primary) shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
             <Heart className="h-4 w-4 fill-(--accent) text-(--accent)" />
             {wishlist.length} saved item{wishlist.length === 1 ? "" : "s"}
           </div>
@@ -62,8 +67,8 @@ export default function WishlistPage() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(143,185,255,0.22)] bg-[rgba(143,185,255,0.14)] text-(--accent)">
               <Heart className="h-7 w-7" />
             </div>
-            <h2 className="mt-6 text-[2rem] font-semibold tracking-[-0.04em] text-(--text-primary)">Your wishlist is empty</h2>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-(--text-secondary)">
+            <h2 className="mt-6 text-[2.2rem] font-semibold tracking-[-0.055em] text-[#1d1d1f] sm:text-[2.55rem]">Your wishlist is empty</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-[1.02rem] leading-8 text-[#6e6e73] sm:text-[1.08rem]">
               Save products you are considering and come back to them later without losing track.
             </p>
             <Link to="/products" className="cy-btn-primary mt-8 inline-flex h-14 items-center justify-center px-8">

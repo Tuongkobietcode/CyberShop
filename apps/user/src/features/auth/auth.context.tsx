@@ -39,6 +39,7 @@ type AuthContextValue = {
   orders: CustomerOrder[];
   isAuthenticated: boolean;
   isBootstrapping: boolean;
+  recoverSession: () => Promise<boolean>;
   signIn: (payload: { email: string; password: string }) => Promise<void>;
   signUp: (payload: { name: string; email: string; phone: string; password: string }) => Promise<void>;
   signOut: () => Promise<void>;
@@ -66,6 +67,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setOrders(nextOrders);
   }, []);
 
+  const recoverSession = useCallback(async () => {
+    try {
+      const token = getCustomerAccessToken();
+
+      if (token) {
+        try {
+          const current = await getCurrentCustomer();
+          patchStoredCustomerAuth({ customer: current });
+          setCustomer(current);
+          const nextOrders = await getMyOrders();
+          setOrders(nextOrders);
+          return true;
+        } catch {
+          // Fall through to refresh-token recovery.
+        }
+      }
+
+      const refreshed = await refreshCustomerAccessToken();
+      setStoredCustomerAuth({ customer: refreshed.customer, accessToken: refreshed.accessToken });
+      setCustomer(refreshed.customer);
+      const nextOrders = await getMyOrders();
+      setOrders(nextOrders);
+      return true;
+    } catch {
+      clearStoredCustomerAuth();
+      setCustomer(null);
+      setOrders([]);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     const eventName = getCustomerAuthEventName();
     window.addEventListener(eventName, syncFromStorage);
@@ -77,29 +109,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function bootstrap() {
       try {
-        const token = getCustomerAccessToken();
-
-        if (token) {
-          const current = await getCurrentCustomer();
-          if (!cancelled) {
-            patchStoredCustomerAuth({ customer: current });
-            setCustomer(current);
-            const nextOrders = await getMyOrders();
-            if (!cancelled) {
-              setOrders(nextOrders);
-            }
-          }
-          return;
-        }
-
-        const refreshed = await refreshCustomerAccessToken();
-        if (!cancelled) {
-          setStoredCustomerAuth({ customer: refreshed.customer, accessToken: refreshed.accessToken });
-          setCustomer(refreshed.customer);
-          const nextOrders = await getMyOrders();
-          if (!cancelled) {
-            setOrders(nextOrders);
-          }
+        const restored = await recoverSession();
+        if (!cancelled && !restored) {
+          setCustomer(null);
+          setOrders([]);
         }
       } catch {
         if (!cancelled) {
@@ -183,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       orders,
       isAuthenticated: !!customer,
       isBootstrapping,
+      recoverSession,
       signIn,
       signUp,
       signOut,
@@ -191,7 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       saveAddress,
       deleteAddress,
     }),
-    [customer, deleteAddress, isBootstrapping, orders, refreshProfile, saveAddress, signIn, signOut, signUp, updateProfile]
+    [customer, deleteAddress, isBootstrapping, orders, recoverSession, refreshProfile, saveAddress, signIn, signOut, signUp, updateProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

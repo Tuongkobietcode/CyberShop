@@ -88,16 +88,18 @@ function mergeBlogPosts(primary: BlogPost[], fallback: BlogPost[]) {
 export default function BlogDetailPage() {
   const { slug = "" } = useParams();
   const fallbackPost = getBlogPostBySlug(slug);
-  const [post, setPost] = useState<BlogPost | null>(fallbackPost);
+  const [post, setPost] = useState<BlogPost | null>(null);
   const [missing, setMissing] = useState(false);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>(
-    fallbackBlogPosts.filter((item) => item.slug !== slug).slice(0, 3)
-  );
+  const [loading, setLoading] = useState(true);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
     let active = true;
 
     async function loadDetail() {
+      setLoading(true);
+      setMissing(false);
+
       try {
         const [detail, apiPosts] = await Promise.all([getBlogPostDetail(slug), getBlogPosts()]);
 
@@ -115,6 +117,14 @@ export default function BlogDetailPage() {
 
         if (!fallbackPost) {
           setMissing(true);
+          setPost(null);
+        } else {
+          setPost(fallbackPost);
+          setRelatedPosts(fallbackBlogPosts.filter((item) => item.slug !== slug).slice(0, 3));
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
         }
       }
     }
@@ -125,6 +135,36 @@ export default function BlogDetailPage() {
       active = false;
     };
   }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="pb-24">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/home" },
+            { label: "Blog", to: "/blog" },
+            { label: "Loading..." },
+          ]}
+        />
+
+        <div className="cy-shell space-y-12 pt-10">
+          <article className="overflow-hidden rounded-[36px] border bg-[linear-gradient(180deg,#f7fbff_0%,#eef6ff_100%)] border-[#d8e8f6] shadow-[0_18px_55px_rgba(150,182,214,0.14)] animate-pulse">
+            <div className="grid gap-8 p-8 lg:grid-cols-[0.95fr_1.05fr] lg:p-10">
+              <div className="flex flex-col justify-center">
+                <div className="h-5 w-24 rounded-full bg-black/5" />
+                <div className="mt-6 h-4 w-32 rounded-full bg-black/5" />
+                <div className="mt-4 h-20 rounded-[28px] bg-black/6" />
+                <div className="mt-5 h-20 rounded-[28px] bg-black/4" />
+              </div>
+              <div className="relative overflow-hidden rounded-[30px] bg-[radial-gradient(circle_at_top,#ffffff_0%,#ebf4ff_42%,#dce9f8_100%)] p-8">
+                <div className="mx-auto h-[240px] rounded-[28px] bg-white/70 sm:h-[280px] lg:h-[320px]" />
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    );
+  }
 
   if (missing || (!post && !fallbackPost)) {
     return <Navigate to="/blog" replace />;
