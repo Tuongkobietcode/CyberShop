@@ -7,7 +7,6 @@ import {
   Newspaper,
   Wallet,
   Inbox,
-  PlusCircle,
   PackageSearch,
   List,
   UserCog,
@@ -40,7 +39,6 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Product",
     items: [
-      { label: "Add Products", to: "/admin/products/new", icon: PlusCircle },
       { label: "Product List", to: "/admin/products", icon: List },
       { label: "Inventory", to: "/admin/products/inventory", icon: PackageSearch },
     ],

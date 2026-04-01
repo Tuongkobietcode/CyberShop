@@ -5,10 +5,31 @@ import { Product } from "../products/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { expireStalePendingVnpayOrders } from "../orders/order.service.js";
 
+const DASHBOARD_TIMEZONE = "Asia/Ho_Chi_Minh";
+
 function getDateDaysAgo(days) {
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date;
+}
+
+function formatDateInTimezone(date, timeZone = DASHBOARD_TIMEZONE) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  return formatter.format(date);
+}
+
+function buildRecentDateLabels(days, now = new Date(), timeZone = DASHBOARD_TIMEZONE) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(now);
+    date.setDate(now.getDate() - (days - index - 1));
+    return formatDateInTimezone(date, timeZone);
+  });
 }
 
 function scheduleDashboardInventoryCleanup() {
@@ -21,7 +42,7 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
   scheduleDashboardInventoryCleanup();
 
   const now = new Date();
-  const sevenDaysAgo = getDateDaysAgo(7);
+  const sevenDaysAgo = getDateDaysAgo(6);
   const thirtyDaysAgo = getDateDaysAgo(30);
   const validOrderFilter = {
     orderStatus: { $ne: "cancelled" },
@@ -86,7 +107,7 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
     }),
   ]);
 
-  const recentRevenue = await Order.aggregate([
+  const recentRevenueRaw = await Order.aggregate([
     {
       $match: {
         ...paidOrderFilter,
@@ -99,6 +120,7 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
           $dateToString: {
             format: "%Y-%m-%d",
             date: "$createdAt",
+            timezone: DASHBOARD_TIMEZONE,
           },
         },
         revenue: { $sum: "$totalAmount" },
@@ -106,6 +128,13 @@ export const getDashboardSummary = asyncHandler(async (_req, res) => {
     },
     { $sort: { _id: 1 } },
   ]);
+
+  const recentDateLabels = buildRecentDateLabels(7, now, DASHBOARD_TIMEZONE);
+  const revenueByDate = new Map(recentRevenueRaw.map((item) => [item._id, item.revenue]));
+  const recentRevenue = recentDateLabels.map((dateLabel) => ({
+    _id: dateLabel,
+    revenue: revenueByDate.get(dateLabel) || 0,
+  }));
 
   res.json({
     success: true,

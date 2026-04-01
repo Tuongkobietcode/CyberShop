@@ -4,7 +4,9 @@ import AdminLayout from "@/layouts/AdminLayout/AdminLayout";
 import { CustomersListPage } from "@/features/customers/pages/CustomersListPage";
 import CustomerDetailsPage from "@/features/customers/pages/CustomerDetailsPage";
 import { CategoriesPage } from "@/features/categories/pages/CategoriesPage";
+import CategoryCreatePage from "@/features/categories/pages/CategoryCreatePage";
 import BlogPostsPage from "@/features/blog/pages/BlogPostsPage";
+import BlogCreatePage from "@/features/blog/pages/BlogCreatePage";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import OrdersListPage from "@/features/orders/pages/OrdersListPage";
 import ProductListPage from "@/features/products/pages/ProductListPage";
@@ -29,7 +31,9 @@ export default function AppRoutes() {
           <Route path="customers" element={<CustomersListPage />} />
           <Route path="customers/:id" element={<CustomerDetailsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="categories/new" element={<CategoryCreatePage />} />
           <Route path="blog" element={<BlogPostsPage />} />
+          <Route path="blog/new" element={<BlogCreatePage />} />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="contact-inbox" element={<ContactInboxPage />} />
           <Route path="products" element={<ProductListPage />} />

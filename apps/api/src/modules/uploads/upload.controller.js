@@ -3,6 +3,7 @@ import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import { createHttpError } from "../../utils/createHttpError.js";
+import { isCloudinaryConfigured, uploadBufferToCloudinary } from "../../utils/cloudinary.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,8 +59,10 @@ const storage = multer.diskStorage({
   },
 });
 
+const memoryStorage = multer.memoryStorage();
+
 const upload = multer({
-  storage,
+  storage: isCloudinaryConfigured() ? memoryStorage : storage,
   limits: {
     fileSize: 6 * 1024 * 1024,
     files: 8,
@@ -100,7 +103,7 @@ export function uploadAdminImages(req, res, next) {
   });
 }
 
-export function createAdminUploadResponse(req, res) {
+export async function createAdminUploadResponse(req, res) {
   const scope = resolveUploadScope(req.query.scope);
   const files = Array.isArray(req.files) ? req.files : [];
 
@@ -108,9 +111,22 @@ export function createAdminUploadResponse(req, res) {
     throw createHttpError(400, "At least one image file is required");
   }
 
+  const uploadedFiles = isCloudinaryConfigured()
+    ? await Promise.all(
+        files.map((file) =>
+          uploadBufferToCloudinary({
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            originalname: file.originalname,
+            scope,
+          })
+        )
+      )
+    : files.map((file) => mapUploadedFile(scope, file));
+
   res.status(201).json({
     success: true,
     message: "Images uploaded successfully",
-    data: files.map((file) => mapUploadedFile(scope, file)),
+    data: uploadedFiles,
   });
 }

@@ -34,12 +34,12 @@ export default function AdminLayout() {
   return (
     <div
       className={[
-        "min-h-screen transition-colors duration-300",
+        "h-screen overflow-hidden transition-colors duration-300",
         theme === "dark" ? "bg-[#0b1220]" : "bg-[#f3f5f7]",
       ].join(" ")}
     >
-      <div className="p-4">
-        <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start">
+      <div className="h-full p-4">
+        <div className="flex h-full flex-col items-stretch gap-4 lg:flex-row lg:items-start">
           <aside
             className={[
               "w-full transition-all duration-300 lg:shrink-0",
@@ -53,10 +53,10 @@ export default function AdminLayout() {
             />
           </aside>
 
-          <main className="min-w-0 flex-1">
+          <main className="min-h-0 min-w-0 flex-1 lg:h-[calc(100vh-32px)]">
             <div
               className={[
-                "overflow-hidden rounded-[28px] border transition-colors duration-300",
+                "flex h-full flex-col overflow-hidden rounded-[28px] border transition-colors duration-300",
                 theme === "dark"
                   ? "border-slate-800 bg-[#111827]"
                   : "border-slate-200 bg-white",
@@ -69,7 +69,7 @@ export default function AdminLayout() {
                 }
               />
 
-              <div className="p-5">
+              <div className="min-h-0 flex-1 overflow-y-auto p-5">
                 <Outlet />
               </div>
             </div>

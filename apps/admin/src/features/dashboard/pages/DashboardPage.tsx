@@ -102,6 +102,7 @@ export default function DashboardPage() {
   }, [summary]);
 
   const revenueMax = Math.max(...(summary?.recentRevenue.map((item) => item.revenue) || [1]));
+  const hasRevenueInWindow = (summary?.recentRevenue || []).some((item) => item.revenue > 0);
   const operationsMix = useMemo(() => {
     if (!summary) return [];
 
@@ -208,14 +209,14 @@ export default function DashboardPage() {
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-black/35">Revenue trend</p>
-                <p className="mt-2 text-sm text-black/45">Paid revenue over recent recorded days</p>
+                <p className="mt-2 text-sm text-black/45">Paid revenue by local day across the latest 7-day window</p>
               </div>
               <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/55">
                 7 day view
               </span>
             </div>
 
-            {summary.recentRevenue.length === 0 ? (
+            {!hasRevenueInWindow ? (
               <div className="flex h-[300px] flex-col items-center justify-center rounded-[20px] border border-dashed border-black/10 bg-white/65 px-6 text-center">
                 <p className="text-sm font-semibold text-black">No revenue points yet</p>
                 <p className="mt-2 max-w-[24rem] text-sm leading-6 text-black/45">
@@ -224,8 +225,8 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid h-[300px] grid-cols-6 items-end gap-4">
-                {summary.recentRevenue.slice(0, 6).map((point) => {
+              <div className="grid h-[300px] grid-cols-7 items-end gap-4">
+                {summary.recentRevenue.map((point) => {
                   const height = Math.max(18, Math.round((point.revenue / revenueMax) * 220));
                   return (
                     <div key={point._id} className="flex h-full flex-col justify-end gap-3">
