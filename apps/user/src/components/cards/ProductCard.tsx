@@ -1,19 +1,50 @@
-import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import type { CatalogProduct } from "@/features/catalog/catalog.types";
+import { useAuth } from "@/features/auth/auth.context";
+import { useCart } from "@/features/cart/cart.context";
+import { resolveAssetUrl } from "@/utils/assets";
 
 function formatMoney(value: number) {
   return value.toLocaleString("vi-VN");
 }
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggleWishlist } = useCart();
+  const active = isInWishlist(product.id, product.slug);
+
   return (
-    <Link
-      to={`/products/${product.slug}`}
-      className="group block overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-    >
+    <article className="group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+      <button
+        type="button"
+        onClick={() => {
+          if (!isAuthenticated) {
+            navigate(`/sign-in?redirect=${encodeURIComponent(`/products/${product.slug}`)}`);
+            return;
+          }
+          toggleWishlist(product);
+        }}
+        className={[
+          "absolute right-5 top-5 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white/90 backdrop-blur transition focus:outline-none",
+          active
+            ? "border-rose-300 text-rose-500 shadow-[0_12px_30px_rgba(244,63,94,0.18)]"
+            : "border-slate-200 text-slate-300 hover:border-slate-300 hover:text-slate-400",
+        ].join(" ")}
+      >
+        <Heart
+          className={["h-4 w-4", active ? "text-rose-500" : "text-slate-300"].join(" ")}
+          fill={active ? "currentColor" : "none"}
+        />
+      </button>
+      <Link
+        to={`/products/${product.slug}`}
+        className="block"
+      >
       <div className="aspect-[4/3] bg-[linear-gradient(180deg,_#f8fafc,_#e2e8f0)] p-6">
         <img
-          src={product.image || "https://placehold.co/320x240?text=Product"}
+          src={resolveAssetUrl(product.image || "/assets/images/iphone-fallback.png")}
           alt={product.name}
           className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
         />
@@ -33,7 +64,9 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             </span>
           ) : null}
         </div>
-      </div>
-    </Link>
+      </Link>
+    </article>
   );
 }
+
+

@@ -1,4 +1,5 @@
 import { Edit2, Trash2 } from "lucide-react";
+import { resolveAssetUrl } from "@/utils/assets";
 import type { ProductItem } from "../types";
 
 type Props = {
@@ -7,11 +8,11 @@ type Props = {
 
 export function CategoriesTable({ rows }: Props) {
   return (
-    <div className="overflow-hidden rounded-[5px] border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="overflow-x-auto">
         <table className="w-full min-w-190 border-separate border-spacing-0 text-sm">
           <thead>
-            <tr className="bg-[#eef7ea] text-slate-700">
+            <tr className="bg-[#f7f7f8] text-slate-700">
               <th className="px-5 py-4 text-left font-semibold">No.</th>
               <th className="px-5 py-4 text-left font-semibold">Product</th>
               <th className="px-5 py-4 text-left font-semibold">Created Date</th>
@@ -36,9 +37,9 @@ export function CategoriesTable({ rows }: Props) {
                 <td className="border-b border-slate-100 px-5 py-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={row.image}
+                      src={resolveAssetUrl(row.image)}
                       alt={row.name}
-                      className="h-11 w-11 rounded-[5px] object-cover"
+                      className="h-11 w-11 rounded-xl object-cover"
                     />
                     <span className="font-medium text-slate-800">{row.name}</span>
                   </div>

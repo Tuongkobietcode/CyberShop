@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "framer-motion": "^12.29.2",
-    "lucide-react": "^0.563.0"
+    "lucide-react": "^0.563.0",
+    "nodemailer": "^8.0.2"
   }
 }

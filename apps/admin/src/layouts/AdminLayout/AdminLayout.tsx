@@ -38,8 +38,8 @@ export default function AdminLayout() {
         theme === "dark" ? "bg-[#0b1220]" : "bg-[#f3f5f7]",
       ].join(" ")}
     >
-      <div>
-        <div className="flex items-start">
+      <div className="p-4">
+        <div className="flex items-start gap-4">
           <aside
             className={[
               "shrink-0 transition-all duration-300",
@@ -56,10 +56,10 @@ export default function AdminLayout() {
           <main className="min-w-0 flex-1">
             <div
               className={[
-                "overflow-hidden border transition-colors duration-300",
+                "overflow-hidden rounded-[28px] border transition-colors duration-300",
                 theme === "dark"
                   ? "border-slate-800 bg-[#111827]"
-                  : "border-slate-200 bg-gray-100",
+                  : "border-slate-200 bg-white",
               ].join(" ")}
             >
               <Topbar

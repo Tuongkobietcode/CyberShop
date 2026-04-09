@@ -1,83 +1,61 @@
-import React from "react";
+import { Facebook, Instagram, Music2, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Footer: React.FC = () => {
+const serviceLinks = [
+  "Bonus program",
+  "Gift cards",
+  "Credit and payment",
+  "Service contracts",
+  "Non-cash account",
+  "Payment",
+];
+
+const supportLinks = [
+  "Find an order",
+  "Terms of delivery",
+  "Exchange and return of goods",
+  "Guarantee",
+  "Frequently asked questions",
+  "Terms of use of the site",
+];
+
+export default function Footer() {
   return (
-    <footer className="bg-black text-gray-400 px-6 py-16">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        {/* LEFT */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <img
-              src="/src/assets/images/logo.png"
-              alt="Cyber logo"
-            />
-          </div>
-
-          <p className="text-sm leading-relaxed max-w-sm">
-            We are a residential interior design firm located in Portland. Our
-            boutique-studio offers more than
+    <footer className="bg-black text-white">
+      <div className="mx-auto grid max-w-[1200px] gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.9fr] lg:px-8 lg:py-24">
+        <div>
+          <Link to="/home" className="text-[2rem] font-black tracking-[-0.06em] text-white">
+            cyber
+          </Link>
+          <p className="mt-8 max-w-sm text-[15px] leading-8 text-white/72">
+            We are a residential interior design firm located in Portland. Our boutique-studio offers more than thoughtful product curation.
           </p>
-
-          <div className="flex gap-4">
-            {["Twitter", "Facebook", "Tiktok", "Instagram"].map((icon) => (
-              <img
-                key={icon}
-                src={`/src/assets/images/${icon}.png`}
-                alt={icon}
-                className="w-5 h-5 cursor-pointer opacity-80 hover:opacity-100 transition"
-              />
-            ))}
+          <div className="mt-16 flex items-center gap-6 text-white">
+            <Twitter className="h-5 w-5" />
+            <Facebook className="h-5 w-5" />
+            <Music2 className="h-5 w-5" />
+            <Instagram className="h-5 w-5" />
           </div>
         </div>
 
-        {/* MIDDLE */}
         <div>
-          <h3 className="text-white font-semibold mb-4">Services</h3>
-          <ul className="space-y-3 text-sm">
-            {[
-              "Bonus program",
-              "Gift cards",
-              "Credit and payment",
-              "Service contracts",
-              "Non-cash account",
-              "Payment",
-            ].map((item) => (
-              <li
-                key={item}
-                className="hover:text-white cursor-pointer transition"
-              >
-                {item}
-              </li>
+          <h3 className="text-[1.75rem] font-semibold tracking-[-0.04em]">Services</h3>
+          <ul className="mt-8 space-y-5 text-[15px] text-white/72">
+            {serviceLinks.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
         </div>
 
-        {/* RIGHT */}
         <div>
-          <h3 className="text-white font-semibold mb-4">
-            Assistance to the buyer
-          </h3>
-          <ul className="space-y-3 text-sm">
-            {[
-              "Find an order",
-              "Terms of delivery",
-              "Exchange and return of goods",
-              "Guarantee",
-              "Frequently asked questions",
-              "Terms of use of the site",
-            ].map((item) => (
-              <li
-                key={item}
-                className="hover:text-white cursor-pointer transition"
-              >
-                {item}
-              </li>
+          <h3 className="text-[1.75rem] font-semibold tracking-[-0.04em]">Assistance to the buyer</h3>
+          <ul className="mt-8 space-y-5 text-[15px] text-white/72">
+            {supportLinks.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

@@ -1,217 +1,159 @@
+import { ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
-import ArrowDownIcon from "../../../assets/icons/expand_more.png";
-import SearchIcon from "../../../assets/icons/Search.png";
+import type { CatalogCategory, CatalogProductFilters } from "@/features/catalog/catalog.types";
 
-type BrandItem = {
+type FilterKey =
+  | "brand"
+  | "batteryCapacity"
+  | "screenType"
+  | "screenDiagonal"
+  | "protectionClass"
+  | "builtInMemory";
+
+type Props = {
+  categories: CatalogCategory[];
+  activeCategory: string;
+  search: string;
+  filters: CatalogProductFilters;
+  selectedFilters: Record<FilterKey, string[]>;
+  onSearch: (value: string) => void;
+  onSelectCategory: (categoryId: string) => void;
+  onToggleFilter: (key: FilterKey, value: string) => void;
+};
+
+const filterSections: Array<{
+  key: FilterKey;
   label: string;
-  count?: number;
-};
-
-type OptionItem = {
-  label: string;
-  count?: number;
-};
-
-type FilterSection = {
-  key: string;
-  title: string;
-  options: OptionItem[];
-};
-
-const mockBrands: BrandItem[] = [
-  { label: "Samsung", count: 125 },
-  { label: "Xiaomi", count: 68 },
-  { label: "Poco", count: 44 },
-  { label: "OPPO", count: 36 },
-  { label: "Honor", count: 10 },
-  { label: "Motorola", count: 34 },
-  { label: "Nokia", count: 22 },
-  { label: "Realme", count: 35 },
-  { label: "Apple", count: 110 },
+  source: keyof CatalogProductFilters;
+}> = [
+  { key: "brand", label: "Brand", source: "brands" },
+  { key: "batteryCapacity", label: "Battery capacity", source: "batteryCapacity" },
+  { key: "screenType", label: "Screen type", source: "screenType" },
+  { key: "screenDiagonal", label: "Screen diagonal", source: "screenDiagonal" },
+  { key: "protectionClass", label: "Protection class", source: "protectionClass" },
+  { key: "builtInMemory", label: "Built-in memory", source: "builtInMemory" },
 ];
 
-const mockSections: FilterSection[] = [
-  {
-    key: "battery",
-    title: "Battery capacity",
-    options: [
-      { label: "3000 – 3999 mAh", count: 24 },
-      { label: "4000 – 4999 mAh", count: 68 },
-      { label: "5000 – 5999 mAh", count: 102 },
-      { label: "6000+ mAh", count: 19 },
-    ],
-  },
-  {
-    key: "screen",
-    title: "Screen type",
-    options: [
-      { label: "AMOLED", count: 86 },
-      { label: "OLED", count: 44 },
-      { label: "IPS LCD", count: 72 },
-    ],
-  },
-  {
-    key: "diagonal",
-    title: "Screen diagonal",
-    options: [
-      { label: "≤ 6.1 inch", count: 38 },
-      { label: "6.2 – 6.6 inch", count: 96 },
-      { label: "≥ 6.7 inch", count: 54 },
-    ],
-  },
-  {
-    key: "protection",
-    title: "Protection class",
-    options: [
-      { label: "IP53", count: 14 },
-      { label: "IP67", count: 22 },
-      { label: "IP68", count: 41 },
-    ],
-  },
-  {
-    key: "memory",
-    title: "Built-in memory",
-    options: [
-      { label: "64 GB", count: 33 },
-      { label: "128 GB", count: 88 },
-      { label: "256 GB", count: 61 },
-      { label: "512 GB", count: 12 },
-    ],
-  },
-];
-
-function DropdownIcon({ isOpen }: { isOpen?: boolean }) {
-  return (
-    <img
-      src={ArrowDownIcon}
-      alt="dropdown"
-      className={`h-4 w-4 transition-transform duration-200 ${
-        isOpen ? "rotate-180" : ""
-      }`}
-    />
-  );
-}
-
-function SearchBox() {
-  return (
-    <div className="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2">
-      <img src={SearchIcon} alt="search" className="h-4 w-4 opacity-60" />
-      <input
-        placeholder="Search"
-        className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
-      />
-    </div>
-  );
-}
-
-export default function FilterSidebar() {
-  const [open, setOpen] = useState<Record<string, boolean>>({
+export default function FilterSidebar({
+  categories,
+  activeCategory,
+  search,
+  filters,
+  selectedFilters,
+  onSearch,
+  onSelectCategory,
+  onToggleFilter,
+}: Props) {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    category: true,
     brand: true,
+    batteryCapacity: false,
+    screenType: false,
+    screenDiagonal: false,
+    protectionClass: false,
+    builtInMemory: false,
   });
 
-  const [selected, setSelected] = useState<Record<string, string[]>>({});
-
-  const toggleSection = (key: string) => {
-    setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const toggleOption = (section: string, value: string) => {
-    setSelected((prev) => {
-      const current = prev[section] || [];
-      return {
-        ...prev,
-        [section]: current.includes(value)
-          ? current.filter((v) => v !== value)
-          : [...current, value],
-      };
-    });
-  };
+  function toggleSection(key: string) {
+    setOpenSections((current) => ({ ...current, [key]: !current[key] }));
+  }
 
   return (
-    <aside className="w-72 border-r bg-white px-4 py-6">
-      <div className="mb-6">
+    <aside className="space-y-6">
+      <section>
         <button
-          onClick={() => toggleSection("brand")}
-          className="flex w-full items-center justify-between text-sm font-semibold"
+          type="button"
+          onClick={() => toggleSection("category")}
+          className="mb-4 flex w-full items-center justify-between border-b border-black/10 pb-4"
         >
-          Brand
-          <DropdownIcon isOpen={open.brand} />
+          <h3 className="text-[1.9rem] font-medium tracking-[-0.04em] text-black">Category</h3>
+          <ChevronDown
+            className={[
+              "h-5 w-5 text-black transition",
+              openSections.category ? "rotate-180" : "rotate-0",
+            ].join(" ")}
+          />
         </button>
 
-        <div className="mt-3 h-px bg-gray-200" />
+        <label className="mb-4 flex h-12 items-center gap-3 rounded-xl bg-[#f5f5f5] px-4 text-[#989898]">
+          <Search className="h-4 w-4" />
+          <input
+            value={search}
+            onChange={(event) => onSearch(event.target.value)}
+            placeholder="Search"
+            className="w-full border-0 bg-transparent text-sm text-black outline-none placeholder:text-[#989898]"
+          />
+        </label>
 
-        {open.brand && (
-          <div className="mt-4 space-y-4">
-            <SearchBox />
-
-            <div className="space-y-3">
-              {mockBrands.map((item) => (
-                <label
-                  key={item.label}
-                  className="flex cursor-pointer items-center justify-between text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4"
-                      checked={(selected.brand || []).includes(item.label)}
-                      onChange={() => toggleOption("brand", item.label)}
-                    />
-                    <span className="font-medium text-gray-900">
-                      {item.label}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-400">{item.count}</span>
-                </label>
-              ))}
-            </div>
+        {openSections.category ? (
+          <div className="space-y-3 text-[15px] text-black/88">
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={!activeCategory}
+                onChange={() => onSelectCategory("")}
+                className="h-4 w-4 rounded border-black/20"
+              />
+              <span>All</span>
+              <span className="text-black/30">{categories.length}</span>
+            </label>
+            {categories.map((category) => (
+              <label key={category.id} className="flex cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={activeCategory === category.id}
+                  onChange={() => onSelectCategory(activeCategory === category.id ? "" : category.id)}
+                  className="h-4 w-4 rounded border-black/20"
+                />
+                <span>{category.name}</span>
+              </label>
+            ))}
           </div>
-        )}
-      </div>
+        ) : null}
+      </section>
 
-      <div className="space-y-6">
-        {mockSections.map((section) => (
-          <div key={section.key}>
+      {filterSections.map((section) => {
+        const options = filters[section.source];
+        const selectedValues = selectedFilters[section.key];
+
+        return (
+          <section key={section.key}>
             <button
+              type="button"
               onClick={() => toggleSection(section.key)}
-              className="flex w-full items-center justify-between text-sm font-semibold"
+              className="flex w-full items-center justify-between border-b border-black/10 pb-4 text-left text-[1.1rem] text-black/92"
             >
-              {section.title}
-              <DropdownIcon isOpen={open[section.key]} />
+              <span>{section.label}</span>
+              <ChevronDown
+                className={[
+                  "h-4 w-4 text-black transition",
+                  openSections[section.key] ? "rotate-180" : "rotate-0",
+                ].join(" ")}
+              />
             </button>
 
-            <div className="mt-3 h-px bg-gray-200" />
-
-            {open[section.key] && (
-              <div className="mt-4 space-y-4">
-                <SearchBox />
-
-                <div className="space-y-3">
-                  {section.options.map((opt) => (
-                    <label
-                      key={opt.label}
-                      className="flex cursor-pointer items-center justify-between text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4"
-                          checked={(selected[section.key] || []).includes(
-                            opt.label,
-                          )}
-                          onChange={() => toggleOption(section.key, opt.label)}
-                        />
-                        <span className="font-medium">{opt.label}</span>
-                      </div>
-                      <span className="text-xs text-gray-400">{opt.count}</span>
+            {openSections[section.key] ? (
+              options.length ? (
+                <div className="mt-4 max-h-64 space-y-3 overflow-y-auto pr-2 text-[15px] text-black/88">
+                  {options.map((option) => (
+                    <label key={option} className="flex cursor-pointer items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedValues.includes(option)}
+                        onChange={() => onToggleFilter(section.key, option)}
+                        className="h-4 w-4 rounded border-black/20"
+                      />
+                      <span>{option}</span>
                     </label>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              ) : (
+                <p className="mt-4 text-sm text-black/35">No options available</p>
+              )
+            ) : null}
+          </section>
+        );
+      })}
     </aside>
   );
 }
